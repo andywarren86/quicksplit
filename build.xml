@@ -4,16 +4,16 @@
     <property name="tomcatDir" value="C:\tomcat7\webapps\quicksplit"/>
 
 	<target name="deploy">
-	  <copy todir="${tomcatDir}\WEB-INF\classes">
+	  <copy todir="${tomcatDir}\WEB-INF\classes" verbose="true">
 	    <fileset dir="${projectDir}\bin"/>
 	  </copy>
-	  <copy todir="${tomcatDir}\jsp">
+	  <copy todir="${tomcatDir}\jsp" verbose="true">
 	    <fileset dir="${projectDir}\jsp"/>
 	  </copy>
-	  <copy todir="${tomcatDir}\css">
+	  <copy todir="${tomcatDir}\css" verbose="true">
 	    <fileset dir="${projectDir}\css"/>
 	  </copy>
-	  <copy todir="${tomcatDir}\js">
+	  <copy todir="${tomcatDir}\js" verbose="true">
 	    <fileset dir="${projectDir}\js"/>
 	  </copy>
 	</target>
