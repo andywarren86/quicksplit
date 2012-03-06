@@ -1,0 +1,87 @@
+body {
+	background: #FFF;
+	color: #000;
+	font: normal normal 12px Verdana, Geneva, Arial, Helvetica, sans-serif;
+	margin: 10px;
+	padding: 0;
+}
+
+h1 {
+	font: normal normal 18px Verdana, Geneva, Arial, Helvetica, sans-serif;
+	margin: 0 0 5px 0;
+}
+
+h2 {
+	font: normal normal 16px Verdana, Geneva, Arial, Helvetica, sans-serif;
+	margin: 0 0 5px 0;
+}
+
+h3 {
+	font: normal normal 13px Verdana, Geneva, Arial, Helvetica, sans-serif;
+	color: #008000;
+	margin: 0 0 15px 0;
+}
+
+table { 
+	border-collapse: collapse; 
+}
+	
+table th, table td { 
+	border: 1px solid black; 
+}
+
+table td {
+	border-color:#DDDDDD #CCCCCC;
+	border-style:solid solid none none;
+	border-width:1px 1px medium medium;
+	padding:2px 3px 3px 4px;
+}
+
+table, td, a {
+	color: #000;
+	font: normal normal 12px Verdana, Geneva, Arial, Helvetica, sans-serif;
+}
+
+/* make the TH elements pretty */
+thead th {
+	background: #C96;
+	border-left: 1px solid #EB8;
+	border-right: 1px solid #B74;
+	border-top: 1px solid #EB8;
+	font-weight: normal;
+	padding: 4px 3px;
+}
+
+/* make the A elements pretty. makes for nice clickable headers                */
+thead a, thead a:link, thead a:visited {
+	color: #FFF;
+	display: block;
+	text-decoration: none;
+	width: 100%
+}
+
+/* make the A elements pretty. makes for nice clickable headers                */
+/* WARNING: swapping the background on hover may cause problems in WinIE 6.x   */
+thead a:hover {
+	color: #FFF;
+	display: block;
+	text-decoration: underline;
+	width: 100%
+}
+
+/* make TD elements pretty. Provide alternating classes for striping the table */
+/* http://www.alistapart.com/articles/zebratables/                             */
+tbody td, tbody.scrollContent tr.normalRow td {
+	background: #FFF;
+}
+tbody tr.alternateRow td {
+	background: #EEE;
+}
+
+tr.divider td {
+  background:#C96;
+}
+
+.negative { color: red; }
+.ui-datepicker {font-size:12px;}
+	
