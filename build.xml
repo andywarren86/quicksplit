@@ -1,0 +1,21 @@
+<project default="deploy">
+    
+    <property name="projectDir" value="."/>
+    <property name="tomcatDir" value="C:\tomcat7\webapps\quicksplit"/>
+
+	<target name="deploy">
+	  <copy todir="${tomcatDir}\WEB-INF\classes">
+	    <fileset dir="${projectDir}\bin"/>
+	  </copy>
+	  <copy todir="${tomcatDir}\jsp">
+	    <fileset dir="${projectDir}\jsp"/>
+	  </copy>
+	  <copy todir="${tomcatDir}\css">
+	    <fileset dir="${projectDir}\css"/>
+	  </copy>
+	  <copy todir="${tomcatDir}\js">
+	    <fileset dir="${projectDir}\js"/>
+	  </copy>
+	</target>
+	
+</project>
