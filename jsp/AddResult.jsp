@@ -26,7 +26,7 @@
 						} 
 				 %>
 				
-				for( var i=1; i<=15; i++ )
+				for( var i=1; i<=16; i++ )
 				{
 					$( "#players" + i ).autocomplete({
 						source: players,
@@ -114,7 +114,7 @@
 				</thead>
 				
 				<tbody>
-				  <c:forEach var="i" begin="1" end="15">
+				  <c:forEach var="i" begin="1" end="16">
 				    <tr>
 				    	<td><input type="text" name="Player" id="players${i}" value="${paramValues.Player[i-1]}"/></td>
 				    	<td><input type="text" name="Result" value="${paramValues.Result[i-1]}"/></td>
