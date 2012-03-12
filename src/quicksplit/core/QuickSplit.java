@@ -86,9 +86,9 @@ public class QuickSplit
     }
 
     /**
-     * Return result for a Player & Game
+     * Return result for a Game & Player
      */
-    public static Result getResult( Player p, Game g )
+    public static Result getResult( Game g, Player p )
     {
         for( Result r : g.getResults() )
         {
@@ -248,7 +248,7 @@ public class QuickSplit
             // write results
             for( Player player : myPlayers )
             {
-                Result r = getResult( player, game );
+                Result r = getResult( game, player );
                 writer.write( "," );
 
                 if( r != null )
@@ -268,8 +268,7 @@ public class QuickSplit
     /**
      * Read in season start & finish dates.
      */
-    public static void loadSeasonsFromFile( File f )
-        throws Exception
+    public static void loadSeasonsFromFile( File f ) throws Exception
     {
         System.out.println( "Reading season dates from: " + f.getAbsolutePath() );
         BufferedReader reader = new BufferedReader( new FileReader( f ) );
@@ -291,11 +290,22 @@ public class QuickSplit
         }
     }
 
+    public static Season getSeasonById( String id )
+    {
+        for( Season s : mySeasons )
+        {
+            if( s.getId().equals( id ) )
+            {
+                return s;
+            }
+        }
+        return null;
+    }
+    
     /**
      * Get which season this games belongs to.
      */
     public static Season getSeasonForGame( Game g )
-        throws Exception
     {
         Season season = null;
         for( Season s : mySeasons )
@@ -311,7 +321,7 @@ public class QuickSplit
 
         if( season == null )
         {
-            throw new Exception( "Failed to find a season for game: " + g );
+            throw new IllegalStateException( "Failed to find a season for game: " + g );
         }
 
         return season;
@@ -397,7 +407,7 @@ public class QuickSplit
             // look for duplicate dates
             if( games.contains( g ) )
             {
-                System.out.println( "Duplicate entry exists for: " + g );
+                //System.out.println( "Duplicate entry exists for: " + g );
             }
             games.add( g );
 
