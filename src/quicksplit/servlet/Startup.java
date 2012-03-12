@@ -21,6 +21,7 @@ public class Startup
         catch( Exception e )
         {
             e.printStackTrace();
+            System.exit( 1 );
         }
     }
 }

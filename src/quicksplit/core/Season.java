@@ -69,4 +69,17 @@ public class Season
     {
         return "Season " + id;
     }
+    
+    @Override
+    public boolean equals( Object o )
+    {
+        if( o instanceof Season )
+        {
+            return id.equals( ((Season)o).getId() );
+        }
+        else
+        {
+            return false;
+        }
+    }
 }
