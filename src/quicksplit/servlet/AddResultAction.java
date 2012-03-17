@@ -21,6 +21,7 @@ import quicksplit.core.Result;
 @WebServlet("/AddResultAction")
 public class AddResultAction extends HttpServlet
 {
+
     @Override
     protected void doGet( HttpServletRequest request, HttpServletResponse response )
         throws ServletException, IOException
@@ -41,14 +42,14 @@ public class AddResultAction extends HttpServlet
         }
         
         // check if a game with the same date is already present
-        Game newGame = null;
         if( date != null )
         {
-            newGame = new Game( date );
-            int index = QuickSplit.getGameList().indexOf( newGame );
-            if( index != -1 )
+            for( Game g : QuickSplit.getGameList() )
             {
-                errors.add( "Game already exists: " + QuickSplit.getGameList().get( index ) );
+                if( g.getDate().equals( date ) )
+                {
+                    errors.add( "Game already exists: " + g );
+                }
             }
         }
         
@@ -56,7 +57,6 @@ public class AddResultAction extends HttpServlet
         int sum = 0;
         String[] names = request.getParameterValues( "Player" );
         String[] results = request.getParameterValues( "Result" );
-        List<Player> playerList = new ArrayList<Player>();
         List<Integer> amountList = new ArrayList<Integer>();
         List<String> nameList = new ArrayList<String>();
         
@@ -77,8 +77,7 @@ public class AddResultAction extends HttpServlet
                 continue;
             }
             
-            Player p = new Player( name );
-            if( !QuickSplit.getPlayerList().contains( p ) )
+            if( Player.getByName( name ) == null )
             {
                 warnings.add( "Unrecognised player: " + name + ". Are you sure you want to add a new player?" );
             }
@@ -102,10 +101,7 @@ public class AddResultAction extends HttpServlet
             }
             
             nameList.add( name );
-            playerList.add( p );
             amountList.add( cents );
-            Result r = new Result( p, newGame, cents );
-            newGame.addResult( r );
             
             sum += cents;
         }
@@ -118,14 +114,13 @@ public class AddResultAction extends HttpServlet
         // check if a game already exists with the same results
         if( errors.isEmpty() )
         {
-            for( Game g : QuickSplit.getGameList() )
+            for( Game existingGame : QuickSplit.getGameList() )
             {
-                if( compareGameResults( newGame, g ) )
+                if( matchResults( existingGame, nameList, amountList ) )
                 {
-                    warnings.add( "Results matched to existing game: " + g );
+                    warnings.add( "Results matched to existing game: " + existingGame );
                 }
             }
-
         }
         
         // check sum
@@ -141,9 +136,10 @@ public class AddResultAction extends HttpServlet
             
             if( "Confirm".equals( request.getParameter( "submit" ) ) )
             {
+                Game newGame = null;
                 try
                 {
-                    QuickSplit.addNewRecord( date, nameList, amountList );
+                    newGame = QuickSplit.addNewRecord( date, nameList, amountList );
                 }
                 catch( Exception e )
                 {
@@ -166,15 +162,32 @@ public class AddResultAction extends HttpServlet
     }
     
     /**
-     * Are all of the results of g1 contained in g2?
+     * Are all of the results contained within the existing game?
      */
-    public boolean compareGameResults( Game g1, Game g2 )
+    private boolean matchResults( Game existingGame, List<String> names, List<Integer> amounts )
     {
-        boolean match = true;
-        for( Result r : g1.getResults() )
+        for( int i=0; i<names.size(); i++ )
         {
-            match = match && g2.getResults().contains( r );
+            boolean match = false;
+            for( Result r : existingGame.getResults() )
+            {
+                String name = r.getPlayer().getName();
+                Integer amount = r.getAmount();
+                if( names.get( i ).equals( name ) && amounts.get( i ).equals( amount ) )
+                {
+                    match = true;
+                    break;
+                }
+            }
+            
+            // no matching result found
+            if( !match )
+            {
+                return false;
+            }
         }
-        return match;
+        
+        // each result has been matched
+        return true;
     }
 }

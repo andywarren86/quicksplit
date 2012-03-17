@@ -1,40 +1,43 @@
 package quicksplit.core;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 public class Game
     implements Comparable<Game>
 {
-    private Date myDate;
-    private List<Result> myResults;
+    private static Long nextId = 1L;
+    
+    private final Long myId;
+    private final Date myDate;
+    private final List<Result> myResults;
 
-    public Game(Date myDate)
+    Game( Date date )
     {
-        this.myDate = myDate;
+        myId = nextId++;
+        myDate = date;
         myResults = new ArrayList<Result>();
+    }
+    
+    public long getId()
+    {
+        return myId;
     }
 
     public Date getDate()
     {
         return myDate;
     }
-    public void setDate( Date date )
-    {
-        this.myDate = date;
-    }
 
     public List<Result> getResults()
     {
-        return myResults;
+        return Collections.unmodifiableList( myResults );
     }
 
-    public void setResults(List<Result> myResults)
-    {
-        this.myResults = myResults;
-    }
-
-    public void addResult( Result result )
+    
+    // package-private
+    void addResult( Result result )
     {
         myResults.add( result );
     }
@@ -46,18 +49,39 @@ public class Game
     }
 
     @Override
-    public int compareTo( Game o )
+    public int compareTo( Game g )
     {
-        return myDate.compareTo( o.getDate() );
+        return Double.compare( myId, g.getId() );
+    }
+    
+    public List<Player> getPlayers()
+    {
+        List<Player> players = new ArrayList<Player>();
+        for( Result r : myResults )
+        {
+            players.add( r.getPlayer() );
+        }
+        return players;
+    }
+    
+    
+    /**
+     * Return the season this games belongs to.
+     */
+    public Season getSeason()
+    {
+        for( Season s : QuickSplit.getSeasonList() )
+        {
+            // if game is after the start date of the current season
+            // or between start & end dates of a previous season
+            if( ( QuickSplit.getCurrentSeason().equals( s ) && getDate().compareTo( s.getStartDate() ) >= 0 ) ||
+                ( getDate().compareTo( s.getStartDate() ) >= 0 && getDate().compareTo( s.getEndDate() ) <= 0 ) )
+            {
+                return s;
+            }
+        }
+
+        throw new IllegalStateException( "Failed to find a season for game: " + toString() );
     }
 
-    @Override
-    public boolean equals( Object o )
-    {
-        if( o instanceof Game )
-        {
-            return ((Game)o).getDate().equals( myDate );
-        }
-        return false;
-    }
 }

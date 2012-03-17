@@ -1,54 +1,59 @@
 package quicksplit.core;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 public class Player
     implements Comparable<Player>
 {
-    private enum Direction { ACS, DESC };
-
-    private String myName;
-    private List<Result> myResults;
+    private final String myName;
+    private final List<Result> myResults;
 
     // overall stats
-    private int gameCount = 0;
-    private int net = 0;
-    private double average = 0;
+    @Deprecated private int gameCount = 0;
+    @Deprecated private int net = 0;
+    @Deprecated private double average = 0;
 
     // current season stats
-    private int seasonGameCount = 0;
-    private int seasonNet = 0;
-    private double seasonAverage = 0;
+    @Deprecated private int seasonGameCount = 0;
+    @Deprecated private int seasonNet = 0;
+    @Deprecated private double seasonAverage = 0;
 
-    public Player(String name)
+    Player(String name)
     {
         this.myName = name;
         myResults = new ArrayList<Result>();
     }
 
+    @Deprecated
     public void setSeasonGameCount( int seasonGameCount )
     {
         this.seasonGameCount = seasonGameCount;
     }
+    @Deprecated
     public void setSeasonNet( int seasonNet )
     {
         this.seasonNet = seasonNet;
     }
+    @Deprecated
     public void setSeasonAverage( double seasonAverage )
     {
         this.seasonAverage = seasonAverage;
     }
 
+    @Deprecated
     public int getSeasonGameCount()
     {
         return seasonGameCount;
     }
+    @Deprecated
     public int getSeasonNet()
     {
         return seasonNet;
     }
+    @Deprecated
     public double getSeasonAverage()
     {
         return seasonAverage;
@@ -61,51 +66,43 @@ public class Player
         return myName;
     }
 
-    public void setName(String name)
-    {
-        this.myName = name;
-    }
-
     public List<Result> getResults()
     {
-        return myResults;
+        return Collections.unmodifiableList( myResults );
     }
 
-    public void setResults(List<Result> myResults)
-    {
-        this.myResults = myResults;
-    }
-
-    public void addResult( Result result )
+    // package-private
+    void addResult( Result result )
     {
         myResults.add( result );
     }
 
+    @Deprecated
     public int getGameCount()
     {
         return gameCount;
     }
-
+    @Deprecated
     public void setGameCount( int gameCount )
     {
         this.gameCount = gameCount;
     }
-
+    @Deprecated
     public int getNet()
     {
         return net;
     }
-
+    @Deprecated
     public void setNet( int net )
     {
         this.net = net;
     }
-
+    @Deprecated
     public double getAverage()
     {
         return average;
     }
-
+    @Deprecated
     public void setAverage( double avergae )
     {
         this.average = avergae;
@@ -118,51 +115,40 @@ public class Player
     }
 
     @Override
-    public boolean equals( Object o )
-    {
-        if( o instanceof Player )
-        {
-            return ((Player)o).getName().equals( myName );
-        }
-        return false;
-    }
-
-    @Override
     public int compareTo( Player p )
     {
-        return this.getName().compareTo( p.getName() );
+        return myName.compareTo( p.getName() );
+    }
+    
+    // static utilities
+    public static Player getByName( String name )
+    {
+        for( Player p : QuickSplit.getPlayerList() )
+        {
+            if( p.getName().equals( name ) )
+            {
+                return p;
+            }
+        }
+        return null;
     }
 
     // comparators
-    class PlayerAverageComparator implements Comparator<Player>
+    public static class PlayerAverageComparator implements Comparator<Player>
     {
-        private Direction dir;
-
         @Override
         public int compare( Player p1, Player p2 )
         {
-            double av1 = p1.getAverage();
-            double av2 = p2.getAverage();
-
-            int compare = 0;
-            if( av1 < av2 )
-            {
-                compare = -1;
-            }
-            else if( av1 > av2 )
-            {
-                compare = 1;
-            }
-
-            if( dir == Direction.ACS )
-            {
-                return compare;
-            }
-            else
-            {
-                return compare * -1;
-            }
+            return Double.compare( p1.getAverage(), p2.getAverage() );
         }
     }
-
+    
+    public static class PlayerSeasonTotalComparator implements Comparator<Player>
+    {
+        @Override
+        public int compare( Player p1, Player p2 )
+        {
+            return Double.compare( p1.getSeasonNet(), p2.getSeasonNet() );
+        }
+    }
 }

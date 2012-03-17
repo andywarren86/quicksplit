@@ -22,7 +22,6 @@ public class QuickSplit
     private static Season theCurrentSeason = null;
     private static List<Player> myPlayers = new ArrayList<Player>();
     private static List<Game> myGames = new ArrayList<Game>();
-    private static List<Result> myResults = new ArrayList<Result>();
     private static List<Season> mySeasons = new ArrayList<Season>();
 
     public static DecimalFormat moneyFormat = new DecimalFormat( "0.00" );
@@ -45,7 +44,7 @@ public class QuickSplit
             System.out.println( "Current Season: " + theCurrentSeason );
             System.out.println( "Players: " + myPlayers.size() );
             System.out.println( "Games: " + myGames.size() );
-            System.out.println( "Results: " + myResults.size() );
+            //System.out.println( "Results: " + myResults.size() );
 
             calculatePlayerSummary();
             validateData();
@@ -68,11 +67,6 @@ public class QuickSplit
     public static List<Game> getGameList()
     {
         return Collections.unmodifiableList( myGames );
-    }
-
-    public static List<Result> getResultList()
-    {
-        return Collections.unmodifiableList( myResults );
     }
 
     public static List<Season> getSeasonList()
@@ -138,10 +132,6 @@ public class QuickSplit
                 Game game = new Game( date );
                 myGames.add( game );
 
-                // get the season
-                Season season = getSeasonForGame( game );
-                season.addGame( game );
-
                 // for each result
                 for( int i=1; i<fields.length; i++ )
                 {
@@ -156,11 +146,7 @@ public class QuickSplit
                     int centAmount = (int)Math.round( Double.parseDouble( amountStr ) * 100 );
 
                     Player player = myPlayers.get( i-1 );
-                    Result result = new Result( player, game, centAmount );
-                    myResults.add( result );
-                    player.addResult( result );
-                    game.addResult( result );
-                    season.addPlayer( player );
+                    new Result( player, game, centAmount );
                 }
             }
 
@@ -172,12 +158,8 @@ public class QuickSplit
     /**
      * Add a new record in to memory, recalculates summary data and writes the current state to file.
      * Assumes all data has already been validated.
-     * @param gameDate
-     * @param names
-     * @param amounts
-     * @throws Exception
      */
-    public static void addNewRecord( Date gameDate, List<String> names, List<Integer> amounts ) throws Exception
+    public static Game addNewRecord( Date gameDate, List<String> names, List<Integer> amounts ) throws Exception
     {
         System.out.println( "Creating new record." );
         System.out.println( "Date: " + gameDate );
@@ -185,6 +167,7 @@ public class QuickSplit
         System.out.println( "Amounts: " + amounts );
 
         Game newGame = new Game( gameDate );
+        myGames.add( newGame );
         for( int i=0; i<names.size(); i++ )
         {
             String name = names.get( i );
@@ -205,20 +188,16 @@ public class QuickSplit
                 myPlayers.add( player );
             }
 
-            Result r = new Result( player, newGame, amount );
-            myResults.add( r );
-            player.addResult( r );
-            newGame.addResult( r );
-            theCurrentSeason.addPlayer( player );
+            new Result( player, newGame, amount );
         }
-        myGames.add( newGame );
-        theCurrentSeason.addGame( newGame );
-
+        
+        
         calculatePlayerSummary();
         validateData();
         sortData();
 
         writeResultsToFile( new File( FILE_DIR + OUTPUT_FILE ) );
+        return newGame;
     }
 
     /**
@@ -303,31 +282,6 @@ public class QuickSplit
     }
     
     /**
-     * Get which season this games belongs to.
-     */
-    public static Season getSeasonForGame( Game g )
-    {
-        Season season = null;
-        for( Season s : mySeasons )
-        {
-            if( ( s.getEndDate() == null && ( s.getStartDate().equals( g.getDate() ) || s.getStartDate().before( g.getDate() ) ) ) ||
-                  s.getStartDate().equals( g.getDate() ) || s.getEndDate().equals( g.getDate() ) ||
-                ( s.getStartDate().before( g.getDate() ) && s.getEndDate().after( g.getDate() ) ) )
-            {
-                season = s;
-                break;
-            }
-        }
-
-        if( season == null )
-        {
-            throw new IllegalStateException( "Failed to find a season for game: " + g );
-        }
-
-        return season;
-    }
-
-    /**
      * Calculate total games, net profit and average for each player.
      */
     public static void calculatePlayerSummary()
@@ -405,10 +359,12 @@ public class QuickSplit
             */
 
             // look for duplicate dates
+            /*
             if( games.contains( g ) )
             {
-                //System.out.println( "Duplicate entry exists for: " + g );
+                System.out.println( "Duplicate entry exists for: " + g );
             }
+            */
             games.add( g );
 
         }
