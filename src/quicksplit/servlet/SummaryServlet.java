@@ -3,10 +3,8 @@ package quicksplit.servlet;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -24,35 +22,14 @@ public class SummaryServlet extends HttpServlet
     protected void doGet( HttpServletRequest req, HttpServletResponse resp )
         throws ServletException, IOException
     {
-        List<Player> sorted = new ArrayList<Player>( QuickSplit.getPlayerList() );
-
-        // sort by average
-        Collections.sort( sorted, new Comparator<Player>(){
-            @Override
-            public int compare( Player o1, Player o2 )
-            {
-                if( o1 == o2 )
-                {
-                    return 0;
-                }
-
-                if( o1.getSeasonNet() < o2.getSeasonNet() )
-                {
-                    return 1;
-                }
-                else
-                {
-                    return -1;
-                }
-            }}
-        );
+        // get players sorted by total
+        List<Player> playerList = new ArrayList<Player>( QuickSplit.getPlayerList() );
+        Collections.sort( playerList, Collections.reverseOrder( new Player.PlayerSeasonTotalComparator() ) );
 
         Game lastGame = QuickSplit.getGameList().get( QuickSplit.getGameList().size()-1 );
 
-        req.setAttribute( "Players", sorted );
+        req.setAttribute( "Players", playerList );
         req.setAttribute( "LastUpdated", QuickSplit.format( lastGame.getDate() ) );
-
-        RequestDispatcher dispatcher = req.getRequestDispatcher( "/jsp/Summary.jsp"  );
-        dispatcher.forward( req, resp );
+        req.getRequestDispatcher( "/jsp/Summary.jsp"  ).forward( req, resp );
     }
 }

@@ -8,59 +8,56 @@ import java.util.Set;
 
 public class Season
 {
-    private String id;
-    private Date startDate;
-    private Date endDate;
-    private final List<Game> games;
-    private final Set<Player> players;
+    private final String id;
+    private final Date startDate;
+    private final Date endDate;
     
-    public Season( String id, Date startDate, Date endDate )
+    Season( String id, Date startDate, Date endDate )
     {
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
-        games = new ArrayList<Game>();
-        players = new HashSet<Player>();
     }
     
     public String getId()
     {
         return id;
     }
-    public void setId( String id )
-    {
-        this.id = id;
-    }
     public Date getStartDate()
     {
         return startDate;
-    }
-    public void setStartDate( Date startDate )
-    {
-        this.startDate = startDate;
     }
     public Date getEndDate()
     {
         return endDate;
     }
-    public void setEndDate( Date endDate )
+    
+    public boolean isCurrentSeason()
     {
-        this.endDate = endDate;
+        return QuickSplit.getCurrentSeason().equals( this );
     }
-    public void addGame( Game g )
-    {
-        games.add( g );
-    }
-    public void addPlayer( Player p )
-    {
-        players.add( p );
-    }
+    
     public List<Game> getGames()
     {
-        return games;
+        List<Game> seasonGames = new ArrayList<Game>();
+        for( Game g : QuickSplit.getGameList() )
+        {
+            if( g.getSeason().equals( this ) )
+            {
+                seasonGames.add( g );
+            }
+        }
+        return seasonGames;
     }
+    
     public Set<Player> getPlayers()
     {
+        Set<Player> players = new HashSet<Player>();
+        List<Game> games = getGames();
+        for( Game g : games )
+        {
+            players.addAll( g.getPlayers() );
+        }
         return players;
     }
     
@@ -68,18 +65,5 @@ public class Season
     public String toString()
     {
         return "Season " + id;
-    }
-    
-    @Override
-    public boolean equals( Object o )
-    {
-        if( o instanceof Season )
-        {
-            return id.equals( ((Season)o).getId() );
-        }
-        else
-        {
-            return false;
-        }
     }
 }
