@@ -46,7 +46,6 @@ public class QuickSplit
             System.out.println( "Games: " + myGames.size() );
             //System.out.println( "Results: " + myResults.size() );
 
-            calculatePlayerSummary();
             validateData();
             sortData();
 
@@ -192,7 +191,6 @@ public class QuickSplit
         }
         
         
-        calculatePlayerSummary();
         validateData();
         sortData();
 
@@ -279,50 +277,6 @@ public class QuickSplit
             }
         }
         return null;
-    }
-    
-    /**
-     * Calculate total games, net profit and average for each player.
-     */
-    public static void calculatePlayerSummary()
-    {
-        System.out.println( "Calculating summary data..." );
-
-        for( Player player : myPlayers )
-        {
-            // overall stats
-            int count = 0;
-            double average = 0;
-            int total = 0;
-
-            int seasonCount = 0;
-            double seasonAverage = 0;
-            int seasonTotal = 0;
-
-            for( Result r : player.getResults() )
-            {
-                count++;
-                total += r.getAmount();
-
-                // current season stats
-                if( theCurrentSeason.getGames().contains( r.getGame() ) )
-                {
-                    seasonCount++;
-                    seasonTotal += r.getAmount();
-                }
-            }
-
-            average = new Double( total ) / new Double( count );
-            player.setGameCount( count );
-            player.setAverage( average );
-            player.setNet( total );
-
-            seasonAverage = seasonCount == 0 ? 0 : new Double( seasonTotal ) / new Double( seasonCount );
-            player.setSeasonGameCount( seasonCount );
-            player.setSeasonAverage( seasonAverage );
-            player.setSeasonNet( seasonTotal );
-        }
-
     }
 
     /**

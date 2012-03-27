@@ -68,7 +68,7 @@
 	
 	<body>
 	
-		<h1>Poker Results</h1>
+		<h1>Results</h1>
 		<h2>${season}</h2>
 		<h3>
 			<fmt:formatDate value="${season.startDate}" pattern="dd MMM yyyy" /> to 
