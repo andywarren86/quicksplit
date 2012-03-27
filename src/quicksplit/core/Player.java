@@ -11,55 +11,264 @@ public class Player
     private final String myName;
     private final List<Result> myResults;
 
-    // overall stats
-    @Deprecated private int gameCount = 0;
-    @Deprecated private int net = 0;
-    @Deprecated private double average = 0;
-
-    // current season stats
-    @Deprecated private int seasonGameCount = 0;
-    @Deprecated private int seasonNet = 0;
-    @Deprecated private double seasonAverage = 0;
-
     Player(String name)
     {
         this.myName = name;
         myResults = new ArrayList<Result>();
     }
+    
+    public int getSeasonCount( Season s )
+    {
+        int count = 0;
+        for( Result r : getResults() )
+        {
+            if( r.getGame().getSeason().equals( s ) )
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+    
+    public int getOverallCount()
+    {
+        return getResults().size();
+    }
+    
+    public double getSeasonTotal( Season s )
+    {
+        int total = 0;
+        for( Result r : getResults() )
+        {
+            if( r.getGame().getSeason().equals( s ) )
+            {
+                total += r.getAmount();
+            }
+        }
+        return total / 100d;
+    }
+    
+    public double getOverallTotal()
+    {
+        int total = 0;
+        for( Result r : getResults() )
+        {
+            total += r.getAmount();
+        }
+        return total / 100d;
+    }
+    
+    public double getSeasonAverage( Season s )
+    {
+        return getSeasonTotal( s ) / getSeasonCount( s );
+    }
+    
+    public double getOverallAverage()
+    {
+        return getOverallTotal() / getOverallCount();
+    }
+    
+    public int getSeasonUpGameCount( Season s )
+    {
+        int count = 0;
+        for( Result r : getResults() )
+        {
+            if( r.getGame().getSeason().equals( s ) && r.getAmount() > 0 )
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+    
+    public int getOverallUpGameCount()
+    {
+        int count = 0;
+        for( Result r : getResults() )
+        {
+            if( r.getAmount() > 0 )
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+    
+    public double getSeasonUpGamePercent( Season s )
+    {
+        return Double.valueOf( getSeasonUpGameCount( s ) ) / Double.valueOf( getSeasonCount( s ) );
+    }
+    
+    public double getOverallUpGamePercent()
+    {
+        return Double.valueOf( getOverallUpGameCount() ) / Double.valueOf( getOverallCount() );
+    }
+    
+    public double getSeasonMostWon( Season s )
+    {
+        int max = 0;
+        for( Result r : getResults() )
+        {
+            if( r.getGame().getSeason().equals( s ) )
+            {
+                if( r.getAmount() > max )
+                {
+                    max = r.getAmount();
+                }
+            }
+        }
+        return max / 100d;
+    }
+    
+    public double getOverallMostWon()
+    {
+        int max = 0;
+        for( Result r : getResults() )
+        {
+            if( r.getAmount() > max )
+            {
+                max = r.getAmount();
+            }
+        }
+        return max / 100d;
+    }
+    
+    public double getSeasonGrossWon( Season s )
+    {
+        int total = 0;
+        for( Result r : getResults() )
+        {
+            if( r.getGame().getSeason().equals( s ) && r.getAmount() > 0 )
+            {
+                total += r.getAmount();
+            }
+        }
+        return total / 100d;
+    }
+    
+    public double getOverallGrossWon()
+    {
+        int total = 0;
+        for( Result r : getResults() )
+        {
+            if( r.getAmount() > 0 )
+            {
+                total += r.getAmount();
+            }
+        }
+        return total / 100d;
+    }
+    
+    public double getSeasonAverageWon( Season s )
+    {
+        return getSeasonGrossWon( s ) / getSeasonUpGameCount( s );
+    }
+    
+    public double getOverallAverageWon()
+    {
+        return getOverallGrossWon() / getOverallUpGameCount();
+    }
+    
+    public int getSeasonDownGameCount( Season s )
+    {
+        int count = 0;
+        for( Result r : getResults() )
+        {
+            if( r.getGame().getSeason().equals( s ) && r.getAmount() < 0 )
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+    
+    public int getOverallDownGameCount()
+    {
+        int count = 0;
+        for( Result r : getResults() )
+        {
+            if( r.getAmount() < 0 )
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+    
+    public double getSeasonDownGamePercent( Season s )
+    {
+        return Double.valueOf( getSeasonDownGameCount( s ) ) / Double.valueOf( getSeasonCount( s ) );
+    }
+    
+    public double getOverallDownGamePercent()
+    {
+        return Double.valueOf( getOverallDownGameCount() ) / Double.valueOf( getOverallCount() );
+    }
+    
+    public double getSeasonMostLost( Season s )
+    {
+        int min = 0;
+        for( Result r : getResults() )
+        {
+            if( r.getGame().getSeason().equals( s ) )
+            {
+                if( r.getAmount() < min )
+                {
+                    min = r.getAmount();
+                }
+            }
+        }
+        return min / 100d;
+    }
+    
+    public double getOverallMostLost()
+    {
+        int min = 0;
+        for( Result r : getResults() )
+        {
+            if( r.getAmount() < min )
+            {
+                min = r.getAmount();
+            }
+        }
+        return min / 100d;
+    }
+    
+    public double getSeasonGrossLost( Season s )
+    {
+        int total = 0;
+        for( Result r : getResults() )
+        {
+            if( r.getGame().getSeason().equals( s ) && r.getAmount() < 0 )
+            {
+                total += r.getAmount();
+            }
+        }
+        return total / 100d;
+    }
+    
+    public double getOverallGrossLost()
+    {
+        int total = 0;
+        for( Result r : getResults() )
+        {
+            if( r.getAmount() < 0 )
+            {
+                total += r.getAmount();
+            }
+        }
+        return total / 100d;
+    }
+    
+    public double getSeasonAverageLost( Season s )
+    {
+        return getSeasonGrossLost( s ) / getSeasonDownGameCount( s );
+    }
 
-    @Deprecated
-    public void setSeasonGameCount( int seasonGameCount )
+    public double getOverallAverageLost()
     {
-        this.seasonGameCount = seasonGameCount;
+        return getOverallGrossLost() / getOverallDownGameCount();
     }
-    @Deprecated
-    public void setSeasonNet( int seasonNet )
-    {
-        this.seasonNet = seasonNet;
-    }
-    @Deprecated
-    public void setSeasonAverage( double seasonAverage )
-    {
-        this.seasonAverage = seasonAverage;
-    }
-
-    @Deprecated
-    public int getSeasonGameCount()
-    {
-        return seasonGameCount;
-    }
-    @Deprecated
-    public int getSeasonNet()
-    {
-        return seasonNet;
-    }
-    @Deprecated
-    public double getSeasonAverage()
-    {
-        return seasonAverage;
-    }
-
-
 
     public String getName()
     {
@@ -75,37 +284,6 @@ public class Player
     void addResult( Result result )
     {
         myResults.add( result );
-    }
-
-    @Deprecated
-    public int getGameCount()
-    {
-        return gameCount;
-    }
-    @Deprecated
-    public void setGameCount( int gameCount )
-    {
-        this.gameCount = gameCount;
-    }
-    @Deprecated
-    public int getNet()
-    {
-        return net;
-    }
-    @Deprecated
-    public void setNet( int net )
-    {
-        this.net = net;
-    }
-    @Deprecated
-    public double getAverage()
-    {
-        return average;
-    }
-    @Deprecated
-    public void setAverage( double avergae )
-    {
-        this.average = avergae;
     }
 
     @Override
@@ -134,6 +312,7 @@ public class Player
     }
 
     // comparators
+    /*
     public static class PlayerAverageComparator implements Comparator<Player>
     {
         @Override
@@ -142,13 +321,32 @@ public class Player
             return Double.compare( p1.getAverage(), p2.getAverage() );
         }
     }
+    */
     
-    public static class PlayerSeasonTotalComparator implements Comparator<Player>
+    public static class PlayerTotalComparator implements Comparator<Player>
     {
+        final Season mySeason;
+        
+        public PlayerTotalComparator()
+        {
+            this( null );
+        }
+        public PlayerTotalComparator( Season season )
+        {
+            mySeason = season;
+        }
+        
         @Override
         public int compare( Player p1, Player p2 )
         {
-            return Double.compare( p1.getSeasonNet(), p2.getSeasonNet() );
+            if( mySeason != null )
+            {
+                return Double.compare( p1.getSeasonTotal( mySeason ), p2.getSeasonTotal( mySeason ) );
+            }
+            else
+            {
+                return Double.compare( p1.getOverallTotal(), p2.getOverallTotal() );
+            }
         }
     }
 }

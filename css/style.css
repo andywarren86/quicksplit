@@ -56,7 +56,9 @@ td {
 	font-size: 12px;
 }
 
-/* Results Page */
+/*
+ * Results Page 
+ */
 .playerList th span {
   display: inline-block;
   overflow: hidden;
@@ -69,3 +71,11 @@ td {
 .resultTable td {
   text-align: right;
 }
+
+/*
+ * Summary Page
+ */
+ 
+ .summaryTable th, .summaryTable td {
+	padding: 4px 4px;
+ }
