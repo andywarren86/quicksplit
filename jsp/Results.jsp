@@ -14,6 +14,9 @@
 	  <script type="text/javascript">
 			$(function(){
 				
+				colourNegativeCells( $( ".resultTable" ) );
+				zebrafyTable( $( ".resultTable" ) );
+				
 				// set the header to absolute position, and move the result table down the height of the header
 				$( ".playerList" )
 					.css( "position", "absolute" );
@@ -102,10 +105,10 @@
 		
 		<table class="resultTable" style="margin-bottom: 3em;">
 		  <c:forEach items="${gameList}" var="game" varStatus="status">
-				<tr class="${ status.index mod 2 == 1 ? 'odd' : 'even' }">
+				<tr>
 					<td>${game}</td>
 					<c:forEach items="${resultsMap[game]}" var="result">
-						<td class="${result.amount < 0 ? 'negative' : ''}">${result}</td>
+						<td>${result}</td>
 					</c:forEach>
 			  </tr>
 			</c:forEach>

@@ -29,7 +29,7 @@ table {
 th {
   color: #FFF;
   font-size: 11px;
-  background: url("tr_back.gif") repeat-x scroll 0 0 #328AA4;
+  background: url( tr_back.gif ) repeat-x scroll 0 0 #328AA4;
 	border: 1px solid #FFFFFF;
 	padding: 4px 0px;
 }
@@ -75,7 +75,15 @@ td {
 /*
  * Summary Page
  */
- 
  .summaryTable th, .summaryTable td {
 	padding: 4px 4px;
  }
+
+/*
+ * Table Sorter
+ */
+.ascending, .descending {
+	background: url( tr_back_sorted.gif ) repeat-x scroll 0 0 #56A9BE;
+}
+
+}
