@@ -2,7 +2,6 @@ package quicksplit.servlet;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -39,12 +38,10 @@ public class SummaryServlet extends HttpServlet
         if( season == null )
         {
             playerList = new ArrayList<Player>( QuickSplit.getPlayerList() );
-            Collections.sort( playerList, Collections.reverseOrder( new Player.PlayerTotalComparator() ) );
         }
         else
         {
             playerList = new ArrayList<Player>( season.getPlayers() );
-            Collections.sort( playerList, Collections.reverseOrder( new Player.PlayerTotalComparator( season ) ) );
         }
 
         // get date of the last entry

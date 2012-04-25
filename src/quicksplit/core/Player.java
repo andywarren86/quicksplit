@@ -2,7 +2,6 @@ package quicksplit.core;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class Player
@@ -309,44 +308,5 @@ public class Player
             }
         }
         return null;
-    }
-
-    // comparators
-    /*
-    public static class PlayerAverageComparator implements Comparator<Player>
-    {
-        @Override
-        public int compare( Player p1, Player p2 )
-        {
-            return Double.compare( p1.getAverage(), p2.getAverage() );
-        }
-    }
-    */
-    
-    public static class PlayerTotalComparator implements Comparator<Player>
-    {
-        final Season mySeason;
-        
-        public PlayerTotalComparator()
-        {
-            this( null );
-        }
-        public PlayerTotalComparator( Season season )
-        {
-            mySeason = season;
-        }
-        
-        @Override
-        public int compare( Player p1, Player p2 )
-        {
-            if( mySeason != null )
-            {
-                return Double.compare( p1.getSeasonTotal( mySeason ), p2.getSeasonTotal( mySeason ) );
-            }
-            else
-            {
-                return Double.compare( p1.getOverallTotal(), p2.getOverallTotal() );
-            }
-        }
     }
 }

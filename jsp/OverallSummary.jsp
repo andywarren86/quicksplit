@@ -9,18 +9,24 @@
 	<head>
 	  <title>QuickSplit: Overall Summary</title>
 	  <jsp:include page="common/includes.jsp" />
+	  <script type="text/javascript" src="js/jquery.tablesorter.min.js"></script>
 	  
 	  <script type="text/javascript">
 			$(function(){
 				
-				// set negative class on any table cell containing a negative value
-				$( ".summaryTable td" ).each( function( i, e ){
-					if( parseFloat( $( e ).text() ) < 0 )
-					{
-						$( e ).addClass( "negative" );
-					}
-				});
+				colourNegativeCells( $( ".summaryTable" ) );
 				
+				// make table sortable
+				$( ".summaryTable" ).tablesorter({
+					cssAsc: "descending",
+					cssDesc: "ascending",
+					sortList: [[3,1]]
+				})
+				.bind( "sortEnd", function(){ 
+					// have to rezebrafy the rows after a sort otherwise they get out of whack
+					zebrafyTable( $( ".summaryTable" ) ); 
+			  })
+
 			});
 		</script>
 	</head>
@@ -55,7 +61,7 @@
 		  
 		  <tbody>
 		  	<c:forEach items="${playerList}" var="player" varStatus="status">
-		  		<tr class="${status.index mod 2 == 0 ? 'even' : 'odd'}">
+		  		<tr>
 		  			<td>${player.name}</td>
 		  			<td></td>
 		  			<td style="text-align:right;">${player.overallCount}</td>
