@@ -9,7 +9,6 @@ import java.util.List;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -18,12 +17,13 @@ import quicksplit.core.Player;
 import quicksplit.core.QuickSplit;
 import quicksplit.core.Result;
 
+@AuthorisationRequired
 @WebServlet("/AddResultAction")
-public class AddResultAction extends HttpServlet
+public class AddResultAction extends BaseServlet
 {
 
     @Override
-    protected void doGet( HttpServletRequest request, HttpServletResponse response )
+    protected void doGetPost( HttpServletRequest request, HttpServletResponse response )
         throws ServletException, IOException
     {
         List<String> warnings = new ArrayList<String>();

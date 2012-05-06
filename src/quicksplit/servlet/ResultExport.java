@@ -8,7 +8,6 @@ import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -19,10 +18,10 @@ import quicksplit.core.Result;
 import quicksplit.core.Season;
 
 @WebServlet( "/ResultExport" )
-public class ResultExport extends HttpServlet
+public class ResultExport extends BaseServlet
 {
     @Override
-    protected void doGet( HttpServletRequest req, HttpServletResponse resp )
+    protected void doGetPost( HttpServletRequest req, HttpServletResponse resp )
             throws ServletException, IOException
     {
         resp.setContentType( "text/csv" );
