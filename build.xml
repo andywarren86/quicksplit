@@ -1,21 +1,24 @@
 <project default="deploy">
     
-    <property name="projectDir" value="."/>
-    <property name="tomcatDir" value="C:\tomcat7\webapps\quicksplit"/>
+  <property name="projectDir" value="."/>
+  <property name="tomcatDir" value="C:\tomcat7\webapps\quicksplit"/>
 
-	<target name="deploy">
-	  <copy todir="${tomcatDir}\WEB-INF\classes" verbose="true">
-	    <fileset dir="${projectDir}\bin"/>
-	  </copy>
-	  <copy todir="${tomcatDir}\jsp" verbose="true">
-	    <fileset dir="${projectDir}\jsp"/>
-	  </copy>
-	  <copy todir="${tomcatDir}\css" verbose="true">
-	    <fileset dir="${projectDir}\css"/>
-	  </copy>
-	  <copy todir="${tomcatDir}\js" verbose="true">
-	    <fileset dir="${projectDir}\js"/>
-	  </copy>
-	</target>
-	
+  <target name="deploy">
+    <copy todir="${tomcatDir}\WEB-INF\classes" verbose="true">
+      <fileset dir="${projectDir}\bin"/>
+    </copy>
+    <copy todir="${tomcatDir}\WEB-INF\lib" verbose="true">
+      <fileset dir="${projectDir}\jars"/>
+    </copy>
+    <copy todir="${tomcatDir}\jsp" verbose="true">
+      <fileset dir="${projectDir}\jsp"/>
+    </copy>
+    <copy todir="${tomcatDir}\css" verbose="true">
+      <fileset dir="${projectDir}\css"/>
+    </copy>
+    <copy todir="${tomcatDir}\js" verbose="true">
+      <fileset dir="${projectDir}\js"/>
+    </copy>
+  </target>
+  
 </project>
