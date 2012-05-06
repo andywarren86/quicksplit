@@ -4,12 +4,15 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 public class QuickSplit
 {
@@ -23,6 +26,7 @@ public class QuickSplit
     private static List<Player> myPlayers = new ArrayList<Player>();
     private static List<Game> myGames = new ArrayList<Game>();
     private static List<Season> mySeasons = new ArrayList<Season>();
+    private static Properties myProperties = new Properties();
 
     public static DecimalFormat moneyFormat = new DecimalFormat( "0.00" );
     public static SimpleDateFormat dateFormat = new SimpleDateFormat( "dd/MM/yyyy" );
@@ -36,26 +40,18 @@ public class QuickSplit
     public static void Startup()
         throws Exception
     {
-        try
-        {
-            loadSeasonsFromFile( new File( FILE_DIR + SEASON_FILENAME ) );
-            loadResultsFromFile( new File( FILE_DIR + RESULT_FILENAME ) );
+        loadProperties( "quicksplit/resources/quicksplit.properties" );
+        loadSeasonsFromFile( new File( FILE_DIR + SEASON_FILENAME ) );
+        loadResultsFromFile( new File( FILE_DIR + RESULT_FILENAME ) );
 
-            System.out.println( "Current Season: " + theCurrentSeason );
-            System.out.println( "Players: " + myPlayers.size() );
-            System.out.println( "Games: " + myGames.size() );
-            //System.out.println( "Results: " + myResults.size() );
+        System.out.println( "Current Season: " + theCurrentSeason );
+        System.out.println( "Players: " + myPlayers.size() );
+        System.out.println( "Games: " + myGames.size() );
 
-            validateData();
-            sortData();
+        validateData();
+        sortData();
 
-            System.out.println( "Finished startup processing." );
-        }
-        catch( Exception e )
-        {
-            e.printStackTrace();
-            throw e;
-        }
+        System.out.println( "Finished startup processing." );
     }
 
     public static List<Player> getPlayerList()
@@ -91,6 +87,48 @@ public class QuickSplit
             }
         }
         return null;
+    }
+    
+    /**
+     * Load properties from the named resource.
+     * @throws IOException 
+     */
+    private static void loadProperties( String resourceName ) throws IOException
+    {
+        InputStream inputStream = null;
+        try
+        {
+            inputStream = QuickSplit.class.getClassLoader().getResourceAsStream( resourceName );
+            if( inputStream == null )
+            {
+                throw new IllegalArgumentException( "Failed to load properties from: " + resourceName );
+            }
+            myProperties.load( inputStream );
+            System.out.println( "Properties loaded from: " + resourceName );
+        }
+        finally
+        {
+            if( inputStream != null )
+            {
+                inputStream.close();
+            }
+        }
+    }
+    
+    /**
+     * Returns a property value given a key.
+     */
+    public static String getProperty( String key )
+    {
+        return myProperties.getProperty( key );
+    }
+    
+    /**
+     * Return an array of IP addresses that are authorised to access admin servlets
+     */
+    public static String[] getAuthorisedAddresses()
+    {
+        return getProperty( "authorisedAddresses" ).split( "," );
     }
 
     /**

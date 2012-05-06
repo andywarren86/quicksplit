@@ -16,11 +16,13 @@ public class Startup
     {
         try
         {
+            System.out.println( "Server Info: " + getServletContext().getServerInfo() );
+            System.out.println( "Root Context Path: " + getServletContext().getRealPath("/") );
             QuickSplit.main( new String[]{} );
         }
         catch( Exception e )
         {
-            e.printStackTrace();
+            getServletContext().log( "Exception occured during startup", e );
             System.exit( 1 );
         }
     }

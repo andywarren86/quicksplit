@@ -6,7 +6,6 @@ import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -16,10 +15,10 @@ import quicksplit.core.QuickSplit;
 import quicksplit.core.Season;
 
 @WebServlet( "/Summary" )
-public class SummaryServlet extends HttpServlet
+public class SummaryServlet extends BaseServlet
 {
     @Override
-    protected void doGet( HttpServletRequest req, HttpServletResponse resp )
+    protected void doGetPost( HttpServletRequest req, HttpServletResponse resp )
         throws ServletException, IOException
     {
         Season season = null;
