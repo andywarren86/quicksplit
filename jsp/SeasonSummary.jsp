@@ -56,7 +56,7 @@
 		
 		<table class="summaryTable">
 			<thead>
-			  <tr>
+			  <tr style="cursor:pointer;">
 			    <th>Player</th>
 			    <th></th>
 			    <th>Count</th>
