@@ -2,7 +2,9 @@ package quicksplit.servlet;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -13,6 +15,7 @@ import quicksplit.core.Game;
 import quicksplit.core.Player;
 import quicksplit.core.QuickSplit;
 import quicksplit.core.Season;
+import quicksplit.core.Stats;
 
 @WebServlet( "/Summary" )
 public class SummaryServlet extends BaseServlet
@@ -32,22 +35,32 @@ public class SummaryServlet extends BaseServlet
             season = QuickSplit.getSeasonById( seasonId );
         }
         
-        // get players sorted by total
-        List<Player> playerList = null;
+        List<Player> players = null;
+        List<Game> games = null;
         if( season == null )
         {
-            playerList = new ArrayList<Player>( QuickSplit.getPlayerList() );
+            players = new ArrayList<Player>( QuickSplit.getPlayerList() );
+            games = new ArrayList<Game>( QuickSplit.getGameList() );
         }
         else
         {
-            playerList = new ArrayList<Player>( season.getPlayers() );
+            players = new ArrayList<Player>( season.getPlayers() );
+            games = new ArrayList<Game>( season.getGames() );
         }
-
+        
+        // generate stats
+        Map<Player,Stats> statsMap = new HashMap<Player,Stats>();
+        for( Player p : players )
+        {
+            statsMap.put( p, new Stats( p, games ) );
+        }
+        
         // get date of the last entry
         Game lastGame = QuickSplit.getGameList().get( QuickSplit.getGameList().size()-1 );
 
         req.setAttribute( "season", season );
-        req.setAttribute( "playerList", playerList );
+        req.setAttribute( "playerList", players );
+        req.setAttribute( "stats", statsMap );
         req.setAttribute( "lastUpdated", QuickSplit.format( lastGame.getDate() ) );
         
         if( season == null )

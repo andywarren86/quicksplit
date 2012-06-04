@@ -47,42 +47,43 @@
 			    <th></th>
 			    <th>Up<br/>Games</th>
 			    <th>Up %</th>
-			    <th>Gross<br/>Won</th>
 			    <th>Avg. Won</th>
 			    <th>Most Won</th>
 			    <th></th>
 			    <th>Down<br/>Games</th>
 			    <th>Down %</th>
-			    <th>Gross<br/>Lost</th>
 			    <th>Avg. Lost</th>
 			    <th>Most Lost</th>
+			    <th></th>
+			    <th>Even<br/>Games</th>
+			    <th>Even %</th>
 			  </tr>
 			</thead>
 		  
 		  <tbody>
-		  	<c:forEach items="${playerList}" var="player" varStatus="status">
+		  	<c:forEach items="${playerList}" var="player">
 		  		<tr>
 		  			<td>${player.name}</td>
 		  			<td></td>
-		  			<td style="text-align:right;">${player.overallCount}</td>
-		  			<td style="text-align:right;"><fmt:formatNumber value="${player.overallTotal}" pattern="0.00" /></td>
-		  			<td style="text-align:right;"><fmt:formatNumber value="${player.overallAverage}" pattern="0.00" /></td>
+		  			<td style="text-align:right;">${stats[player].count}</td>
+		  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].total/100}" pattern="0.00" /></td>
+		  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].average/100}" pattern="0.00" /></td>
 		  			<td></td>
-		  			<td style="text-align:right;">${player.overallUpGameCount}</td>
-		  			<td style="text-align:right;"><fmt:formatNumber value="${player.overallUpGamePercent}" pattern="0%" /></td>
-		  			<td style="text-align:right;"><fmt:formatNumber value="${player.overallGrossWon}" pattern="0.00" /></td>
-		  			<td style="text-align:right;"><fmt:formatNumber value="${player.overallAverageWon}" pattern="0.00" /></td>
-		  			<td style="text-align:right;"><fmt:formatNumber value="${player.overallMostWon}" pattern="0.00" /></td>
+		  			<td style="text-align:right;">${stats[player].winCount}</td>
+		  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].winPercent}" pattern="0%" /></td>
+		  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].averageWon/100}" pattern="0.00" /></td>
+		  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].mostWon/100}" pattern="0.00" /></td>
 		  			<td></td>
-		  			<td style="text-align:right;">${player.overallDownGameCount}</td>
-		  			<td style="text-align:right;"><fmt:formatNumber value="${player.overallDownGamePercent}" pattern="0%" /></td>
-		  			<td style="text-align:right;"><fmt:formatNumber value="${player.overallGrossLost}" pattern="0.00" /></td>
-		  			<td style="text-align:right;"><fmt:formatNumber value="${player.overallAverageLost}" pattern="0.00" /></td>
-		  			<td style="text-align:right;"><fmt:formatNumber value="${player.overallMostLost}" pattern="0.00" /></td>
+		  			<td style="text-align:right;">${stats[player].lostCount}</td>
+		  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].lostPercent}" pattern="0%" /></td>
+		  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].averageLost/100}" pattern="0.00" /></td>
+		  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].mostLost/100}" pattern="0.00" /></td>
+		  			<td></td>
+		  			<td style="text-align:right;">${stats[player].evenCount}</td>
+		  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].evenPercent}" pattern="0%" /></td>
 		  		</tr>
 		  	</c:forEach>
 		  </tbody>
-
 	  </table>
 	  
 	  <p style="margin-top:1em;"><i>Last updated ${ lastUpdated }</i></p>
