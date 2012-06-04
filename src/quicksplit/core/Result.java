@@ -35,9 +35,4 @@ public class Result
         return QuickSplit.format( this );
     }
     
-    public String toStringLong()
-    {
-        return myPlayer + " = $" + QuickSplit.format( this );
-    }
-    
 }
