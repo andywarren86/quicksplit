@@ -1,11 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page import="java.util.*" %>
 <%@ page import="quicksplit.core.*" %>
-<%
-  List<Player> players = (List<Player>)request.getAttribute( "Players" );
-  List<String> warnings = (List<String>)request.getAttribute( "Warnings" );
-  List<String> errors = (List<String>)request.getAttribute( "Errors" ); 
-%>
 
 <html>
 
@@ -20,28 +15,19 @@
 				});
 				
 				var players = [];
-				 <% 
-						for( Player p : players ){
-						  out.println( "players.push( \"" + p + "\" );" );
-						} 
-				 %>
-				
-				for( var i=1; i<=18; i++ )
-				{
-					$( "#players" + i ).autocomplete({
-						source: players,
-						delay: 0
-					});
-				}
+				<c:forEach items="${Players}" var="player">
+				  players.push( '${player.name}' );
+				</c:forEach>
+
+				$( "input[type='text']" ).autocomplete({
+				  source: players,
+					delay: 0
+				});
 		  });
 		  
 		  function clearForm()
 		  {
-		    var inputs = $( "input[type='text']" );
-		    for( var i=0; i<inputs.length; i++ )
-		    {
-		    	inputs[i].value="";
-		    }
+		    $( "input[type='text']" ).val( "" );
 		  }
 	  </script>
 	</head>
@@ -49,41 +35,31 @@
 	<body>
 		<h1>Add Results</h1>
 		
-		<% 
-			if( errors != null && !errors.isEmpty() )
-		  { 
-		%>
-		    <div class="ui-widget">
-					<div style="padding: 0pt 0.7em; margin-top: 20px;" class="ui-state-error ui-corner-all"> 
-						<% for( String error : errors ) { %>
-							<p>
-								<span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-alert">&nbsp;</span>
-								<%= error %>
-							</p>
-						<% } %>
-					</div>
+		<c:if test="${not empty Errors}">
+	    <div class="ui-widget">
+				<div style="padding: 0pt 0.7em; margin-top: 20px;" class="ui-state-error ui-corner-all">
+				  <c:forEach items="${Errors}" var="error">
+						<p>
+							<span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-alert">&nbsp;</span>
+							${error}
+						</p>
+				  </c:forEach>
 				</div>
-		<%
-		  }
-		%>
-		
-		<% 
-		  if( warnings != null && !warnings.isEmpty() )
-		  { 
-		%>
-		    <div class="ui-widget">
-					<div style="padding: 0pt 0.7em; margin-top: 20px;" class="ui-state-highlight ui-corner-all"> 
-						<% for( String warning : warnings ) { %>
-						  <p>
-						  	<span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-info">&nbsp;</span>
-							  <%= warning %>
-							</p>
-					  <% } %>
-					</div>
+			</div>
+	  </c:if>
+
+		<c:if test="${not empty Warnings}">
+	    <div class="ui-widget">
+				<div style="padding: 0pt 0.7em; margin-top: 20px;" class="ui-state-highlight ui-corner-all"> 
+					<c:forEach items="${Warnings}" var="warning">
+					  <p>
+					  	<span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-info">&nbsp;</span>
+						  ${warning}
+						</p>
+				  </c:forEach>
 				</div>
-		<%
-		  }
-		%>
+			</div>
+		</c:if>
 		
 		<c:if test="${Success}">
 	    <div class="ui-widget">
