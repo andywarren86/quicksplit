@@ -57,6 +57,11 @@
 			    <th></th>
 			    <th>Even<br/>Games</th>
 			    <th>Even %</th>
+			    <th></th>
+			    <th>Up<br/>Streak</th>
+			    <th>Up<br/>Streak $</th>
+			    <th>Down<br/>Streak</th>
+			    <th>Down<br/>Streak $</th>
 			  </tr>
 			</thead>
 		  
@@ -81,6 +86,11 @@
 		  			<td></td>
 		  			<td style="text-align:right;">${stats[player].evenCount}</td>
 		  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].evenPercent}" pattern="0%" /></td>
+		  			<td></td>
+		  			<td style="text-align:right;">${stats[player].winStreak}</td>
+		  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].winStreakTotal/100}" pattern="0.00" /></td>
+		  			<td style="text-align:right;">${stats[player].downStreak}</td>
+		  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].downStreakTotal/100}" pattern="0.00" /></td>
 		  		</tr>
 		  	</c:forEach>
 		  </tbody>
