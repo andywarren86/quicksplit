@@ -60,60 +60,91 @@
 				$( ".resultTable" ).css( "width", tableWidth );
 				$( ".resultTable tr:first td" ).css( "width", cellWidth - ( cellPadding + cellBorder ) );
 				$( ".resultTable tr:first td:first" ).css( "width", cellHeaderWidth - ( cellPadding + cellBorder ) );
+				
+				// event handlers
+				$( "#GameType" ).change( function(){
+					document.GameFilterForm.submit();
+				})
+				
+				$( "input[name='PreviousSeason']" ).click( function(){
+					$( "#Season" ).val( parseInt( $( "#Season" ).val() ) - 1 );
+					document.GameFilterForm.submit();
+				});
+				
+				$( "input[name='NextSeason']" ).click( function(){
+					$( "#Season" ).val( parseInt( $( "#Season" ).val() ) + 1 );
+					document.GameFilterForm.submit();
+				});
+				
 			});
 			
-			function scrollToBottom()
-			{
-				$( "html,body" ).animate({ scrollTop : $(document).height() }, 800 );				
-			}
 		</script>
 	</head>
 	
 	<body>
 	
-		<h1>Results</h1>
-		<h2>${season}</h2>
-		<h3>
-			<fmt:formatDate value="${season.startDate}" pattern="dd MMM yyyy" /> to 
-			<c:choose>
-				<c:when test="${empty season.endDate}">Present</c:when>
-				<c:otherwise><fmt:formatDate value="${season.endDate}" pattern="dd MMM yyyy" /></c:otherwise>
-		  </c:choose>
-	  </h3>
+		<h1>Results - ${season}</h1>
+		<h3>${startDate} to ${endDate}</h3>
 	  
-	  <p>
+	  <form name="GameFilterForm" method="get" action="Results">
+	    <input type="hidden" name="Season" id="Season" value="${season.id}"/>
+	  
+			<label>Game Type:</label> 
+			<select name="GameType" id="GameType">
+			  <option value="">ALL</option>
+				<c:forEach items="${gameTypes}" var="type">
+					<c:choose>
+						<c:when test="${type==gameType}">
+					    <option selected="selected">${type}</option>
+						</c:when>
+						<c:otherwise>
+						  <option>${type}</option>
+						</c:otherwise>
+				  </c:choose>
+				</c:forEach>
+			</select>
+			<br/>
+			
+			<label>Season:</label> 
 	  	<c:if test="${season.id != 1}">
-	  		<a href="?season=${season.id - 1}">&lt;- Prev</a>
+	  	  <input type="button" name="PreviousSeason" value="Previous"/>
 	  	</c:if>
-	  	&#160;
-	  	<c:if test="${not empty season.endDate}">
-	  		<a href="?season=${season.id + 1}">Next -&gt;</a>
+	  	<c:if test="${not season.currentSeason}">
+	  		<input type="button" name="NextSeason" value="Next"/>
 	  	</c:if>
-	  </p>
+	  </form>
+	  <br/>
 	  
-		<p><a id="scrollToBottom" href="javascript:scrollToBottom();">Scroll to bottom</a></p>
-		<br/>
-	
-		<table class="playerList">
-			<tr>
-				<th>&#160;</th>
-			  <c:forEach items="${playerList}" var="player">
-			  	<th><span><c:out value="${player.name}"/></span></th>
-			  </c:forEach>
-			</tr>
-		</table>
-		
-		<table class="resultTable" style="margin-bottom: 3em;">
-		  <c:forEach items="${gameList}" var="game" varStatus="status">
-				<tr>
-					<td>${game}</td>
-					<c:forEach items="${resultsMap[game]}" var="result">
-						<td>${result}</td>
+	  <c:choose>
+	  	<c:when test="${not empty playerList}">
+			
+				<table class="playerList">
+					<tr>
+						<th>&#160;</th>
+					  <c:forEach items="${playerList}" var="player">
+					  	<th><span><c:out value="${player.name}"/></span></th>
+					  </c:forEach>
+					</tr>
+				</table>
+				
+				<table class="resultTable" style="margin-bottom: 3em;">
+				  <c:forEach items="${gameList}" var="game" varStatus="status">
+						<tr>
+							<td>${game}</td>
+							<c:forEach items="${resultsMap[game]}" var="result">
+								<td>${result}</td>
+							</c:forEach>
+					  </tr>
 					</c:forEach>
-			  </tr>
-			</c:forEach>
-		</table>
-	  
+				</table>
+				
+	  	</c:when>
+	  	<c:otherwise>
+	  		<h1><i>No Results Recorded</i></h1>
+	  		<br/>
+	  	</c:otherwise>
+	  </c:choose>
+	    
 		<p><a href="ResultExport?season=${season.id}">Export season results (.csv)</a></p>
 		<p><a href="ResultExport">Export all results (.csv)</a></p>
 		<br/><br/>

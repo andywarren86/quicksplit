@@ -26,6 +26,10 @@
 					// have to rezebrafy the rows after a sort otherwise they get out of whack
 					zebrafyTable( $( ".summaryTable" ) ); 
 			  })
+			  
+			  $( "#GameType" ).change( function(){
+					document.GameFilterForm.submit();
+				})
 
 			});
 		</script>
@@ -33,8 +37,27 @@
 	
 	<body>
 		<h1>Overall Summary</h1>
+		
+	  <form name="GameFilterForm" method="get" action="Summary">
+	    <input type="hidden" name="Season" value="ALL"/>
 	  
-	  <p><a href="Summary">View current season stats</a></p>
+			<label>Game Type:</label> 
+			<select name="GameType" id="GameType">
+			  <option value="">ALL</option>
+				<c:forEach items="${gameTypes}" var="type">
+					<c:choose>
+						<c:when test="${type==gameType}">
+					    <option selected="selected">${type}</option>
+						</c:when>
+						<c:otherwise>
+						  <option>${type}</option>
+						</c:otherwise>
+				  </c:choose>
+				</c:forEach>
+			</select>
+	  </form>
+	  
+	  <p><a href="Summary">View current season statistics</a></p>
 		
 		<table class="summaryTable">
 			<thead>

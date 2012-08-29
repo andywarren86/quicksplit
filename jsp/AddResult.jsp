@@ -10,8 +10,9 @@
 	  
 	  <script type="text/javascript">
 	    $(function(){
-				$('#datepicker').datepicker({
-					dateFormat: 'dd/mm/yy'
+				$("#datepicker").datepicker({
+					dateFormat: "dd/mm/yy",
+					defaultDate: new Date()
 				});
 				
 				var players = [];
@@ -73,11 +74,27 @@
 		</c:if>
 		
 		
-		<br/><br/>
+		<br/>
 		<form name="AddResultForm" method="get" action="AddResultAction">
 		
 			<!-- Datepicker -->
-			Game Date: <input type="text" id="datepicker" name="Date" size="15" value="${param.Date}" />
+			<label>Game Date:</label>
+			<input type="text" id="datepicker" name="Date" size="15" value="${param.Date}" />
+			<br/>
+			
+			<label>Game Type:</label> 
+			<select name="GameType">
+				<c:forEach items="${GameTypes}" var="type">
+					<c:choose>
+						<c:when test="${type==param.GameType}">
+					    <option selected="selected">${type}</option>
+						</c:when>
+						<c:otherwise>
+						  <option>${type}</option>
+						</c:otherwise>
+				  </c:choose>
+				</c:forEach>
+			</select>
 			<br/><br/>
 			
 			<!-- Auto complete -->

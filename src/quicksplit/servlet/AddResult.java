@@ -1,6 +1,8 @@
 package quicksplit.servlet;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Date;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -8,6 +10,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import quicksplit.core.GameType;
 import quicksplit.core.QuickSplit;
 
 @AuthorisationRequired
@@ -20,7 +23,8 @@ public class AddResult extends BaseServlet
         throws ServletException, IOException
     {
         request.setAttribute( "Players", QuickSplit.getPlayerList() );
-        RequestDispatcher dispatcher = request.getRequestDispatcher( "/jsp/AddResult.jsp"  );
+        request.setAttribute( "GameTypes", Arrays.asList( GameType.values() ) );
+        RequestDispatcher dispatcher = request.getRequestDispatcher( "/jsp/AddResult.jsp?Date=" + QuickSplit.format( new Date() ) );
         dispatcher.forward( request, response );
     }
 }

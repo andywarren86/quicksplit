@@ -1,6 +1,7 @@
 package quicksplit.core;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -37,12 +38,12 @@ public class Season
         return QuickSplit.getCurrentSeason().equals( this );
     }
     
-    public List<Game> getGames()
+    public List<Game> getGames( GameType gameType )
     {
         List<Game> seasonGames = new ArrayList<Game>();
         for( Game g : QuickSplit.getGameList() )
         {
-            if( g.getSeason().equals( this ) )
+            if( g.getSeason().equals( this ) && ( gameType == null || g.getGameType() == gameType ) )
             {
                 seasonGames.add( g );
             }
@@ -50,14 +51,16 @@ public class Season
         return seasonGames;
     }
     
-    public Set<Player> getPlayers()
+    public List<Player> getPlayers( GameType gameType )
     {
-        Set<Player> players = new HashSet<Player>();
-        List<Game> games = getGames();
+        Set<Player> playerSet = new HashSet<Player>();
+        List<Game> games = getGames( gameType );
         for( Game g : games )
         {
-            players.addAll( g.getPlayers() );
+            playerSet.addAll( g.getPlayers() );
         }
+        List<Player> players = new ArrayList<Player>( playerSet );
+        Collections.sort( players );
         return players;
     }
     

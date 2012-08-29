@@ -11,12 +11,14 @@ public class Game
     
     private final Long myId;
     private final Date myDate;
+    private final GameType myGameType;
     private final List<Result> myResults;
 
-    Game( Date date )
+    Game( Date date, GameType gameType )
     {
         myId = nextId++;
         myDate = date;
+        myGameType = gameType;
         myResults = new ArrayList<Result>();
     }
     
@@ -28,6 +30,11 @@ public class Game
     public Date getDate()
     {
         return myDate;
+    }
+    
+    public GameType getGameType()
+    {
+        return myGameType;
     }
 
     public List<Result> getResults()
@@ -45,7 +52,7 @@ public class Game
     @Override
     public String toString()
     {
-        return QuickSplit.format( myDate );
+        return QuickSplit.format( myDate ) + " " + myGameType;
     }
 
     @Override

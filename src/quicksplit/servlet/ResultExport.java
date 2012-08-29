@@ -31,7 +31,7 @@ public class ResultExport extends BaseServlet
         Season s = null;
         List<Player> players = null;
         List<Game> games = null;
-        if( req.getParameter( "season" ) != null )
+        if( req.getParameter( "Season" ) != null )
         {
             s = QuickSplit.getSeasonById( req.getParameter( "season" ) );
         }
@@ -43,16 +43,17 @@ public class ResultExport extends BaseServlet
         }
         else
         {
-            games = s.getGames();
-            players = new ArrayList<Player>( s.getPlayers() );
+            // TODO this should probably reflect the current search criteria (game type)
+            games = s.getGames( null );
+            players = new ArrayList<Player>( s.getPlayers( null ) );
             Collections.sort( players ); 
         }
         
-        
-        // write each player
+        // write header
+        writer.write( "Date,GameType" );
         for( Player player : players )
         {
-            writer.print( "," + player );
+            writer.write( "," + player );
         }
         writer.println();
 
@@ -61,6 +62,9 @@ public class ResultExport extends BaseServlet
         {
             // write date
             writer.print( QuickSplit.format( game.getDate() ) );
+            
+            // write game type
+            writer.write( "," + game.getGameType() );
 
             // write results
             for( Player player : players )
