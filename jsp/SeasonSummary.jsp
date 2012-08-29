@@ -26,83 +26,119 @@
 					// have to rezebrafy the rows after a sort otherwise they get out of whack
 					zebrafyTable( $( ".summaryTable" ) ); 
 			  })
+			  
+				// event handlers
+				$( "#GameType" ).change( function(){
+					document.GameFilterForm.submit();
+				})
+				
+				$( "input[name='PreviousSeason']" ).click( function(){
+					$( "#Season" ).val( parseInt( $( "#Season" ).val() ) - 1 );
+					document.GameFilterForm.submit();
+				});
+				
+				$( "input[name='NextSeason']" ).click( function(){
+					$( "#Season" ).val( parseInt( $( "#Season" ).val() ) + 1 );
+					document.GameFilterForm.submit();
+				});
 				
 			});
 		</script>
 	</head>
 	
 	<body>
-		<h1>Season Summary</h1>
-		<h2>${season}</h2>
-		<h3>
-			<fmt:formatDate value="${season.startDate}" pattern="dd MMM yyyy" /> to 
-			<c:choose>
-				<c:when test="${empty season.endDate}">Present</c:when>
-				<c:otherwise><fmt:formatDate value="${season.endDate}" pattern="dd MMM yyyy" /></c:otherwise>
-		  </c:choose>
-	  </h3>
+		<h1>Summary - ${season}</h1>
+		<h3>${startDate} to ${endDate}</h3>
 	  
-	  <p>
+	  <form name="GameFilterForm" method="get" action="Summary">
+	    <input type="hidden" name="Season" id="Season" value="${season.id}"/>
+	  
+			<label>Game Type:</label> 
+			<select name="GameType" id="GameType">
+			  <option value="">ALL</option>
+				<c:forEach items="${gameTypes}" var="type">
+					<c:choose>
+						<c:when test="${type==gameType}">
+					    <option selected="selected">${type}</option>
+						</c:when>
+						<c:otherwise>
+						  <option>${type}</option>
+						</c:otherwise>
+				  </c:choose>
+				</c:forEach>
+			</select>
+			<br/>
+			
+			<label>Season:</label> 
 	  	<c:if test="${season.id != 1}">
-	  		<a href="?season=${season.id-1}">&lt;- Prev</a>
+	  	  <input type="button" name="PreviousSeason" value="Previous"/>
 	  	</c:if>
-	  	&#160;
-	  	<c:if test="${not empty season.endDate}">
-	  		<a href="?season=${season.id+1}">Next -&gt;</a>
+	  	<c:if test="${not season.currentSeason}">
+	  		<input type="button" name="NextSeason" value="Next"/>
 	  	</c:if>
-	  </p>
+	  </form>
 	  
-	  <p><a href="?season=all">View overall stats</a></p>
+	  <p><a href="?Season=ALL">View overall statistics</a></p>
 		
-		<table class="summaryTable">
-			<thead>
-			  <tr style="cursor:pointer;">
-			    <th>Player</th>
-			    <th></th>
-			    <th>Count</th>
-			    <th>Total</th>
-			    <th>Average</th>
-			    <th></th>
-			    <th>Up<br/>Games</th>
-			    <th>Up %</th>
-			    <th>Avg. Won</th>
-			    <th>Most Won</th>
-			    <th></th>
-			    <th>Down<br/>Games</th>
-			    <th>Down %</th>
-			    <th>Avg. Lost</th>
-			    <th>Most Lost</th>
-			    <th></th>
-			    <th>Even<br/>Games</th>
-			    <th>Even %</th>
-			  </tr>
-			</thead>
-		  
-		  <tbody>
-		  	<c:forEach items="${playerList}" var="player">
-		  		<tr>
-		  			<td>${player.name}</td>
-		  			<td></td>
-		  			<td style="text-align:right;">${stats[player].count}</td>
-		  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].total/100}" pattern="0.00" /></td>
-		  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].average/100}" pattern="0.00" /></td>
-		  			<td></td>
-		  			<td style="text-align:right;">${stats[player].winCount}</td>
-		  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].winPercent}" pattern="0%" /></td>
-		  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].averageWon/100}" pattern="0.00" /></td>
-		  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].mostWon/100}" pattern="0.00" /></td>
-		  			<td></td>
-		  			<td style="text-align:right;">${stats[player].lostCount}</td>
-		  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].lostPercent}" pattern="0%" /></td>
-		  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].averageLost/100}" pattern="0.00" /></td>
-		  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].mostLost/100}" pattern="0.00" /></td>
-		  			<td></td>
-		  			<td style="text-align:right;">${stats[player].evenCount}</td>
-		  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].evenPercent}" pattern="0%" /></td>
-		  		</tr>
-		  	</c:forEach>
-		  </tbody>
-	  </table>
+	  <c:choose>
+	  	<c:when test="${not empty stats}">
+	  	
+				<table class="summaryTable">
+					<thead>
+					  <tr style="cursor:pointer;">
+					    <th>Player</th>
+					    <th></th>
+					    <th>Count</th>
+					    <th>Total</th>
+					    <th>Average</th>
+					    <th></th>
+					    <th>Up<br/>Games</th>
+					    <th>Up %</th>
+					    <th>Avg. Won</th>
+					    <th>Most Won</th>
+					    <th></th>
+					    <th>Down<br/>Games</th>
+					    <th>Down %</th>
+					    <th>Avg. Lost</th>
+					    <th>Most Lost</th>
+					    <th></th>
+					    <th>Even<br/>Games</th>
+					    <th>Even %</th>
+					  </tr>
+					</thead>
+				  
+				  <tbody>
+				  	<c:forEach items="${playerList}" var="player">
+				  		<tr>
+				  			<td>${player.name}</td>
+				  			<td></td>
+				  			<td style="text-align:right;">${stats[player].count}</td>
+				  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].total/100}" pattern="0.00" /></td>
+				  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].average/100}" pattern="0.00" /></td>
+				  			<td></td>
+				  			<td style="text-align:right;">${stats[player].winCount}</td>
+				  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].winPercent}" pattern="0%" /></td>
+				  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].averageWon/100}" pattern="0.00" /></td>
+				  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].mostWon/100}" pattern="0.00" /></td>
+				  			<td></td>
+				  			<td style="text-align:right;">${stats[player].lostCount}</td>
+				  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].lostPercent}" pattern="0%" /></td>
+				  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].averageLost/100}" pattern="0.00" /></td>
+				  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].mostLost/100}" pattern="0.00" /></td>
+				  			<td></td>
+				  			<td style="text-align:right;">${stats[player].evenCount}</td>
+				  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].evenPercent}" pattern="0%" /></td>
+				  		</tr>
+				  	</c:forEach>
+				  </tbody>
+			  </table>
+			
+			</c:when>
+	  	<c:otherwise>
+	  		<h1><i>No Results Recorded</i></h1>
+	  		<br/>
+	  	</c:otherwise>
+	  </c:choose>
 	  
 	  <p style="margin-top:1em;"><i>Last updated ${ lastUpdated }</i></p>
 	  

@@ -11,8 +11,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 public class QuickSplit
 {
@@ -58,10 +60,36 @@ public class QuickSplit
     {
         return Collections.unmodifiableList( myPlayers );
     }
+    
+    public static List<Player> getPlayerList( GameType gameType )
+    {
+        Set<Player> playerSet = new HashSet<Player>();
+        List<Game> games = getGameList( gameType );
+        for( Game game : games )
+        {
+            playerSet.addAll( game.getPlayers() );
+        }
+        List<Player> players = new ArrayList<Player>( playerSet );
+        Collections.sort( players );
+        return players;
+    }
 
     public static List<Game> getGameList()
     {
         return Collections.unmodifiableList( myGames );
+    }
+    
+    public static List<Game> getGameList( GameType gameType )
+    {
+        List<Game> games = new ArrayList<Game>();
+        for( Game game : myGames )
+        {
+            if( gameType == null || game.getGameType() == gameType )
+            {
+                games.add( game );
+            }
+        }
+        return games;
     }
 
     public static List<Season> getSeasonList()
@@ -154,23 +182,21 @@ public class QuickSplit
             // read in player names
             if( count == 1 )
             {
-                for( String field : fields )
+                for( int i=2; i<fields.length; i++ )
                 {
-                    if( field.length() > 0 )
-                    {
-                        myPlayers.add( new Player( field ) );
-                    }
+                    myPlayers.add( new Player( fields[i] ) );
                 }
             }
             else
             {
                 // create game
                 Date date = dateFormat.parse( fields[0] );
-                Game game = new Game( date );
+                GameType gameType = GameType.valueOf( fields[1] );
+                Game game = new Game( date, gameType );
                 myGames.add( game );
 
                 // for each result
-                for( int i=1; i<fields.length; i++ )
+                for( int i=2; i<fields.length; i++ )
                 {
                     String amountStr = fields[i];
 
@@ -182,7 +208,7 @@ public class QuickSplit
 
                     int centAmount = (int)Math.round( Double.parseDouble( amountStr ) * 100 );
 
-                    Player player = myPlayers.get( i-1 );
+                    Player player = myPlayers.get( i-2 );
                     new Result( player, game, centAmount );
                 }
             }
@@ -196,14 +222,18 @@ public class QuickSplit
      * Add a new record in to memory, recalculates summary data and writes the current state to file.
      * Assumes all data has already been validated.
      */
-    public static Game addNewRecord( Date gameDate, List<String> names, List<Integer> amounts ) throws Exception
+    public static Game addNewRecord( Date gameDate, 
+                                     GameType gameType, 
+                                     List<String> names, 
+                                     List<Integer> amounts ) throws Exception
     {
         System.out.println( "Creating new record." );
         System.out.println( "Date: " + gameDate );
+        System.out.println( "GameType: " + gameType );
         System.out.println( "Players: " + names );
         System.out.println( "Amounts: " + amounts );
 
-        Game newGame = new Game( gameDate );
+        Game newGame = new Game( gameDate, gameType );
         myGames.add( newGame );
         for( int i=0; i<names.size(); i++ )
         {
@@ -246,7 +276,8 @@ public class QuickSplit
 
         FileWriter writer = new FileWriter( f );
 
-        // write each player
+        // write header
+        writer.write( "Date,GameType" );
         for( Player player : myPlayers )
         {
             writer.write( "," + player );
@@ -259,6 +290,9 @@ public class QuickSplit
         {
             // write date
             writer.write( format( game.getDate() ) );
+            
+            // write game type
+            writer.write( "," + game.getGameType() );
 
             // write results
             for( Player player : myPlayers )
@@ -277,7 +311,6 @@ public class QuickSplit
         }
 
         writer.close();
-
     }
 
     /**

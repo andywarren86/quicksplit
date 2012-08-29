@@ -3,6 +3,7 @@ package quicksplit.servlet;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import quicksplit.core.Game;
+import quicksplit.core.GameType;
 import quicksplit.core.Player;
 import quicksplit.core.QuickSplit;
 import quicksplit.core.Result;
@@ -31,6 +33,8 @@ public class AddResultAction extends BaseServlet
         
         // parse date
         String dateStr = request.getParameter( "Date" );
+        GameType gameType = GameType.valueOf( request.getParameter( "GameType" ) );
+        
         Date date = null;
         try
         {
@@ -46,7 +50,7 @@ public class AddResultAction extends BaseServlet
         {
             for( Game g : QuickSplit.getGameList() )
             {
-                if( g.getDate().equals( date ) )
+                if( g.getDate().equals( date ) && g.getGameType() == gameType )
                 {
                     errors.add( "Game already exists: " + g );
                 }
@@ -139,14 +143,16 @@ public class AddResultAction extends BaseServlet
                 Game newGame = null;
                 try
                 {
-                    newGame = QuickSplit.addNewRecord( date, nameList, amountList );
+                    newGame = QuickSplit.addNewRecord( date, gameType, nameList, amountList );
                 }
                 catch( Exception e )
                 {
                     throw new ServletException( e );
                 }
+                
                 RequestDispatcher dispatcher = request.getRequestDispatcher( "/jsp/AddResult.jsp"  );
                 request.setAttribute( "Players", QuickSplit.getPlayerList() );
+                request.setAttribute( "GameTypes", Arrays.asList( GameType.values() ) );
                 request.setAttribute( "Success", "true" );
                 request.setAttribute( "NewGame", newGame );
                 dispatcher.forward( request, response );
@@ -156,6 +162,7 @@ public class AddResultAction extends BaseServlet
         
         RequestDispatcher dispatcher = request.getRequestDispatcher( "/jsp/AddResult.jsp"  );
         request.setAttribute( "Players", QuickSplit.getPlayerList() );
+        request.setAttribute( "GameTypes", Arrays.asList( GameType.values() ) );
         request.setAttribute( "Warnings", warnings );
         request.setAttribute( "Errors", errors );
         dispatcher.forward( request, response );

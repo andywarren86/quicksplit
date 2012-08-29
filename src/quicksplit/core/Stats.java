@@ -34,16 +34,6 @@ public class Stats
     int downStreak = 0;
     int downStreakTotal = 0;
     
-    public Stats( Player p )
-    {
-        this( p, QuickSplit.getGameList() );
-    }
-    
-    public Stats( Player p, Season s )
-    {
-        this( p, s.getGames() );
-    }
-    
     public Stats( Player p, Collection<Game> games )
     {
         int tempWinStreak = 0;
