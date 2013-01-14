@@ -22,7 +22,7 @@ import quicksplit.core.Stats;
 public class SummaryServlet extends BaseServlet
 {
     @Override
-    protected void doGetPost( HttpServletRequest req, HttpServletResponse resp )
+    protected void processRequest( HttpServletRequest req, HttpServletResponse resp )
         throws ServletException, IOException
     {
         Season season = null;

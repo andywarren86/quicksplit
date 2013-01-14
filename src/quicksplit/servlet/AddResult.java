@@ -19,7 +19,7 @@ public class AddResult extends BaseServlet
 {
 
     @Override
-    protected void doGetPost( HttpServletRequest request, HttpServletResponse response )
+    protected void processRequest( HttpServletRequest request, HttpServletResponse response )
         throws ServletException, IOException
     {
         request.setAttribute( "Players", QuickSplit.getPlayerList() );

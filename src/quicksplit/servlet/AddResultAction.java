@@ -25,7 +25,7 @@ public class AddResultAction extends BaseServlet
 {
 
     @Override
-    protected void doGetPost( HttpServletRequest request, HttpServletResponse response )
+    protected void processRequest( HttpServletRequest request, HttpServletResponse response )
         throws ServletException, IOException
     {
         List<String> warnings = new ArrayList<String>();
