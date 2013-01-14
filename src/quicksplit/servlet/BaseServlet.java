@@ -2,6 +2,7 @@ package quicksplit.servlet;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Enumeration;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -16,11 +17,6 @@ public abstract class BaseServlet extends HttpServlet
     protected final void doGet( HttpServletRequest req, HttpServletResponse resp )
             throws ServletException, IOException
     {
-        if( !checkAuthorisation( req ) )
-        {
-            setUnauthorisedResponse( resp );
-            return;
-        }
         doGetPost( req, resp );
     }
 
@@ -28,17 +24,35 @@ public abstract class BaseServlet extends HttpServlet
     protected final void doPost( HttpServletRequest req, HttpServletResponse resp )
             throws ServletException, IOException
     {
+        doGetPost( req, resp );
+    }
+    
+    protected final void doGetPost( HttpServletRequest req, HttpServletResponse resp )
+            throws ServletException, IOException
+    {
         if( !checkAuthorisation( req ) )
         {
             setUnauthorisedResponse( resp );
             return;
         }
-        doGetPost( req, resp );
+        
+        // DEBUG
+        System.out.println( "\nURI: " + req.getRequestURI() );
+        System.out.println( "Remote Addr: " + req.getRemoteAddr() );
+        Enumeration<String> e = req.getParameterNames();
+        while( e.hasMoreElements() )
+        {
+            String name = e.nextElement();
+            System.out.println( name + " = " + 
+                    Arrays.toString( req.getParameterMap().get( name ) ) );
+        }
+
+        processRequest( req, resp );
     }
     
-    protected abstract void doGetPost( HttpServletRequest req, HttpServletResponse resp )
-            throws ServletException, IOException;
-    
+    protected abstract void processRequest( HttpServletRequest req, HttpServletResponse resp )
+        throws ServletException, IOException;
+
     /**
      * If the Servlet is annotated with @AuthorisationRequired then check the request is coming
      * from one of the authorised IP addresses.
