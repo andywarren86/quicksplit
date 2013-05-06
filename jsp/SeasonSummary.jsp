@@ -10,6 +10,7 @@
 	  <title>QuickSplit: Season Summary</title>
 	  <jsp:include page="common/includes.jsp" />
 	  <script type="text/javascript" src="js/jquery.tablesorter.min.js"></script>
+	  <script type="text/javascript" src="js/filter.js"></script>
 	  
 	  <script type="text/javascript">
 			$(function(){
@@ -23,7 +24,7 @@
 					sortList: [[3,1]]
 				})
 				.bind( "sortEnd", function(){ 
-					// have to rezebrafy the rows after a sort otherwise they get out of whack
+					// have to re-zebrafy the rows after a sort otherwise they get out of whack
 					zebrafyTable( $( ".summaryTable" ) ); 
 			  })
 			  
@@ -41,7 +42,7 @@
 					$( "#Season" ).val( parseInt( $( "#Season" ).val() ) + 1 );
 					document.GameFilterForm.submit();
 				});
-				
+			
 			});
 		</script>
 	</head>
@@ -53,22 +54,6 @@
 	  <form name="GameFilterForm" method="get" action="Summary">
 	    <input type="hidden" name="Season" id="Season" value="${season.id}"/>
 	  
-			<label>Game Type:</label> 
-			<select name="GameType" id="GameType">
-			  <option value="">ALL</option>
-				<c:forEach items="${gameTypes}" var="type">
-					<c:choose>
-						<c:when test="${type==gameType}">
-					    <option selected="selected">${type}</option>
-						</c:when>
-						<c:otherwise>
-						  <option>${type}</option>
-						</c:otherwise>
-				  </c:choose>
-				</c:forEach>
-			</select>
-			<br/>
-			
 			<label>Season:</label> 
 	  	<c:if test="${season.id != 1}">
 	  	  <input type="button" name="PreviousSeason" value="Previous"/>
@@ -78,8 +63,8 @@
 	  	</c:if>
 	  </form>
 	  
-	  <p><a href="?Season=ALL">View overall statistics</a></p>
-		
+	  <jsp:include page="common/filter.jsp" />
+	  
 	  <c:choose>
 	  	<c:when test="${not empty stats}">
 	  	
@@ -140,6 +125,7 @@
 	  	</c:otherwise>
 	  </c:choose>
 	  
+	  <p><a href="?Season=ALL">View overall statistics</a></p>
 	  <p style="margin-top:1em;"><i>Last updated ${ lastUpdated }</i></p>
 	  
 	</body>

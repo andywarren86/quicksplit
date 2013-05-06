@@ -38,7 +38,7 @@ public abstract class BaseServlet extends HttpServlet
         
         // DEBUG
         System.out.println( "\nURI: " + req.getRequestURI() );
-        System.out.println( "Remote Addr: " + req.getRemoteAddr() );
+        System.out.println( "Request Params:" );
         Enumeration<String> e = req.getParameterNames();
         while( e.hasMoreElements() )
         {

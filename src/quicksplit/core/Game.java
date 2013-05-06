@@ -8,20 +8,20 @@ public class Game
     implements Comparable<Game>
 {
     private static Long nextId = 1L;
-
+    
     private final Long myId;
     private final Date myDate;
     private final GameType myGameType;
     private final List<Result> myResults;
 
-    Game( final Date date, final GameType gameType )
+    Game( Date date, GameType gameType )
     {
         myId = nextId++;
         myDate = date;
         myGameType = gameType;
         myResults = new ArrayList<Result>();
     }
-
+    
     public long getId()
     {
         return myId;
@@ -31,7 +31,7 @@ public class Game
     {
         return myDate;
     }
-
+    
     public GameType getGameType()
     {
         return myGameType;
@@ -42,9 +42,9 @@ public class Game
         return Collections.unmodifiableList( myResults );
     }
 
-
+    
     // package-private
-    void addResult( final Result result )
+    void addResult( Result result )
     {
         myResults.add( result );
     }
@@ -56,36 +56,28 @@ public class Game
     }
 
     @Override
-    public int compareTo( final Game g )
+    public int compareTo( Game g )
     {
-        final int dateCompare = myDate.compareTo( g.getDate() );
-        if( dateCompare != 0 )
-        {
-            return dateCompare;
-        }
-        else
-        {
-            return myGameType.compareTo( g.getGameType() );
-        }
+        return Double.compare( myId, g.getId() );
     }
-
+    
     public List<Player> getPlayers()
     {
-        final List<Player> players = new ArrayList<Player>();
-        for( final Result r : myResults )
+        List<Player> players = new ArrayList<Player>();
+        for( Result r : myResults )
         {
             players.add( r.getPlayer() );
         }
         return players;
     }
-
-
+    
+    
     /**
      * Return the season this games belongs to.
      */
     public Season getSeason()
     {
-        for( final Season s : QuickSplit.getSeasonList() )
+        for( Season s : QuickSplit.getSeasonList() )
         {
             // if game is after the start date of the current season
             // or between start & end dates of a previous season
