@@ -10,6 +10,7 @@
 	  <title>QuickSplit: Overall Summary</title>
 	  <jsp:include page="common/includes.jsp" />
 	  <script type="text/javascript" src="js/jquery.tablesorter.min.js"></script>
+	  <script type="text/javascript" src="js/filter.js"></script>
 	  
 	  <script type="text/javascript">
 			$(function(){
@@ -38,26 +39,7 @@
 	<body>
 		<h1>Overall Summary</h1>
 		
-	  <form name="GameFilterForm" method="get" action="Summary">
-	    <input type="hidden" name="Season" value="ALL"/>
-	  
-			<label>Game Type:</label> 
-			<select name="GameType" id="GameType">
-			  <option value="">ALL</option>
-				<c:forEach items="${gameTypes}" var="type">
-					<c:choose>
-						<c:when test="${type==gameType}">
-					    <option selected="selected">${type}</option>
-						</c:when>
-						<c:otherwise>
-						  <option>${type}</option>
-						</c:otherwise>
-				  </c:choose>
-				</c:forEach>
-			</select>
-	  </form>
-	  
-	  <p><a href="Summary">View current season statistics</a></p>
+		<jsp:include page="common/filter.jsp" />
 		
 		<table class="summaryTable">
 			<thead>
@@ -119,6 +101,7 @@
 		  </tbody>
 	  </table>
 	  
+	  <p><a href="Summary">View current season statistics</a></p>
 	  <p style="margin-top:1em;"><i>Last updated ${ lastUpdated }</i></p>
 	  
 	</body>

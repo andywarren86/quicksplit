@@ -20,5 +20,11 @@
       <fileset dir="${projectDir}\js"/>
     </copy>
   </target>
+
+  <target name="data">
+    <copy todir="${tomcatDir}\WEB-INF" verbose="true">
+      <fileset dir="${projectDir}\data"/>
+    </copy>
+  </target>
   
 </project>

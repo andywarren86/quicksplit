@@ -9,8 +9,7 @@
 	  <jsp:include page="common/includes.jsp" />
 	  
 	  <script type="text/javascript">
-	    var players;
-	    
+    
 	    $(function(){
 	    	
 	    	// configure date field
@@ -18,12 +17,6 @@
 					dateFormat: "dd/mm/yy",
 					defaultDate: new Date()
 				});
-				
-				// get all player names for autocomplete
-				players = [];
-				<c:forEach items="${Players}" var="player">
-				  players.push( "${player.name}" );
-				</c:forEach>
 				
 			  // capture field values from request params
 			  var results = [];
