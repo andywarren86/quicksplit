@@ -19,6 +19,11 @@
     <copy todir="${tomcatDir}\js" verbose="true">
       <fileset dir="${projectDir}\js"/>
     </copy>
+  	<copy todir="${tomcatDir}\WEB-INF" verbose="true">
+  		<fileset dir="${projectDir}\data">
+  	    <include name="SeasonDates.csv"/>
+  		</fileset>
+  	</copy>
   </target>
 
   <target name="data">
