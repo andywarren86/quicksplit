@@ -7,7 +7,12 @@
 <!-- jQuery -->
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.0.min.js"></script>
 <script type="text/javascript" src="js/jquery-ui-1.10.0.custom.min.js"></script>
+
 <script type="text/javascript" src="js/quicksplit.js"></script>
+
+<c:if test="${Filterable}">
+  <script type="text/javascript" src="js/filter.js"></script>
+</c:if>
 
 <!-- Load all players into array because it's just handy -->
 <script type="text/javascript">

@@ -22,13 +22,19 @@ public class RemoveFilterAction extends BaseServlet
             HttpServletResponse resp ) throws ServletException, IOException
     {
         int i = Integer.parseInt( req.getParameter( "i" ) );
-        
-        @SuppressWarnings( "unchecked" )
-        List<Filter> filters = (List<Filter>)req.getSession().getAttribute( FILTER_KEY );
-        
-        if( filters != null )
+    
+        if( i >= 0 )
         {
-            filters.remove( i );
+            @SuppressWarnings( "unchecked" )
+            List<Filter> filters = (List<Filter>)req.getSession().getAttribute( FILTER_KEY );
+            if( filters != null )
+            {
+                filters.remove( i );
+            }
+        }
+        else
+        {
+            req.getSession().removeAttribute( FILTER_KEY );
         }
         
         resp.setStatus( HttpServletResponse.SC_ACCEPTED );  

@@ -5,8 +5,8 @@ $(function(){
 		height: 300,
 		width: 350,
 		resizable: false,
-	  modal: true,
-	  buttons: {
+	    modal: true,
+	    buttons: {
 		  "Add Filter": function(){
 			  $.post( 
 		        "AddFilterAction",
@@ -22,11 +22,7 @@ $(function(){
 	  }
 	});
 	
-	$( "#add-filter" ).button().click( function(){ 
-		$( "#dialog-form" ).dialog( "open" );
-	});
-		
-		// filter specific stuff
+	// filter specific stuff
 	$( "#FilterType" ).change( function(){
 		var filterType = $(this).val();
 		
@@ -48,12 +44,12 @@ $(function(){
 
 function removeFilter( index )
 {
-	  $.post( 
-        "RemoveFilterAction",
-        "i=" + index,
-        function( data, status, jqXhr )
-        {
-        	location.reload();
-        }
-      );
+  $.post( 
+    "RemoveFilterAction",
+    "i=" + index,
+    function( data, status, jqXhr )
+    {
+    	location.reload();
+    }
+  );
 }

@@ -34,6 +34,11 @@ public class Stats
     int downStreak = 0;
     int downStreakTotal = 0;
     
+    public Stats( Player p )
+    {
+        this( p, p.getGames() );
+    }
+    
     public Stats( Player p, Collection<Game> games )
     {
         int tempWinStreak = 0;

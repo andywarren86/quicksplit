@@ -52,7 +52,7 @@ public class Game
     @Override
     public String toString()
     {
-        return QuickSplit.format( myDate ) + " " + myGameType;
+        return QuickSplit.format( myDate );
     }
 
     @Override

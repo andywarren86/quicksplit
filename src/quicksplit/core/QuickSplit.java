@@ -60,38 +60,12 @@ public class QuickSplit
     {
         return Collections.unmodifiableList( myPlayers );
     }
-    
-    public static List<Player> getPlayerList( GameType gameType )
-    {
-        Set<Player> playerSet = new HashSet<Player>();
-        List<Game> games = getGameList( gameType );
-        for( Game game : games )
-        {
-            playerSet.addAll( game.getPlayers() );
-        }
-        List<Player> players = new ArrayList<Player>( playerSet );
-        Collections.sort( players );
-        return players;
-    }
 
     public static List<Game> getGameList()
     {
         return Collections.unmodifiableList( myGames );
     }
     
-    public static List<Game> getGameList( GameType gameType )
-    {
-        List<Game> games = new ArrayList<Game>();
-        for( Game game : myGames )
-        {
-            if( gameType == null || game.getGameType() == gameType )
-            {
-                games.add( game );
-            }
-        }
-        return games;
-    }
-
     public static List<Season> getSeasonList()
     {
         return Collections.unmodifiableList( mySeasons );
@@ -115,6 +89,21 @@ public class QuickSplit
             }
         }
         return null;
+    }
+    
+    /**
+     * Returns a sorted list of Players for the specified games.
+     */
+    public static List<Player> getPlayersFromGames( List<Game> games )
+    {
+        Set<Player> playerSet = new HashSet<>();
+        for( Game g : games )
+        {
+            playerSet.addAll( g.getPlayers() );
+        }
+        List<Player> playerList = new ArrayList<>( playerSet );
+        Collections.sort( playerList );
+        return playerList;
     }
     
     /**

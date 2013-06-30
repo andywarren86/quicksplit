@@ -1,30 +1,24 @@
 package quicksplit.servlet;
 
-import static quicksplit.servlet.ajax.AddFilterAction.FILTER_KEY;
-
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import quicksplit.core.Filter;
 import quicksplit.core.Game;
-import quicksplit.core.GameType;
 import quicksplit.core.Player;
 import quicksplit.core.QuickSplit;
 import quicksplit.core.Season;
 import quicksplit.core.Stats;
 
+
+@Filterable
 @WebServlet( "/Summary" )
 public class SummaryServlet extends BaseServlet
 {
@@ -43,36 +37,21 @@ public class SummaryServlet extends BaseServlet
             season = QuickSplit.getSeasonById( seasonId );
         }
         
-        GameType gameType = null;
-        String gameTypeStr = req.getParameter( "GameType" );
-        if( gameTypeStr != null && !gameTypeStr.isEmpty() )
-        {
-            gameType = GameType.valueOf( gameTypeStr );
-        }
-        
         List<Game> games;
         if( season == null )
         {
-            games = QuickSplit.getGameList( gameType );
+            games = new ArrayList<>( QuickSplit.getGameList() );
         }
         else
         {
-            games = season.getGames( gameType );
+            games = season.getGames();
         }
         
-        // apply any filters if necessary
-        @SuppressWarnings( "unchecked" )
-        List<Filter> filters = (List<Filter>)req.getSession().getAttribute( FILTER_KEY );
-        if( filters != null )
-        {
-            for( Filter filter : filters )
-            {
-                filter.applyFilter( games );
-            }
-        }
+        // apply filters
+        applyFilters( req, games );
         
         // get all players for games
-        List<Player> players = getPlayersFromGames( games );
+        List<Player> players = QuickSplit.getPlayersFromGames( games );
         
         // generate stats for each player
         Map<Player,Stats> statsMap = new HashMap<Player,Stats>();
@@ -83,8 +62,6 @@ public class SummaryServlet extends BaseServlet
         
         // get date of the last entry
         Game lastGame = QuickSplit.getGameList().get( QuickSplit.getGameList().size()-1 );
-        req.setAttribute( "Players", QuickSplit.getPlayerList() );
-        req.setAttribute( "GameTypes", Arrays.asList( GameType.values() ) );
         req.setAttribute( "playerList", players );
         req.setAttribute( "stats", statsMap );
         req.setAttribute( "lastUpdated", QuickSplit.format( lastGame.getDate() ) );
@@ -102,15 +79,4 @@ public class SummaryServlet extends BaseServlet
         }
     }
     
-    private List<Player> getPlayersFromGames( List<Game> games )
-    {
-        Set<Player> playerSet = new HashSet<>();
-        for( Game g : games )
-        {
-            playerSet.addAll( g.getPlayers() );
-        }
-        List<Player> playerList = new ArrayList<>( playerSet );
-        Collections.sort( playerList );
-        return playerList;
-    }
 }

@@ -1,4 +1,3 @@
-
 // zebrafy the table rows
 function zebrafyTable( table )
 {
@@ -16,3 +15,10 @@ function colourNegativeCells( table )
 		}
 	});
 }
+
+$(function(){
+	// create the menu
+	$( "#menu" ).menu();
+	$( "#menu ul" ).css( "z-index", 100 );
+	$( "#menu-div" ).show();
+});

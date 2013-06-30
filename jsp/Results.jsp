@@ -1,6 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ page import="java.util.*" %>
 <%@ page import="quicksplit.core.*" %>
 
@@ -14,31 +15,21 @@
 	  <script type="text/javascript">
 			$(function(){
 				
+        // event handlers
+        $( "input[name='PreviousSeason']" )
+	        .button()
+	        .click( function(){
+	          window.location.href = "Results?Season=" + ${season.id - 1};
+	        });
+        
+        $( "input[name='NextSeason']" )
+	        .button()
+	        .click( function(){
+	          window.location.href = "Results?Season=" + ${season.id + 1};
+	        });
+				
 				colourNegativeCells( $( ".resultTable" ) );
 				zebrafyTable( $( ".resultTable" ) );
-				
-				// set the header to absolute position, and move the result table down the height of the header
-				$( ".playerList" )
-					.css( "position", "absolute" );
-				$( ".resultTable" )
-					.css( "position", "relative" )
-					.css( "top", $( ".playerList" ).outerHeight() )
-					.css( "z-index", -1 );
-				
-				var initialOffset = $( ".playerList" ).offset();
-				$( window ).scroll( function(e){
-					
-					// once we have scrolled passed this element fix it to the top of the screen
-					if( $( window ).scrollTop() > initialOffset.top )
-				  {
-						$( ".playerList" ).css( "top", $( window ).scrollTop() );
-				  }
-					else
-					{
-						$( ".playerList" ).offset( initialOffset );
-					}
-
-				});
 				
 				// set table widths
 				// needs to be manually set otherwise tables max out at 100% width
@@ -61,21 +52,36 @@
 				$( ".resultTable tr:first td" ).css( "width", cellWidth - ( cellPadding + cellBorder ) );
 				$( ".resultTable tr:first td:first" ).css( "width", cellHeaderWidth - ( cellPadding + cellBorder ) );
 				
-				// event handlers
-				$( "#GameType" ).change( function(){
-					document.GameFilterForm.submit();
-				})
+				$( "input[type='button']" ).show();
+				$( ".playerList" ).show();
+				$( ".resultTable" ).show();
 				
-				$( "input[name='PreviousSeason']" ).click( function(){
-					$( "#Season" ).val( parseInt( $( "#Season" ).val() ) - 1 );
-					document.GameFilterForm.submit();
-				});
-				
-				$( "input[name='NextSeason']" ).click( function(){
-					$( "#Season" ).val( parseInt( $( "#Season" ).val() ) + 1 );
-					document.GameFilterForm.submit();
-				});
-				
+        // set the header to absolute position, and move the result table down the height of the header
+        // note: this has to come after show() to calculate the initial offsets
+        $( ".playerList" )
+          .css( "margin-top", "1em" )
+          .css( "position", "absolute" );
+        
+        var initialOffset = $( ".playerList" ).offset();
+        var initialMargin = parseInt( $( ".playerList" ).css( "margin-top" ) );
+        
+        $( ".resultTable" )
+          .css( "position", "relative" )
+          .css( "top", $( ".playerList" ).outerHeight() + initialMargin )
+          .css( "z-index", -1 );
+        
+        // once we have scrolled the table header fix it to the top of the screen so it is always visible
+        $( window ).scroll( function(e){
+          if( $( window ).scrollTop() > initialOffset.top )
+          {
+            $( ".playerList" ).css( "top", $( window ).scrollTop() - initialMargin );
+          }
+          else
+          {
+            $( ".playerList" ).offset( initialOffset );
+          }
+        });
+        
 			});
 			
 		</script>
@@ -83,42 +89,25 @@
 	
 	<body>
 	
-		<h1>Results - ${season}</h1>
-		<h3>${startDate} to ${endDate}</h3>
-	  
-	  <form name="GameFilterForm" method="get" action="Results">
-	    <input type="hidden" name="Season" id="Season" value="${season.id}"/>
-	  
-			<label>Game Type:</label> 
-			<select name="GameType" id="GameType">
-			  <option value="">ALL</option>
-				<c:forEach items="${gameTypes}" var="type">
-					<c:choose>
-						<c:when test="${type==gameType}">
-					    <option selected="selected">${type}</option>
-						</c:when>
-						<c:otherwise>
-						  <option>${type}</option>
-						</c:otherwise>
-				  </c:choose>
-				</c:forEach>
-			</select>
-			<br/>
-			
-			<label>Season:</label> 
-	  	<c:if test="${season.id != 1}">
-	  	  <input type="button" name="PreviousSeason" value="Previous"/>
-	  	</c:if>
-	  	<c:if test="${not season.currentSeason}">
-	  		<input type="button" name="NextSeason" value="Next"/>
-	  	</c:if>
-	  </form>
-	  <br/>
+    <t:header>
+      <jsp:attribute name="h1">Results - ${season}</jsp:attribute>
+      <jsp:attribute name="h3">${startDate} to ${endDate}</jsp:attribute>
+    </t:header>
+		
+    <label>Season:</label> 
+    <c:if test="${season.id != 1}">
+      <input type="button" name="PreviousSeason" value="Previous" style="display:none;"/>
+    </c:if>
+    <c:if test="${not season.currentSeason}">
+      <input type="button" name="NextSeason" value="Next" style="display:none;"/>
+    </c:if>
+    
+    <t:filter/>
 	  
 	  <c:choose>
 	  	<c:when test="${not empty playerList}">
 			
-				<table class="playerList">
+				<table class="playerList" style="display:none;">
 					<tr>
 						<th>&#160;</th>
 					  <c:forEach items="${playerList}" var="player">
@@ -127,7 +116,7 @@
 					</tr>
 				</table>
 				
-				<table class="resultTable" style="margin-bottom: 3em;">
+				<table class="resultTable" style="margin-bottom:4em; display:none;">
 				  <c:forEach items="${gameList}" var="game" varStatus="status">
 						<tr>
 							<td>${game}</td>
@@ -138,17 +127,16 @@
 					</c:forEach>
 				</table>
 				
+		    <p><a href="ResultExport?Season=${season.id}">Export season results (.csv)</a></p>
+		    <p><a href="ResultExport">Export all results (.csv)</a></p>
+		    <br/><br/>
+				
 	  	</c:when>
 	  	<c:otherwise>
-	  		<h1><i>No Results Recorded</i></h1>
-	  		<br/>
+	  		<h2 style="margin-top: 1em;"><i>No Results</i></h2>
 	  	</c:otherwise>
 	  </c:choose>
-	    
-		<p><a href="ResultExport?season=${season.id}">Export season results (.csv)</a></p>
-		<p><a href="ResultExport">Export all results (.csv)</a></p>
-		<br/><br/>
-		
+
 	</body>
 
 </html>

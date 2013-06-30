@@ -25,6 +25,16 @@ public class Player
     {
         return Collections.unmodifiableList( myResults );
     }
+    
+    public List<Game> getGames()
+    {
+        List<Game> games = new ArrayList<>();
+        for( Result result : myResults )
+        {
+            games.add( result.getGame() );
+        }
+        return games;
+    }
 
     // package-private
     void addResult( Result result )

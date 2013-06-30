@@ -10,6 +10,9 @@
     <copy todir="${tomcatDir}\WEB-INF\lib" verbose="true">
       <fileset dir="${projectDir}\jars"/>
     </copy>
+    <copy todir="${tomcatDir}\WEB-INF\tags" verbose="true">
+      <fileset dir="${projectDir}\tags"/>
+    </copy>
     <copy todir="${tomcatDir}\jsp" verbose="true">
       <fileset dir="${projectDir}\jsp"/>
     </copy>

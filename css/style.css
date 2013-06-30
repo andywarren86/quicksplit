@@ -41,6 +41,12 @@ td {
 	padding: 3px 2px;
 }
 
+td a {
+	color: #555;
+	font-size: 11px;
+	text-decoration: underline;
+}
+
 .even td {
 	background: #E5F1F4;
 }
@@ -75,9 +81,12 @@ td {
 /*
  * Summary Page
  */
- .summaryTable th, .summaryTable td {
+.summaryTable {
+  margin-top: 1em;
+}
+.summaryTable th, .summaryTable td {
 	padding: 4px 4px;
- }
+}
 
 /*
  * Table Sorter
@@ -86,4 +95,24 @@ td {
 	background: url( tr_back_sorted.gif ) repeat-x scroll 0 0 #56A9BE;
 }
 
+/*
+ * Menu
+ */
+.ui-menu { width: 120px; }
+
+/*
+ * Filter
+ */
+div#filterBox p {
+	font-weight: bold;
+	margin-bottom: 0.5em;
+}
+
+div#filterBox ul {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+div#filterBox li {
+  margin: 5px;
 }

@@ -3,7 +3,6 @@ package quicksplit.servlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -17,6 +16,7 @@ import quicksplit.core.QuickSplit;
 import quicksplit.core.Result;
 import quicksplit.core.Season;
 
+@Filterable
 @WebServlet( "/ResultExport" )
 public class ResultExport extends BaseServlet
 {
@@ -28,26 +28,20 @@ public class ResultExport extends BaseServlet
         resp.setHeader("Content-Disposition", "attachment; filename=\"Results.csv\"");
         PrintWriter writer = resp.getWriter();
         
-        Season s = null;
-        List<Player> players = null;
         List<Game> games = null;
         if( req.getParameter( "Season" ) != null )
         {
-            s = QuickSplit.getSeasonById( req.getParameter( "season" ) );
-        }
-        
-        if( s == null )
-        {
-            players = QuickSplit.getPlayerList();
-            games = QuickSplit.getGameList();        
+            Season s = QuickSplit.getSeasonById( req.getParameter( "Season" ) );
+            games = s.getGames();
         }
         else
         {
-            // TODO this should probably reflect the current search criteria (game type)
-            games = s.getGames( null );
-            players = new ArrayList<Player>( s.getPlayers( null ) );
-            Collections.sort( players ); 
+            games = new ArrayList<>( QuickSplit.getGameList() );
         }
+        
+        applyFilters( req, games );
+        
+        List<Player> players = QuickSplit.getPlayersFromGames( games );
         
         // write header
         writer.write( "Date,GameType" );

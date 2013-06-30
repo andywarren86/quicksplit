@@ -1,5 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ page import="java.util.*" %>
 <%@ page import="quicksplit.core.*" %>
 
@@ -10,7 +11,6 @@
 	  <title>QuickSplit: Season Summary</title>
 	  <jsp:include page="common/includes.jsp" />
 	  <script type="text/javascript" src="js/jquery.tablesorter.min.js"></script>
-	  <script type="text/javascript" src="js/filter.js"></script>
 	  
 	  <script type="text/javascript">
 			$(function(){
@@ -29,46 +29,47 @@
 			  })
 			  
 				// event handlers
-				$( "#GameType" ).change( function(){
-					document.GameFilterForm.submit();
-				})
+				$( "input[name='PreviousSeason']" )
+				  .button()
+				  .click( function(){
+					  window.location.href = "Summary?Season=" + ${season.id - 1};
+				  })
+				.show();
 				
-				$( "input[name='PreviousSeason']" ).click( function(){
-					$( "#Season" ).val( parseInt( $( "#Season" ).val() ) - 1 );
-					document.GameFilterForm.submit();
-				});
+				$( "input[name='NextSeason']" )
+					.button()
+					.click( function(){
+						window.location.href = "Summary?Season=" + ${season.id + 1};
+					})
+					.show();
 				
-				$( "input[name='NextSeason']" ).click( function(){
-					$( "#Season" ).val( parseInt( $( "#Season" ).val() ) + 1 );
-					document.GameFilterForm.submit();
-				});
+				$( ".summaryTable" ).show();
 			
 			});
+			
 		</script>
 	</head>
 	
 	<body>
-		<h1>Summary - ${season}</h1>
-		<h3>${startDate} to ${endDate}</h3>
+	  <t:header>
+	    <jsp:attribute name="h1">Summary - ${season}</jsp:attribute>
+	    <jsp:attribute name="h3">${startDate} to ${endDate}</jsp:attribute>
+	  </t:header>
 	  
-	  <form name="GameFilterForm" method="get" action="Summary">
-	    <input type="hidden" name="Season" id="Season" value="${season.id}"/>
+		<label>Season:</label> 
+  	<c:if test="${season.id != 1}">
+  	  <input type="button" name="PreviousSeason" value="Previous" style="display:none;"/>
+  	</c:if>
+  	<c:if test="${not season.currentSeason}">
+  		<input type="button" name="NextSeason" value="Next" style="display:none;"/>
+  	</c:if>
 	  
-			<label>Season:</label> 
-	  	<c:if test="${season.id != 1}">
-	  	  <input type="button" name="PreviousSeason" value="Previous"/>
-	  	</c:if>
-	  	<c:if test="${not season.currentSeason}">
-	  		<input type="button" name="NextSeason" value="Next"/>
-	  	</c:if>
-	  </form>
-	  
-	  <jsp:include page="common/filter.jsp" />
+	  <t:filter/>
 	  
 	  <c:choose>
 	  	<c:when test="${not empty stats}">
 	  	
-				<table class="summaryTable">
+				<table class="summaryTable" style="display:none;">
 					<thead>
 					  <tr style="cursor:pointer;">
 					    <th>Player</th>
@@ -95,7 +96,7 @@
 				  <tbody>
 				  	<c:forEach items="${playerList}" var="player">
 				  		<tr>
-				  			<td>${player.name}</td>
+				  			<td><a href="PlayerStats?Player=${player.name}">${player.name}</a></td>
 				  			<td></td>
 				  			<td style="text-align:right;">${stats[player].count}</td>
 				  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].total/100}" pattern="0.00" /></td>
@@ -120,12 +121,10 @@
 			
 			</c:when>
 	  	<c:otherwise>
-	  		<h1><i>No Results Recorded</i></h1>
-	  		<br/>
+	  		<h2 style="margin-top: 1em;"><i>No Results</i></h2>
 	  	</c:otherwise>
 	  </c:choose>
 	  
-	  <p><a href="?Season=ALL">View overall statistics</a></p>
 	  <p style="margin-top:1em;"><i>Last updated ${ lastUpdated }</i></p>
 	  
 	</body>

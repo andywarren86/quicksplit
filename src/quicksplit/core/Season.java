@@ -38,12 +38,12 @@ public class Season
         return QuickSplit.getCurrentSeason().equals( this );
     }
     
-    public List<Game> getGames( GameType gameType )
+    public List<Game> getGames()
     {
         List<Game> seasonGames = new ArrayList<Game>();
         for( Game g : QuickSplit.getGameList() )
         {
-            if( g.getSeason().equals( this ) && ( gameType == null || g.getGameType() == gameType ) )
+            if( g.getSeason().equals( this ) )
             {
                 seasonGames.add( g );
             }
@@ -51,11 +51,10 @@ public class Season
         return seasonGames;
     }
     
-    public List<Player> getPlayers( GameType gameType )
+    public List<Player> getPlayers()
     {
         Set<Player> playerSet = new HashSet<Player>();
-        List<Game> games = getGames( gameType );
-        for( Game g : games )
+        for( Game g : getGames() )
         {
             playerSet.addAll( g.getPlayers() );
         }
