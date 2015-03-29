@@ -1,29 +1,75 @@
 <project default="deploy">
-    
-  <property name="projectDir" value="."/>
-  <property name="tomcatDir" value="C:\tomcat7\webapps\quicksplit"/>
+  
+  <!-- Read in local properties to override defaults -->
+  <property file="local.properties"/>
+  
+  <!-- Default properties -->
+	<property name="project.name" value="quicksplit" />
+	<property name="war.filename" value="${project.name}.war" />
+  <property name="project.dir" value="."/>
+	<property name="build.dir" value="${project.dir}\build" />
+	<property name="absolute.war.path" location="${build.dir}\${war.filename}"/>
+	
+  <!-- Properties to access the Tomcat Manager application -->
+  <property name="url"      value="http://localhost/manager/text"/>
+  <property name="username" value="admin"/>
+  <property name="password" value="admin"/>
+	
+	<!-- Tomcat tasks -->
+  <taskdef name="start" classname="org.apache.catalina.ant.StartTask" />
+  <taskdef name="stop" classname="org.apache.catalina.ant.StopTask" />
+  <taskdef name="deploy" classname="org.apache.catalina.ant.DeployTask" />
+  <taskdef name="undeploy" classname="org.apache.catalina.ant.UndeployTask" />
 
-  <target name="deploy">
-    <copy todir="${tomcatDir}\WEB-INF\classes" verbose="true">
-      <fileset dir="${projectDir}\bin"/>
-    </copy>
-    <copy todir="${tomcatDir}\WEB-INF\lib" verbose="true">
-      <fileset dir="${projectDir}\jars"/>
-    </copy>
-    <copy todir="${tomcatDir}\jsp" verbose="true">
-      <fileset dir="${projectDir}\jsp"/>
-    </copy>
-    <copy todir="${tomcatDir}\css" verbose="true">
-      <fileset dir="${projectDir}\css"/>
-    </copy>
-    <copy todir="${tomcatDir}\js" verbose="true">
-      <fileset dir="${projectDir}\js"/>
-    </copy>
-    <copy todir="${tomcatDir}\WEB-INF" verbose="true">
-      <fileset dir="${projectDir}\data">
-        <include name="SeasonDates.csv"/>
-      </fileset>
-    </copy>
+  <target name="deploy" depends="war">
+  	<echo>Deploying ${absolute.war.path} to /${project.name} (${url})</echo>
+  	<deploy url="${url}"
+  	        username="${username}"
+  	        password="${password}"
+  	        path="/${project.name}"
+  	        localWar="file:${absolute.war.path}"
+  	        update="true"/>
+  </target>
+	
+  <target name="undeploy">
+  	<echo>Undeploying /${project.name}</echo>
+    <undeploy url="${url}" 
+              username="${username}" 
+    	        password="${password}"
+              path="/${project.name}"/>
+  </target>
+	
+  <target name="start">
+    <echo>Starting /${project.name}</echo>
+    <start url="${url}" 
+           username="${username}" 
+           password="${password}"
+           path="/${project.name}"/>
+  </target>
+	
+  <target name="stop">
+    <echo>Stopping /${project.name}</echo>
+    <stop url="${url}" 
+          username="${username}" 
+          password="${password}"
+          path="/${project.name}"/>
+  </target>
+	
+  <target name="war">
+  	
+  	<echo>Creating war file ${build.dir}\${war.filename}</echo>
+  	
+  	<mkdir dir="${build.dir}" />
+  	<delete file="${build.dir}/${war.filename}" />
+  	
+    <war destfile="${build.dir}/${war.filename}" needxmlfile="false">
+      <lib dir="jars"/>
+    	<classes dir="bin"/>
+    	<zipfileset dir="css" prefix="css"/>
+    	<zipfileset dir="js" prefix="js"/>
+    	<zipfileset dir="jsp" prefix="jsp"/>
+  	</war>
+	
   </target>
   
 </project>

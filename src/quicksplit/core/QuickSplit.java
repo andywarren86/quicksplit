@@ -1,11 +1,13 @@
 package quicksplit.core;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -18,11 +20,8 @@ import java.util.Set;
 
 public class QuickSplit
 {
-    private static final String FILE_DIR = "C:\\tomcat7\\webapps\\quicksplit\\WEB-INF\\";
-    private static final String RESULT_FILENAME = "PokerResults.csv";
-    private static final String SEASON_FILENAME = "SeasonDates.csv";
-    private static final String OUTPUT_FILE = "PokerResults.csv";
     private static final String NEW_LINE = "\r\n";
+    private static final String PROPERTIES_FILE = "quicksplit/resources/quicksplit.properties";
 
     private static Season theCurrentSeason = null;
     private static List<Player> myPlayers = new ArrayList<Player>();
@@ -42,9 +41,9 @@ public class QuickSplit
     public static void Startup()
         throws Exception
     {
-        loadProperties( "quicksplit/resources/quicksplit.properties" );
-        loadSeasonsFromFile( new File( FILE_DIR + SEASON_FILENAME ) );
-        loadResultsFromFile( new File( FILE_DIR + RESULT_FILENAME ) );
+        loadProperties( PROPERTIES_FILE );
+        loadSeasonData( Paths.get( getSeasonDataPath() ) );
+        loadResultData( Paths.get( getResultDataPath() ) );
 
         System.out.println( "Current Season: " + theCurrentSeason );
         System.out.println( "Players: " + myPlayers.size() );
@@ -158,64 +157,81 @@ public class QuickSplit
     {
         return getProperty( "authorisedAddresses" ).split( "," );
     }
+    
+    public static String getSeasonDataPath()
+    {
+    	return getProperty( "season.data.path" );
+    }
+    
+    public static String getResultDataPath()
+    {
+    	return getProperty( "result.data.path" );
+    }
 
     /**
      * Read results from file into memory.
      */
-    public static void loadResultsFromFile( File file )
+    public static void loadResultData( Path resultPath )
         throws Exception
     {
-        System.out.println( "Reading poker result data from: " + file.getAbsolutePath() );
-        BufferedReader reader = new BufferedReader( new FileReader( file ) );
-
-        int count = 0;
-        String line = null;
-        while( ( line = reader.readLine() ) != null )
+        System.out.println( "Reading result data from: " + resultPath );
+        
+        if( !resultPath.toFile().exists() )
         {
-            count++;
-            String[] fields = line.split( "," );
-            if( fields.length == 0 )
-            {
-                break;
-            }
-
-            // read in player names
-            if( count == 1 )
-            {
-                for( int i=2; i<fields.length; i++ )
-                {
-                    myPlayers.add( new Player( fields[i] ) );
-                }
-            }
-            else
-            {
-                // create game
-                Date date = dateFormat.parse( fields[0] );
-                GameType gameType = GameType.valueOf( fields[1] );
-                Game game = new Game( date, gameType );
-                myGames.add( game );
-
-                // for each result
-                for( int i=2; i<fields.length; i++ )
-                {
-                    String amountStr = fields[i];
-
-                    // no result
-                    if( amountStr.length() == 0 )
-                    {
-                        continue;
-                    }
-
-                    int centAmount = (int)Math.round( Double.parseDouble( amountStr ) * 100 );
-
-                    Player player = myPlayers.get( i-2 );
-                    new Result( player, game, centAmount );
-                }
-            }
-
+        	System.out.println( "Could not find result data file." );
+        	return;
+        }
+        
+        try( BufferedReader reader = new BufferedReader( new FileReader( resultPath.toFile() ) ) )
+        {
+	        int count = 0;
+	        String line = null;
+	        while( ( line = reader.readLine() ) != null )
+	        {
+	            count++;
+	            String[] fields = line.split( "," );
+	            if( fields.length == 0 )
+	            {
+	                break;
+	            }
+	
+	            // read in player names
+	            if( count == 1 )
+	            {
+	                for( int i=2; i<fields.length; i++ )
+	                {
+	                    myPlayers.add( new Player( fields[i] ) );
+	                }
+	            }
+	            else
+	            {
+	                // create game
+	                Date date = dateFormat.parse( fields[0] );
+	                GameType gameType = GameType.valueOf( fields[1] );
+	                Game game = new Game( date, gameType );
+	                myGames.add( game );
+	
+	                // for each result
+	                for( int i=2; i<fields.length; i++ )
+	                {
+	                    String amountStr = fields[i];
+	
+	                    // no result
+	                    if( amountStr.length() == 0 )
+	                    {
+	                        continue;
+	                    }
+	
+	                    int centAmount = (int)Math.round( Double.parseDouble( amountStr ) * 100 );
+	
+	                    Player player = myPlayers.get( i-2 );
+	                    new Result( player, game, centAmount );
+	                }
+	            }
+	
+	        }
         }
 
-        reader.close();
     }
 
     /**
@@ -262,7 +278,7 @@ public class QuickSplit
         validateData();
         sortData();
 
-        writeResultsToFile( new File( FILE_DIR + OUTPUT_FILE ) );
+        writeResultsToFile( Paths.get( getResultDataPath() ) );
         return newGame;
     }
 
@@ -270,11 +286,17 @@ public class QuickSplit
      * Write current state to file.
      * @throws Exception
      */
-    public static void writeResultsToFile( File f ) throws Exception
+    public static void writeResultsToFile( Path resultPath ) throws Exception
     {
-        System.out.println( "Writing data to file: " + f.getAbsolutePath() );
+        System.out.println( "Writing data to file: " + resultPath );
+        
+        if( Files.notExists( resultPath ) )
+        {
+        	Files.createDirectories( resultPath.getParent() );
+        	Files.createFile( resultPath );
+        }
 
-        FileWriter writer = new FileWriter( f );
+        FileWriter writer = new FileWriter( resultPath.toFile() );
 
         // write header
         writer.write( "Date,GameType" );
@@ -316,10 +338,20 @@ public class QuickSplit
     /**
      * Read in season start & finish dates.
      */
-    public static void loadSeasonsFromFile( File f ) throws Exception
+    public static void loadSeasonData( Path path ) throws Exception
     {
-        System.out.println( "Reading season dates from: " + f.getAbsolutePath() );
-        BufferedReader reader = new BufferedReader( new FileReader( f ) );
+        System.out.println( "Reading season dates from: " + path );
+        
+        if( !path.toFile().exists() )
+        {
+        	System.out.println( "Could not find season data file." );
+        	Season newSeason = new Season( "1", dateFormat.parse( "01/01/1900" ), null );
+        	mySeasons.add( newSeason );
+        	theCurrentSeason = newSeason;
+        	return;
+        }
+        
+        BufferedReader reader = new BufferedReader( new FileReader( path.toFile() ) );
         String line = null;
         while( ( line = reader.readLine() ) != null )
         {
@@ -336,6 +368,7 @@ public class QuickSplit
             mySeasons.add( s );
             theCurrentSeason = s;
         }
+        reader.close();
     }
 
     public static Season getSeasonById( String id )
@@ -361,7 +394,6 @@ public class QuickSplit
         List<Game> games = new ArrayList<Game>();
 
         // check each game sums to zero
-        //Date previousDate = null;
         for( Game g : myGames )
         {
             int sum = 0;
@@ -373,25 +405,7 @@ public class QuickSplit
             {
                 throw new Exception( "Game " + g + " has total sum of: " + sum );
             }
-
-            // check date is ascending
-            /*
-            if( previousDate != null && previousDate.compareTo( g.getDate() ) > 0 )
-            {
-                throw new Exception( "Invalid date: Previous=" + previousDate + ", Current=" + g.getDate() );
-            }
-            previousDate = g.getDate();
-            */
-
-            // look for duplicate dates
-            /*
-            if( games.contains( g ) )
-            {
-                System.out.println( "Duplicate entry exists for: " + g );
-            }
-            */
             games.add( g );
-
         }
 
     }

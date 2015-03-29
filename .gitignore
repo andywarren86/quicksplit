@@ -1,4 +1,14 @@
-# eclipse stuff
+*.class
+*.jar
+*.war
+*.ear
+*.tmp
+*.bak
+
+bin/
+tmp/
+
 .project
 .classpath
-/bin
+
+local.properties

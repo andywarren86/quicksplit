@@ -64,13 +64,15 @@ public class SummaryServlet extends BaseServlet
         }
         
         // get date of the last entry
-        Game lastGame = QuickSplit.getGameList().get( QuickSplit.getGameList().size()-1 );
+        Game lastGame = QuickSplit.getGameList().isEmpty() ? null :
+        	QuickSplit.getGameList().get( QuickSplit.getGameList().size()-1 );
 
         req.setAttribute( "gameTypes", Arrays.asList( GameType.values() ) );
         req.setAttribute( "gameType", gameType );
         req.setAttribute( "playerList", players );
         req.setAttribute( "stats", statsMap );
-        req.setAttribute( "lastUpdated", QuickSplit.format( lastGame.getDate() ) );
+        if( lastGame != null )
+        	req.setAttribute( "lastUpdated", QuickSplit.format( lastGame.getDate() ) );
         
         if( season == null )
         {

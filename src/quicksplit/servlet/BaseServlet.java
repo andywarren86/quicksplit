@@ -47,7 +47,15 @@ public abstract class BaseServlet extends HttpServlet
                     Arrays.toString( req.getParameterMap().get( name ) ) );
         }
 
-        processRequest( req, resp );
+        try
+        {
+        	processRequest( req, resp );
+        }
+        catch( Exception ex )
+        {
+        	System.err.println( "Exception occurred processing request" );
+        	ex.printStackTrace();
+        }
     }
     
     protected abstract void processRequest( HttpServletRequest req, HttpServletResponse resp )
