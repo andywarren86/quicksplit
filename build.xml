@@ -20,6 +20,7 @@
   <taskdef name="stop" classname="org.apache.catalina.ant.StopTask" />
   <taskdef name="deploy" classname="org.apache.catalina.ant.DeployTask" />
   <taskdef name="undeploy" classname="org.apache.catalina.ant.UndeployTask" />
+	<taskdef name="list" classname="org.apache.catalina.ant.ListTask"/>
 
   <target name="deploy" depends="war">
   	<echo>Deploying ${absolute.war.path} to /${project.name} (${url})</echo>
@@ -53,6 +54,12 @@
           username="${username}" 
           password="${password}"
           path="/${project.name}"/>
+  </target>
+	
+  <target name="list">
+    <list url="${url}" 
+          username="${username}" 
+          password="${password}"/>
   </target>
 	
   <target name="war">
