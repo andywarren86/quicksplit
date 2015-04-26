@@ -43,7 +43,6 @@ public class Game
     }
 
 
-    // package-private
     void addResult( final Result result )
     {
         myResults.add( result );
@@ -52,7 +51,7 @@ public class Game
     @Override
     public String toString()
     {
-        return QuickSplit.format( myDate ) + " " + myGameType;
+        return "Game " + myId + " (" + QuickSplit.formatDate( myDate ) + ")";
     }
 
     @Override
@@ -77,26 +76,6 @@ public class Game
             players.add( r.getPlayer() );
         }
         return players;
-    }
-
-
-    /**
-     * Return the season this games belongs to.
-     */
-    public Season getSeason()
-    {
-        for( final Season s : QuickSplit.getSeasonList() )
-        {
-            // if game is after the start date of the current season
-            // or between start & end dates of a previous season
-            if( ( QuickSplit.getCurrentSeason().equals( s ) && getDate().compareTo( s.getStartDate() ) >= 0 ) ||
-                ( getDate().compareTo( s.getStartDate() ) >= 0 && getDate().compareTo( s.getEndDate() ) <= 0 ) )
-            {
-                return s;
-            }
-        }
-
-        throw new IllegalStateException( "Failed to find a season for game: " + toString() );
     }
 
 }

@@ -32,7 +32,7 @@ public class Result
     @Override
     public String toString()
     {
-        return QuickSplit.format( this );
+        return QuickSplit.formatAmount( myAmount );
     }
     
 }

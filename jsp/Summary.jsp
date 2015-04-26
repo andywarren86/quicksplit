@@ -1,13 +1,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ page import="java.util.*" %>
-<%@ page import="quicksplit.core.*" %>
 
 <!DOCTYPE html>
 <html>
 
 	<head>
-	  <title>QuickSplit: Season Summary</title>
+	  <title>QuickSplit: Summary</title>
 	  <jsp:include page="common/includes.jsp" />
 	  <script type="text/javascript" src="js/jquery.tablesorter.min.js"></script>
 	  
@@ -27,59 +25,36 @@
 					zebrafyTable( $( ".summaryTable" ) ); 
 			  })
 			  
-				// event handlers
-				$( "#GameType" ).change( function(){
-					document.GameFilterForm.submit();
-				})
-				
-				$( "input[name='PreviousSeason']" ).click( function(){
-					$( "#Season" ).val( parseInt( $( "#Season" ).val() ) - 1 );
-					document.GameFilterForm.submit();
-				});
-				
-				$( "input[name='NextSeason']" ).click( function(){
-					$( "#Season" ).val( parseInt( $( "#Season" ).val() ) + 1 );
-					document.GameFilterForm.submit();
-				});
-				
 			});
 		</script>
 	</head>
 	
 	<body>
-		<h1>Summary - ${season}</h1>
-		<h3>${startDate} to ${endDate}</h3>
+		<h1>Summary - ${not empty season ? 'Season' : ''} ${not empty season ? season.id : 'ALL'}</h1>
+		<h3>
+		  <c:choose>
+		    <c:when test="${not empty season}">
+          <fmt:formatDate pattern="${dateFormat}" value="${season.startDate}"/> to 
+          <fmt:formatDate pattern="${dateFormat}" value="${season.endDate}"/>
+		    </c:when>
+		    <c:otherwise>Overall</c:otherwise>
+		  </c:choose>
+		</h3>
 	  
-	  <form name="GameFilterForm" method="get" action="Summary">
-	    <input type="hidden" name="Season" id="Season" value="${season.id}"/>
-	  
-			<label>Game Type:</label> 
-			<select name="GameType" id="GameType">
-			  <option value="">ALL</option>
-				<c:forEach items="${gameTypes}" var="type">
-					<c:choose>
-						<c:when test="${type==gameType}">
-					    <option selected="selected">${type}</option>
-						</c:when>
-						<c:otherwise>
-						  <option>${type}</option>
-						</c:otherwise>
-				  </c:choose>
-				</c:forEach>
-			</select>
-			<br/>
-			
-			<label>Season:</label> 
-	  	<c:if test="${season.id != 1}">
-	  	  <input type="button" name="PreviousSeason" value="Previous"/>
-	  	</c:if>
-	  	<c:if test="${not season.currentSeason}">
-	  		<input type="button" name="NextSeason" value="Next"/>
-	  	</c:if>
-	  </form>
-	  
-	  <p><a href="?Season=ALL">View overall statistics</a></p>
-		
+    <p>
+      Season: 
+      <c:forEach items="${seasons}" var="s">
+        <c:choose>
+          <c:when test="${s eq season}"><strong>${s.id}</strong></c:when>
+          <c:otherwise><a href="?Season=${s.id}">${s.id}</a></c:otherwise>
+        </c:choose>
+      </c:forEach>
+      <c:choose>
+        <c:when test="${not empty season}"><a href="?Season=ALL">ALL</a></c:when>
+        <c:otherwise><strong>ALL</strong></c:otherwise>
+      </c:choose>
+    </p>
+	  		
 	  <c:choose>
 	  	<c:when test="${not empty stats}">
 	  	
@@ -104,6 +79,13 @@
 					    <th></th>
 					    <th>Even<br/>Games</th>
 					    <th>Even %</th>
+					    <c:if test="${empty season}">
+			          <th></th>
+			          <th>Up<br/>Streak</th>
+			          <th>Up<br/>Streak $</th>
+			          <th>Down<br/>Streak</th>
+			          <th>Down<br/>Streak $</th>
+					    </c:if>
 					  </tr>
 					</thead>
 				  
@@ -128,11 +110,16 @@
 				  			<td></td>
 				  			<td style="text-align:right;">${stats[player].evenCount}</td>
 				  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].evenPercent}" pattern="0%" /></td>
+				  			<c:if test="${empty season}">
+			            <td></td>
+			            <td style="text-align:right;">${stats[player].winStreak}</td>
+			            <td style="text-align:right;"><fmt:formatNumber value="${stats[player].winStreakTotal/100}" pattern="0.00" /></td>
+			            <td style="text-align:right;">${stats[player].downStreak}</td>
+			            <td style="text-align:right;"><fmt:formatNumber value="${stats[player].downStreakTotal/100}" pattern="0.00" /></td>				  			</c:if>
 				  		</tr>
 				  	</c:forEach>
 				  </tbody>
 			  </table>
-			
 			</c:when>
 	  	<c:otherwise>
 	  		<h1><i>No Results Recorded</i></h1>
@@ -140,7 +127,7 @@
 	  	</c:otherwise>
 	  </c:choose>
 	  
-	  <p style="margin-top:1em;"><i>Last updated ${ lastUpdated }</i></p>
+	  <p style="margin-top:1em;"><i>Last updated <fmt:formatDate pattern="${dateFormat}" value="${lastUpdated}"/></i></p>
 	  
 	</body>
 

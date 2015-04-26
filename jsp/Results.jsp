@@ -1,8 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ page import="java.util.*" %>
-<%@ page import="quicksplit.core.*" %>
 
 <!DOCTYPE html>
 <html>
@@ -83,37 +81,21 @@
 	
 	<body>
 	
-		<h1>Results - ${season}</h1>
-		<h3>${startDate} to ${endDate}</h3>
-	  
-	  <form name="GameFilterForm" method="get" action="Results">
-	    <input type="hidden" name="Season" id="Season" value="${season.id}"/>
-	  
-			<label>Game Type:</label> 
-			<select name="GameType" id="GameType">
-			  <option value="">ALL</option>
-				<c:forEach items="${gameTypes}" var="type">
-					<c:choose>
-						<c:when test="${type==gameType}">
-					    <option selected="selected">${type}</option>
-						</c:when>
-						<c:otherwise>
-						  <option>${type}</option>
-						</c:otherwise>
-				  </c:choose>
-				</c:forEach>
-			</select>
-			<br/>
-			
-			<label>Season:</label> 
-	  	<c:if test="${season.id != 1}">
-	  	  <input type="button" name="PreviousSeason" value="Previous"/>
-	  	</c:if>
-	  	<c:if test="${not season.currentSeason}">
-	  		<input type="button" name="NextSeason" value="Next"/>
-	  	</c:if>
-	  </form>
-	  <br/>
+		<h1>Results - Season ${season.id}</h1>
+		<h3>
+      <fmt:formatDate pattern="${dateFormat}" value="${season.startDate}"/> to 
+      <fmt:formatDate pattern="${dateFormat}" value="${season.endDate}"/>
+    </h3>
+    
+		<p>
+		  Season: 
+			<c:forEach items="${seasons}" var="s">
+			  <c:choose>
+			    <c:when test="${s eq season}"><strong>${s.id}</strong></c:when>
+			    <c:otherwise><a href="Results?Season=${s.id}">${s.id}</a></c:otherwise>
+			  </c:choose>
+			</c:forEach>
+	  </p>
 	  
 	  <c:choose>
 	  	<c:when test="${not empty playerList}">
@@ -130,9 +112,16 @@
 				<table class="resultTable" style="margin-bottom: 3em;">
 				  <c:forEach items="${gameList}" var="game" varStatus="status">
 						<tr>
-							<td>${game}</td>
+							<td><fmt:formatDate pattern="${dateFormat}" value="${game.date}"/></td>
 							<c:forEach items="${resultsMap[game]}" var="result">
-								<td>${result}</td>
+							  <c:choose>
+							    <c:when test="${not empty result}">
+							      <td><fmt:formatNumber value="${result.amount/100}" pattern="0.00"/></td>
+							    </c:when>
+							    <c:otherwise>
+							      <td></td>
+							    </c:otherwise>
+							  </c:choose>
 							</c:forEach>
 					  </tr>
 					</c:forEach>

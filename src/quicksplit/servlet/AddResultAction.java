@@ -2,6 +2,7 @@ package quicksplit.servlet;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -38,7 +39,7 @@ public class AddResultAction extends BaseServlet
         Date date = null;
         try
         {
-            date = QuickSplit.dateFormat.parse( dateStr );
+            date = new SimpleDateFormat( QuickSplit.DATE_PATTERN ).parse( dateStr );
         }
         catch( ParseException e )
         {

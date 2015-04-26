@@ -24,7 +24,7 @@ public class AddResult extends BaseServlet
     {
         request.setAttribute( "Players", QuickSplit.getPlayerList() );
         request.setAttribute( "GameTypes", Arrays.asList( GameType.values() ) );
-        RequestDispatcher dispatcher = request.getRequestDispatcher( "/jsp/AddResult.jsp?Date=" + QuickSplit.format( new Date() ) );
+        RequestDispatcher dispatcher = request.getRequestDispatcher( "/jsp/AddResult.jsp?Date=" + QuickSplit.formatDate( new Date() ) );
         dispatcher.forward( request, response );
     }
 }

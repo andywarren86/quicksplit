@@ -13,24 +13,21 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 
 public class QuickSplit
 {
     private static final String NEW_LINE = "\r\n";
     private static final String PROPERTIES_FILE = "quicksplit/resources/quicksplit.properties";
 
-    private static Season theCurrentSeason = null;
     private static List<Player> myPlayers = new ArrayList<Player>();
     private static List<Game> myGames = new ArrayList<Game>();
     private static List<Season> mySeasons = new ArrayList<Season>();
     private static Properties myProperties = new Properties();
 
-    public static DecimalFormat moneyFormat = new DecimalFormat( "0.00" );
-    public static SimpleDateFormat dateFormat = new SimpleDateFormat( "dd/MM/yyyy" );
+    public static final String AMOUNT_PATTERN = "0.00";
+    public static final String DATE_PATTERN = "dd/MM/yyyy";
 
     public static void main( String[] args )
         throws Exception
@@ -41,65 +38,46 @@ public class QuickSplit
     public static void Startup()
         throws Exception
     {
+        System.out.println( "Quicksplit Startup Initiated" );
         loadProperties( PROPERTIES_FILE );
         loadSeasonData( Paths.get( getSeasonDataPath() ) );
         loadResultData( Paths.get( getResultDataPath() ) );
-
-        System.out.println( "Current Season: " + theCurrentSeason );
-        System.out.println( "Players: " + myPlayers.size() );
-        System.out.println( "Games: " + myGames.size() );
-
+        
         validateData();
         sortData();
-
-        System.out.println( "Finished startup processing." );
-    }
-
-    public static List<Player> getPlayerList()
-    {
-        return Collections.unmodifiableList( myPlayers );
-    }
-    
-    public static List<Player> getPlayerList( GameType gameType )
-    {
-        Set<Player> playerSet = new HashSet<Player>();
-        List<Game> games = getGameList( gameType );
-        for( Game game : games )
-        {
-            playerSet.addAll( game.getPlayers() );
-        }
-        List<Player> players = new ArrayList<Player>( playerSet );
-        Collections.sort( players );
-        return players;
-    }
-
-    public static List<Game> getGameList()
-    {
-        return Collections.unmodifiableList( myGames );
+        
+        System.out.println( "Seasons: " + mySeasons.size() );
+        System.out.println( "Players: " + myPlayers.size() );
+        System.out.println( "Games: " + myGames.size() );
+        System.out.println( "Current Season: " + Season.getCurrentSeason() );
+        
+        System.out.println( "Completed startup processing" );
     }
     
-    public static List<Game> getGameList( GameType gameType )
-    {
-        List<Game> games = new ArrayList<Game>();
-        for( Game game : myGames )
-        {
-            if( gameType == null || game.getGameType() == gameType )
-            {
-                games.add( game );
-            }
-        }
-        return games;
-    }
-
+    /**
+     * Returns the list of all Seasons
+     */
     public static List<Season> getSeasonList()
     {
         return Collections.unmodifiableList( mySeasons );
     }
 
-    public static Season getCurrentSeason()
+    /**
+     * Return the list of all Players
+     */
+    public static List<Player> getPlayerList()
     {
-        return theCurrentSeason;
+        return Collections.unmodifiableList( myPlayers );
     }
+
+    /**
+     * Return the list of all Games
+     */
+    public static List<Game> getGameList()
+    {
+        return Collections.unmodifiableList( myGames );
+    }
+    
 
     /**
      * Return result for a Game & Player
@@ -122,23 +100,16 @@ public class QuickSplit
      */
     private static void loadProperties( String resourceName ) throws IOException
     {
-        InputStream inputStream = null;
-        try
+        System.out.println( "Loading properties from resource: " + resourceName );
+        try( InputStream inputStream = 
+                 QuickSplit.class.getClassLoader().getResourceAsStream( resourceName ) )
         {
-            inputStream = QuickSplit.class.getClassLoader().getResourceAsStream( resourceName );
             if( inputStream == null )
             {
                 throw new IllegalArgumentException( "Failed to load properties from: " + resourceName );
             }
-            myProperties.load( inputStream );
-            System.out.println( "Properties loaded from: " + resourceName );
-        }
-        finally
-        {
-            if( inputStream != null )
-            {
-                inputStream.close();
-            }
+            myProperties.load( inputStream );            
+            myProperties.list( System.out );
         }
     }
     
@@ -206,10 +177,14 @@ public class QuickSplit
 	            else
 	            {
 	                // create game
-	                Date date = dateFormat.parse( fields[0] );
+	                Date date = new SimpleDateFormat( DATE_PATTERN ).parse( fields[0] );
 	                GameType gameType = GameType.valueOf( fields[1] );
 	                Game game = new Game( date, gameType );
 	                myGames.add( game );
+	                
+	                // add to season
+	                Season season = Season.getSeasonFromDate( date );
+	                season.addGame( game );
 	
 	                // for each result
 	                for( int i=2; i<fields.length; i++ )
@@ -251,6 +226,10 @@ public class QuickSplit
 
         Game newGame = new Game( gameDate, gameType );
         myGames.add( newGame );
+        
+        Season season = Season.getSeasonFromDate( gameDate );
+        season.addGame( newGame );
+        
         for( int i=0; i<names.size(); i++ )
         {
             String name = names.get( i );
@@ -311,7 +290,7 @@ public class QuickSplit
         for( Game game : myGames )
         {
             // write date
-            writer.write( format( game.getDate() ) );
+            writer.write( formatDate( game.getDate() ) );
             
             // write game type
             writer.write( "," + game.getGameType() );
@@ -324,7 +303,7 @@ public class QuickSplit
 
                 if( r != null )
                 {
-                    writer.write( format( r ) );
+                    writer.write( formatAmount( r.getAmount() ) );
                 }
             }
 
@@ -345,42 +324,24 @@ public class QuickSplit
         if( !path.toFile().exists() )
         {
         	System.out.println( "Could not find season data file." );
-        	Season newSeason = new Season( "1", dateFormat.parse( "01/01/1900" ), null );
+        	Season newSeason = new Season( "1", new SimpleDateFormat( DATE_PATTERN ).parse( "01/01/1900" ), new Date() );
         	mySeasons.add( newSeason );
-        	theCurrentSeason = newSeason;
         	return;
         }
         
-        BufferedReader reader = new BufferedReader( new FileReader( path.toFile() ) );
-        String line = null;
-        while( ( line = reader.readLine() ) != null )
+        try( BufferedReader reader = new BufferedReader( new FileReader( path.toFile() ) ) )
         {
-            String[] fields = line.split( "," );
-            String id = fields[0];
-            Date startDate = dateFormat.parse( fields[1] );
-            Date endDate = null;
-            if( fields.length == 3 && !fields[2].equals( "" ) )
+            String line = null;
+            while( ( line = reader.readLine() ) != null )
             {
-                endDate = dateFormat.parse( fields[2] );
-            }
-
-            Season s = new Season( id, startDate, endDate );
-            mySeasons.add( s );
-            theCurrentSeason = s;
-        }
-        reader.close();
-    }
-
-    public static Season getSeasonById( String id )
-    {
-        for( Season s : mySeasons )
-        {
-            if( s.getId().equals( id ) )
-            {
-                return s;
+                String[] fields = line.split( "," );
+                String id = fields[0];
+                Date startDate = new SimpleDateFormat( DATE_PATTERN ).parse( fields[1] );
+                Date endDate = new SimpleDateFormat( DATE_PATTERN ).parse( fields[2] );
+                Season s = new Season( id, startDate, endDate );
+                mySeasons.add( s );
             }
         }
-        return null;
     }
 
     /**
@@ -420,22 +381,13 @@ public class QuickSplit
         Collections.sort( myGames );
     }
 
-
-    public static String format( Result r )
+    public static String formatAmount( int amount )
     {
-        return format( r.getAmount() );
+        return new DecimalFormat( AMOUNT_PATTERN ).format( amount/100.0 );
     }
-    public static String format( int amount )
+    public static String formatDate( Date d )
     {
-        return moneyFormat.format( amount/100.0 );
-    }
-    public static String format( double amount )
-    {
-        return moneyFormat.format( amount/100 );
-    }
-    public static String format( Date d )
-    {
-        return dateFormat.format( d );
+        return new SimpleDateFormat( DATE_PATTERN ).format( d );
     }
 
 }
