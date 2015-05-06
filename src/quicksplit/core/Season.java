@@ -1,11 +1,14 @@
 package quicksplit.core;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.commons.lang3.time.DateUtils;
 
 public class Season implements Comparable<Season>
 {
@@ -13,15 +16,15 @@ public class Season implements Comparable<Season>
     private final Date startDate;
     private final Date endDate;
     private final List<Game> games;
-    
-    Season( String id, Date startDate, Date endDate )
+
+    Season( final String id, final Date startDate, final Date endDate )
     {
         this.id = id;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.startDate = DateUtils.truncate( startDate, Calendar.DATE );
+        this.endDate = DateUtils.truncate( endDate, Calendar.DATE );
         games = new ArrayList<>();
     }
-    
+
     public String getId()
     {
         return id;
@@ -34,13 +37,13 @@ public class Season implements Comparable<Season>
     {
         return endDate;
     }
-    
+
     public boolean isCurrentSeason()
     {
         return getCurrentSeason().equals( this );
     }
-    
-    public void addGame( Game g )
+
+    public void addGame( final Game g )
     {
         games.add( g );
         Collections.sort( games );
@@ -50,22 +53,22 @@ public class Season implements Comparable<Season>
     {
         return Collections.unmodifiableList( games );
     }
-    
+
     /**
      * Return all Players that have played a game this Season
      */
     public List<Player> getPlayers()
     {
-        Set<Player> playerSet = new HashSet<Player>();
-        for( Game g : games )
+        final Set<Player> playerSet = new HashSet<Player>();
+        for( final Game g : games )
         {
             playerSet.addAll( g.getPlayers() );
         }
-        List<Player> players = new ArrayList<Player>( playerSet );
+        final List<Player> players = new ArrayList<Player>( playerSet );
         Collections.sort( players );
         return players;
     }
-    
+
     @Override
     public String toString()
     {
@@ -73,28 +76,29 @@ public class Season implements Comparable<Season>
     }
 
 	@Override
-	public int compareTo( Season season ) 
+	public int compareTo( final Season season )
 	{
 		return startDate.compareTo( season.getStartDate() );
 	}
-	
+
 	/*
 	 * Static utility methods
 	 */
-	
+
     /**
      * Returns the current Season. This is the Season that spans the current date.
      */
     public static Season getCurrentSeason()
     {
         return getSeasonFromDate( new Date() );
-    }	
+    }
+
 	/**
 	 * Return the Season with the specified id
 	 */
-    public static Season getSeasonById( String id )
+    public static Season getSeasonById( final String id )
     {
-        for( Season s : QuickSplit.getSeasonList() )
+        for( final Season s : QuickSplit.getSeasonList() )
         {
             if( s.getId().equals( id ) )
             {
@@ -103,15 +107,19 @@ public class Season implements Comparable<Season>
         }
         return null;
     }
-	
+
 	/**
 	 * Return the season which encompasses the specified date or null if one doesn't exist.
 	 */
 	public static Season getSeasonFromDate( Date date )
 	{
+	    date = DateUtils.truncate( date, Calendar.DATE );
+
+	    // figure out which season covers the specified date
+	    // date must fall between, or be equal to the season's start and end dates
         for( final Season s : QuickSplit.getSeasonList() )
         {
-            if( s.getStartDate().compareTo( date ) <= 0 && s.getEndDate().compareTo( date ) >= 0 )
+            if( s.getStartDate().compareTo( date ) <= 0 && date.compareTo( s.getEndDate() ) <= 0 )
             {
                 return s;
             }
