@@ -75,6 +75,7 @@
     	<zipfileset dir="css" prefix="css"/>
     	<zipfileset dir="js" prefix="js"/>
     	<zipfileset dir="jsp" prefix="jsp"/>
+    	<zipfileset dir="fonts" prefix="fonts"/>
   	</war>
 	
   </target>
