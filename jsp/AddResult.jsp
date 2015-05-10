@@ -1,23 +1,43 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ page import="java.util.*" %>
-<%@ page import="quicksplit.core.*" %>
 
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
 	<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	
 	  <title>QuickSplit: Add Results</title>
-	  <jsp:include page="common/includes.jsp" />
 	  
+		<!-- jQuery -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+		<!--<script src="js/jquery-1.5.1.min.js"></script>-->
+		<script src="js/jquery-ui-1.8.14.custom.min.js"></script>
+    <link type="text/css" href="css/ui-lightness/jquery-ui-1.8.14.custom.css" rel="stylesheet" />
+ 
+    <!-- Bootstrap -->
+    <script src="js/bootstrap.js"></script>
+    <link type="text/css" href="css/bootstrap.css" rel="stylesheet">
+    <link type="text/css" href="css/bootstrap-theme.css" rel="stylesheet">
+    
+    <!-- Quicksplit -->
+    <script src="js/quicksplit.js"></script>
+    <!-- <link type="text/css" href="css/style.css" rel="stylesheet" /> -->
+      
+	  <!-- Page JS -->
 	  <script type="text/javascript">
 	    var players;
 	    
 	    $(function(){
 	    	
 	    	// configure date field
+	    	/*
 				$("#datepicker").datepicker({
 					dateFormat: "dd/mm/yy",
 					defaultDate: new Date()
 				});
+	    	*/
 				
 				// get all player names for autocomplete
 				players = [];
@@ -33,143 +53,163 @@
 			  		amount: "${paramValues.Result[loop.index]}" });
 			  </c:forEach>
 			  
-			  generateFields( results );
+			  // create new result row when last row is changed			  
+			  $( "form" ).on( "change", ".result-row input", addRow );
+			  
+			  // set autocomplete
+			  /*
+			  $( ".result-row input[name='Player']" ).autocomplete({
+				  source: players,
+		      delay: 0
+		    });
+			  */
+			  
+			  $( "input[name='Date']" ).on( "blur", function(){
+				  var val = $(this).val();
+				  if( val == "" )
+					  console.log( "Date Error >:(|)" );
+				  
+			  });
+			  
 		  });
 	    
-	    function resetHandlers()
+	    function addRow()
 	    {
-				$( "input[type='text'][name='Player']" ).autocomplete({
-				  source: players,
-					delay: 0
-				});
-				
-				$( "input[type='text']" ).blur( function( e ){
-					addEmptyRow();
-			  });
+	    	var lastRow = $( ".result-row:last" );
+	    	var val = false;
+	    	lastRow.find( ":input" ).each( function(){
+	    		val = val || $(this).val();
+	    	});
+	    	
+	    	if( val )
+	    	{
+	    		var newRow = $( ".result-row:first" ).clone();
+	    		newRow.find( ":input" ).val( null );
+	    		$( ".result-row:last" ).after( newRow );
+	    	}
 	    }
 		  
 		  function clearForm()
 		  {
-		    $( "input[type='text']" ).val( "" );
+		    $( ".result-row:input" ).val( null );
 		  }
 		  
-		  function generateFields( results )
-		  {
-			  for( var i=0; i<results.length; i++ )
-				{
-				  $( "#resultsTable tbody" ).append( getRowElement( results[i].player, results[i].amount ) );
-				}
-			  addEmptyRow();
-			  resetHandlers();
-		  }
-		  
-		  // adds an empty result row provided the final row isn't already empty
-		  function addEmptyRow()
-		  {
-			  if( $( "#resultsTable tbody tr:last input:first" ).val() != "" ||
-					  $( "#resultsTable tbody tr:last input:last" ).val() != "" )
-				{
-			  	$( "#resultsTable tbody" ).append( getRowElement( "", "" ) );
-			  	resetHandlers();
-				}
-		  }
-		  
-		  function getRowElement( player, result )
-		  {
-			  return $( 
-					  "<tr>" + 
-					    "<td><input type='text' name='Player' value='" + player + "'/></td>" + 
-					    "<td><input type='text' name='Result' value='" + result + "'/></td>" + 
-					  "</tr>" );
-		  }
 	  </script>
 	</head>
 	
 	<body>
-		<h1>Add Results</h1>
-		
-		<c:if test="${not empty Errors}">
-	    <div class="ui-widget">
-				<div style="padding: 0pt 0.7em; margin-top: 20px;" class="ui-state-error ui-corner-all">
-				  <c:forEach items="${Errors}" var="error">
-						<p>
-							<span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-alert">&nbsp;</span>
-							${error}
-						</p>
-				  </c:forEach>
+	
+   <nav class="navbar navbar-default navbar-static-top">
+     <div class="container">
+     
+       <div class="navbar-header">
+         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+           <span class="sr-only">Toggle navigation</span>
+           <span class="icon-bar"></span>
+           <span class="icon-bar"></span>
+           <span class="icon-bar"></span>
+         </button>
+         <a class="navbar-brand" href="#">QuickSplit</a>
+       </div>
+       
+       <div id="navbar" class="navbar-collapse collapse">
+         <ul class="nav navbar-nav navbar-right">
+           <li><a href="#">Summary</a></li>
+           <li><a href="#">Results</a></li>
+           <li class="dropdown">
+             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Admin <span class="caret"></span></a>
+             <ul class="dropdown-menu" role="menu">
+               <li><a href="#" class="active">Add Result</a></li>
+               <li><a href="#">Add Player</a></li>
+             </ul>
+           </li>
+         </ul>
+       </div>
+       
+     </div>
+   </nav>
+   
+   <datalist id="players">
+     <c:forEach items="${Players}" var="player">
+       <option value="${player.name}"/>
+     </c:forEach>
+   </datalist>
+	    
+	  <div class="container">
+	  
+		  <h1>Add Results</h1>
+				
+		  <p class="lead">Use this form to create a new result.</p>
+	 
+      <c:forEach items="${Errors}" var="error">
+	      <div class="alert alert-danger" role="alert">
+	        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+	        <p>${error}</p>
+	      </div>      
+	    </c:forEach>
+	    
+	    <c:forEach items="${Warnings}" var="warning">
+	      <div class="alert alert-warning" role="alert">
+	        <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+	        <p>${warning}</p>
+	      </div>
+	    </c:forEach>
+			
+			<!-- <p class="bg-danger">Such error, very dog</p>-->
+			
+			<form name="AddResultForm" method="get" action="AddResultAction">
+			
+				<div class="form-group has-error">
+				  <label class="control-label">Game Date</label>
+				  <input type="date" class="form-control" name="Date" value="${CurrentDate}" />
+				  <span class="help-block"><strong>Error: </strong>Please enter a better date</span>
+				  <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
 				</div>
-			</div>
-	  </c:if>
+				
+				<!-- 
+				<div class="form-group">
+					<label class="control-label">Game Type</label> 
+					<select name="GameType" class="form-control">
+						<c:forEach items="${GameTypes}" var="type">
+							<c:choose>
+								<c:when test="${type==param.GameType}">
+							    <option selected="selected">${type}</option>
+								</c:when>
+								<c:otherwise>
+								  <option>${type}</option>
+								</c:otherwise>
+						  </c:choose>
+						</c:forEach>
+					</select>
+					<span class="help-block">Help text!</span>
+			  </div>
+			  -->
+			  <input type="hidden" name="GameType" value="HOLDEM"/>
+			  
+			  <label>Results</label>
+			  <div class="form-inline result-row" style="margin-bottom:5px">
+			    <div class="form-group">
+			      <label class="sr-only">Player</label>
+			      <input type="text" list="players" class="form-control" name="Player" placeholder="Player"/>
+			      <!--<span class="help-block">Help text!</span>-->
+			    </div>
+          <div class="form-group">
+            <label class="sr-only">Amount</label>
+            <div class="input-group">
+              <div class="input-group-addon">$</div>
+              <input type="number" class="form-control" name="Amount" placeholder="Amount" step="0.05"/>
+            </div>
+          </div>			  
+        </div>
+        
+				<br/>
+				
+				<input type="submit" class="btn btn-primary" value="Submit"/>
+				<input type="button" class="btn btn-default" value="Clear"/>
 
-		<c:if test="${not empty Warnings}">
-	    <div class="ui-widget">
-				<div style="padding: 0pt 0.7em; margin-top: 20px;" class="ui-state-highlight ui-corner-all"> 
-					<c:forEach items="${Warnings}" var="warning">
-					  <p>
-					  	<span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-info">&nbsp;</span>
-						  ${warning}
-						</p>
-				  </c:forEach>
-				</div>
-			</div>
-		</c:if>
-		
-		<c:if test="${Success}">
-	    <div class="ui-widget">
-				<div style="padding: 0pt 0.7em; margin-top: 20px;" class="ui-state-success ui-corner-all"> 
-				  <p>
-				  	<span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-check">&nbsp;</span>
-					  New record has been added for ${NewGame}.
-					</p>
-				</div>
-			</div>
-		</c:if>
-		
-		
-		<br/>
-		<form name="AddResultForm" method="get" action="AddResultAction">
-		
-			<!-- Datepicker -->
-			<label>Game Date:</label>
-			<input type="text" id="datepicker" name="Date" size="15" value="${param.Date}" />
-			<br/>
+			</form>
 			
-			<label>Game Type:</label> 
-			<select name="GameType">
-				<c:forEach items="${GameTypes}" var="type">
-					<c:choose>
-						<c:when test="${type==param.GameType}">
-					    <option selected="selected">${type}</option>
-						</c:when>
-						<c:otherwise>
-						  <option>${type}</option>
-						</c:otherwise>
-				  </c:choose>
-				</c:forEach>
-			</select>
-			<br/><br/>
-			
-			<table id="resultsTable">
-				<thead>
-					<tr>
-						<th>Player</th>
-						<th>$</th>
-				  </tr>
-				</thead>
-				
-				<!-- Table content dynamically generated by javascript -->
-				<tbody>
-				</tbody>
-				
-			</table>
-			
-			<br/><br/>
-			<input type="submit" name="submit" value="Submit" />
-			<input type="button" value="Clear" onclick="javascript:clearForm();" />
-			<c:if test="${Confirm}">
-			  <input type="submit" name="submit" value="Confirm" />
-			</c:if>
-		</form>
+		</div>
 		
   </body>
   

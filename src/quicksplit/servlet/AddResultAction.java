@@ -6,7 +6,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -30,7 +33,7 @@ public class AddResultAction extends BaseServlet
         throws ServletException, IOException
     {
         List<String> warnings = new ArrayList<String>();
-        List<String> errors = new ArrayList<String>();
+        Map<String,String> errors = new HashMap<String,String>();
         
         // parse date
         String dateStr = request.getParameter( "Date" );
@@ -43,7 +46,7 @@ public class AddResultAction extends BaseServlet
         }
         catch( ParseException e )
         {
-            errors.add( "Invalid date format." );
+            errors.put( "Date", "Invalid date format." );
         }
         
         // check if a game with the same date is already present
@@ -53,7 +56,7 @@ public class AddResultAction extends BaseServlet
             {
                 if( g.getDate().equals( date ) && g.getGameType() == gameType )
                 {
-                    errors.add( "Game already exists: " + g );
+                    errors.put( "Date", "Game already exists: " + g );
                 }
             }
         }
@@ -61,23 +64,27 @@ public class AddResultAction extends BaseServlet
         // validate data
         int sum = 0;
         String[] names = request.getParameterValues( "Player" );
-        String[] results = request.getParameterValues( "Result" );
+        String[] results = request.getParameterValues( "Amount" );
         List<Integer> amountList = new ArrayList<Integer>();
         List<String> nameList = new ArrayList<String>();
         
+        if( names.length == 0 )
+            errors.put( "Name1", "Mandatory" );
+        if( results.length == 0 )
+            errors.put( "Result1", "Mandatory" );
         
         for( int i=0; i<names.length; i++ )
         {
             String name = names[i];
             String result = results[i];
 
-            if( name.isEmpty() != result.isEmpty() )
-            {
-                errors.add( "Invalid data on row " + (i+1) );
-                continue;
-            }
+            if( name.isEmpty() )
+                errors.put( "Name"+(i+1), "Mandatory" );
             
-            if( name.isEmpty() || result.isEmpty() )
+            if( result.isEmpty() )
+                errors.put( "Result"+(i+1), "Mandatory" );
+
+            if( errors.containsKey( "Name"+(i+1) ) || errors.containsKey( "Result"+(i+1) ) )
             {
                 continue;
             }
@@ -94,44 +101,22 @@ public class AddResultAction extends BaseServlet
             }
             catch( NumberFormatException nfe )
             {
-                errors.add( "Invalid amount: " + result );
+                errors.put( "Result"+(i+1), "Invalid amount: " + result );
                 continue;
             }
             
             int cents = (int)Math.round( resultDbl * 100 );
-            if( cents % 5 != 0 )
-            {
-                errors.add( "Amount (" + result + ") must be multiple of 0.05" );
-                continue;
-            }
-            
             nameList.add( name );
             amountList.add( cents );
             
             sum += cents;
         }
         
-        if( nameList.isEmpty() )
-        {
-            errors.add( "No valid results." );
-        }
-        
-        // check if a game already exists with the same results
-        if( errors.isEmpty() )
-        {
-            for( Game existingGame : QuickSplit.getGameList() )
-            {
-                if( matchResults( existingGame, nameList, amountList ) )
-                {
-                    warnings.add( "Results matched to existing game: " + existingGame );
-                }
-            }
-        }
-        
+
         // check sum
         if( sum != 0 )
         {
-            errors.add( "Sum must equal zero. Sum=" + sum );
+            errors.put( "Result" + results.length, "Sum must equal zero. Sum=" + sum );
         }
 
         if( errors.isEmpty() )
@@ -161,9 +146,9 @@ public class AddResultAction extends BaseServlet
             }
         }
         
-        RequestDispatcher dispatcher = request.getRequestDispatcher( "/jsp/AddResult.jsp"  );
-        request.setAttribute( "Players", QuickSplit.getPlayerList() );
-        request.setAttribute( "GameTypes", Arrays.asList( GameType.values() ) );
+        RequestDispatcher dispatcher = request.getRequestDispatcher( "/AddResult"  );
+        //request.setAttribute( "Players", QuickSplit.getPlayerList() );
+        //request.setAttribute( "GameTypes", Arrays.asList( GameType.values() ) );
         request.setAttribute( "Warnings", warnings );
         request.setAttribute( "Errors", errors );
         dispatcher.forward( request, response );
@@ -197,5 +182,34 @@ public class AddResultAction extends BaseServlet
         
         // each result has been matched
         return true;
+    }
+    
+    public class AddResultActionForm 
+    {
+        // fields
+        // values
+        // validators?
+        // errors
+        
+        Map<String,FormField> myFields = new LinkedHashMap<>();
+        
+        public AddResultActionForm()
+        {
+            // TODO Auto-generated constructor stub
+        }
+        
+        public static fromRequest( HttpServletRequest request )
+        {
+            return new AddResultActionForm();
+        }
+        
+        
+    }
+    
+    public class FormField
+    {
+        private String name;
+        private String value;
+        private String error;
     }
 }

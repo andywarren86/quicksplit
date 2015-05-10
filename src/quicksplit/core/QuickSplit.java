@@ -20,7 +20,8 @@ public class QuickSplit
 {
     private static final String NEW_LINE = "\r\n";
     private static final String PROPERTIES_FILE = "quicksplit/resources/quicksplit.properties";
-
+    private static final String LOCAL_PROPERTIES_FILE = "quicksplit/resources/quicksplit.local.properties";
+    
     private static List<Player> myPlayers = new ArrayList<Player>();
     private static List<Game> myGames = new ArrayList<Game>();
     private static List<Season> mySeasons = new ArrayList<Season>();
@@ -40,6 +41,7 @@ public class QuickSplit
     {
         System.out.println( "Quicksplit Startup Initiated" );
         loadProperties( PROPERTIES_FILE );
+        loadProperties( LOCAL_PROPERTIES_FILE );
         loadSeasonData( Paths.get( getSeasonDataPath() ) );
         loadResultData( Paths.get( getResultDataPath() ) );
         
@@ -106,7 +108,8 @@ public class QuickSplit
         {
             if( inputStream == null )
             {
-                throw new IllegalArgumentException( "Failed to load properties from: " + resourceName );
+                System.out.println( "Could not find resource." );
+                return;
             }
             myProperties.load( inputStream );            
             myProperties.list( System.out );
