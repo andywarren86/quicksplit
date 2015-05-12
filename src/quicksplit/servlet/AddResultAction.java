@@ -4,14 +4,11 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +18,6 @@ import quicksplit.core.Game;
 import quicksplit.core.GameType;
 import quicksplit.core.Player;
 import quicksplit.core.QuickSplit;
-import quicksplit.core.Result;
 
 @AuthorisationRequired
 @WebServlet("/AddResultAction")
@@ -118,6 +114,21 @@ public class AddResultAction extends BaseServlet
         {
             errors.put( "Result" + results.length, "Sum must equal zero. Sum=" + sum );
         }
+        
+        // redirect back to AddResult page
+        if( !errors.isEmpty() )
+        {
+            request.setAttribute( "Warnings", warnings );
+            request.setAttribute( "Errors", errors );
+            request.getRequestDispatcher( "/AddResult"  ).forward( request, response );        
+        }
+        else
+        {
+            request.setAttribute( "Warnings", warnings );
+            request.getRequestDispatcher( "/jsp/AddResultConfirm.jsp" ).forward( request, response );
+        }
+        
+        /*
 
         if( errors.isEmpty() )
         {
@@ -145,71 +156,10 @@ public class AddResultAction extends BaseServlet
                 return;
             }
         }
+        */
         
-        RequestDispatcher dispatcher = request.getRequestDispatcher( "/AddResult"  );
-        //request.setAttribute( "Players", QuickSplit.getPlayerList() );
-        //request.setAttribute( "GameTypes", Arrays.asList( GameType.values() ) );
-        request.setAttribute( "Warnings", warnings );
-        request.setAttribute( "Errors", errors );
-        dispatcher.forward( request, response );
+
     }
     
-    /**
-     * Are all of the results contained within the existing game?
-     */
-    private boolean matchResults( Game existingGame, List<String> names, List<Integer> amounts )
-    {
-        for( int i=0; i<names.size(); i++ )
-        {
-            boolean match = false;
-            for( Result r : existingGame.getResults() )
-            {
-                String name = r.getPlayer().getName();
-                Integer amount = r.getAmount();
-                if( names.get( i ).equals( name ) && amounts.get( i ).equals( amount ) )
-                {
-                    match = true;
-                    break;
-                }
-            }
-            
-            // no matching result found
-            if( !match )
-            {
-                return false;
-            }
-        }
-        
-        // each result has been matched
-        return true;
-    }
     
-    public class AddResultActionForm 
-    {
-        // fields
-        // values
-        // validators?
-        // errors
-        
-        Map<String,FormField> myFields = new LinkedHashMap<>();
-        
-        public AddResultActionForm()
-        {
-            // TODO Auto-generated constructor stub
-        }
-        
-        public static fromRequest( HttpServletRequest request )
-        {
-            return new AddResultActionForm();
-        }
-        
-        
-    }
-    
-    public class FormField
-    {
-        private String name;
-        private String value;
-        private String error;
-    }
 }

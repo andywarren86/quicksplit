@@ -1,5 +1,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
+<%@ page import="java.util.*" %>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -208,6 +210,42 @@
 				<input type="button" class="btn btn-default" value="Clear"/>
 
 			</form>
+			
+			<h4>Request Scope Attributes</h4>
+			<table class="table">
+			  <thead>
+			    <tr>
+			      <th>Name</th>
+			      <th>Value</th>
+			    </tr>
+			  </thead>
+			  <tbody>
+			    <c:forEach items="${requestScope}" var="e">
+			      <tr>
+				      <td>${e.key}</td>
+				      <td>${e.value}</td>
+				    </tr>
+			    </c:forEach>
+			  </tbody>
+			</table>
+			
+			<h4>Request Params</h4>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <c:forEach items="${param}" var="e">
+            <tr>
+              <td>${e.key}</td>
+              <td>${e.value}</td>
+            </tr>
+          </c:forEach>
+        </tbody>
+      </table>			
 			
 		</div>
 		
