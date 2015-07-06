@@ -10,7 +10,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
   
-    <title>QuickSplit: Add Results</title>
+    <title>QuickSplit: View Game</title>
     
     <!-- jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
@@ -69,35 +69,20 @@
       
     <div class="container">
     
-      <c:choose>
-        <c:when test="${Success}">
-          <div class="alert alert-success" role="alert">
-            <strong>Well done!</strong> A new result has been entered into the system.
-          </div>        
-        </c:when>
-        <c:otherwise>
-		      <p class="lead">Please review any warnings and confirm the details before saving.</p>
-		   
-		      <c:forEach items="${Warnings}" var="warning">
-		        <div class="alert alert-warning" role="alert">
-		          <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
-		          <p>${warning}</p>
-		        </div>
-		      </c:forEach>
-		      
-		      <div class="alert alert-warning" role="alert">
-		        <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
-		        Player <strong>Adam</strong> has not played in a while. Are you sure?
-		      </div>
-        </c:otherwise>
-      </c:choose>
+      <c:if test="${Success}">
+        <div class="alert alert-success" role="alert">
+          <span class="glyphicon glyphicon-thumbs-up"></span> 
+          Well done. You've added a new result!
+        </div>        
+      </c:if>
     
-      <h1>Confirm Result</h1>
-        
-      <p>Game Date: <fmt:formatDate pattern="${dateFormat}" value="${Model.gameDateAsDate}"/></p>
-      <p>Game Type: ${Model.gameType}</p>
+      <h1>Game Details</h1>
       
-      <h4>Results</h4>      
+      <p>ID: ${Game.id}</p>
+      <p>Season: ${Season}</p>
+      <p>Date: <fmt:formatDate pattern="${dateFormat}" value="${Game.date}"/></p>
+      <p>Type: ${Game.gameType}</p>
+      
       <table class="table">
         <thead>
           <tr>
@@ -105,23 +90,16 @@
             <th>Amount</th>
         </thead>
         <tbody>
-          <c:forEach items="${Model.results}" var="result">
-	          <tr>
-	            <td>${result.player}</td>
-	            <td><fmt:formatNumber value="${result.amount}" pattern="0.00"/></td>
-	          </tr>
-	        </c:forEach>
+          <c:forEach items="${Game.results}" var="result">
+            <tr>
+              <td>${result.player}</td>
+              <td class="${result.amount < 0 ? 'text-danger' : ''}">
+                <fmt:formatNumber value="${result.amount/100}" pattern="0.00"/>
+              </td>
+            </tr>
+          </c:forEach>
         </tbody>
       </table>
-      
-      <c:if test="${not Success}">
-	      <form name="AddResultForm" method="get" action="AddResultConfirmAction">
-	        <input type="hidden" name="UUID" value="${UUID}"/>
-	        <button class="btn btn-default" name="Action" value="Back">Back</button>
-	        <button class="btn btn-primary" name="Action" value="Save">Save Result</button>
-	      </form>
-      </c:if>
-      
       
     </div>
     

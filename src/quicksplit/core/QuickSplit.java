@@ -16,6 +16,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
+import quicksplit.servlet.model.AddResultModel;
+import quicksplit.servlet.model.AddResultModel.ResultModel;
+
 public class QuickSplit
 {
     private static final String NEW_LINE = "\r\n";
@@ -29,12 +32,6 @@ public class QuickSplit
 
     public static final String AMOUNT_PATTERN = "0.00";
     public static final String DATE_PATTERN = "dd/MM/yyyy";
-
-    public static void main( String[] args )
-        throws Exception
-    {
-        Startup();
-    }
 
     public static void Startup()
         throws Exception
@@ -84,9 +81,9 @@ public class QuickSplit
     /**
      * Return result for a Game & Player
      */
-    public static Result getResult( Game g, Player p )
+    public static Result getResult( final Game g, final Player p )
     {
-        for( Result r : g.getResults() )
+        for( final Result r : g.getResults() )
         {
             if( r.getPlayer().equals( p ) )
             {
@@ -100,7 +97,7 @@ public class QuickSplit
      * Load properties from the named resource.
      * @throws IOException 
      */
-    private static void loadProperties( String resourceName ) throws IOException
+    private static void loadProperties( final String resourceName ) throws IOException
     {
         System.out.println( "Loading properties from resource: " + resourceName );
         try( InputStream inputStream = 
@@ -119,7 +116,7 @@ public class QuickSplit
     /**
      * Returns a property value given a key.
      */
-    public static String getProperty( String key )
+    public static String getProperty( final String key )
     {
         return myProperties.getProperty( key );
     }
@@ -145,7 +142,7 @@ public class QuickSplit
     /**
      * Read results from file into memory.
      */
-    public static void loadResultData( Path resultPath )
+    public static void loadResultData( final Path resultPath )
         throws Exception
     {
         System.out.println( "Reading result data from: " + resultPath );
@@ -163,7 +160,7 @@ public class QuickSplit
 	        while( ( line = reader.readLine() ) != null )
 	        {
 	            count++;
-	            String[] fields = line.split( "," );
+	            final String[] fields = line.split( "," );
 	            if( fields.length == 0 )
 	            {
 	                break;
@@ -180,19 +177,19 @@ public class QuickSplit
 	            else
 	            {
 	                // create game
-	                Date date = new SimpleDateFormat( DATE_PATTERN ).parse( fields[0] );
-	                GameType gameType = GameType.valueOf( fields[1] );
-	                Game game = new Game( date, gameType );
+	                final Date date = new SimpleDateFormat( DATE_PATTERN ).parse( fields[0] );
+	                final GameType gameType = GameType.valueOf( fields[1] );
+	                final Game game = new Game( date, gameType );
 	                myGames.add( game );
 	                
 	                // add to season
-	                Season season = Season.getSeasonFromDate( date );
+	                final Season season = Season.getSeasonFromDate( date );
 	                season.addGame( game );
 	
 	                // for each result
 	                for( int i=2; i<fields.length; i++ )
 	                {
-	                    String amountStr = fields[i];
+	                    final String amountStr = fields[i];
 	
 	                    // no result
 	                    if( amountStr.length() == 0 )
@@ -200,9 +197,9 @@ public class QuickSplit
 	                        continue;
 	                    }
 	
-	                    int centAmount = (int)Math.round( Double.parseDouble( amountStr ) * 100 );
+	                    final int centAmount = (int)Math.round( Double.parseDouble( amountStr ) * 100 );
 	
-	                    Player player = myPlayers.get( i-2 );
+	                    final Player player = myPlayers.get( i-2 );
 	                    new Result( player, game, centAmount );
 	                }
 	            }
@@ -216,46 +213,28 @@ public class QuickSplit
      * Add a new record in to memory, recalculates summary data and writes the current state to file.
      * Assumes all data has already been validated.
      */
-    public static Game addNewRecord( Date gameDate, 
-                                     GameType gameType, 
-                                     List<String> names, 
-                                     List<Integer> amounts ) throws Exception
+    public static Game addNewRecord( final AddResultModel model ) throws Exception
     {
         System.out.println( "Creating new record." );
-        System.out.println( "Date: " + gameDate );
-        System.out.println( "GameType: " + gameType );
-        System.out.println( "Players: " + names );
-        System.out.println( "Amounts: " + amounts );
+        System.out.println( "Date: " + model.getGameDate() );
+        System.out.println( "GameType: " + model.getGameType() );
+        System.out.println( "Results: " + model.getResults() );
 
-        Game newGame = new Game( gameDate, gameType );
+        final Date date = new SimpleDateFormat( "yyyy-MM-dd" ).parse( model.getGameDate() );
+        final GameType type = GameType.valueOf( model.getGameType() );
+        
+        final Game newGame = new Game( date, type );
         myGames.add( newGame );
         
-        Season season = Season.getSeasonFromDate( gameDate );
+        final Season season = Season.getSeasonFromDate( date );
         season.addGame( newGame );
         
-        for( int i=0; i<names.size(); i++ )
+        for( final ResultModel result : model.getResults() )
         {
-            String name = names.get( i );
-            int amount = amounts.get( i );
-
-            // get the player or create a new one
-            Player player = null;
-            for( Player p : myPlayers )
-            {
-                if( p.getName().equals( name ) )
-                {
-                    player = p;
-                }
-            }
-            if( player == null )
-            {
-                player = new Player( name );
-                myPlayers.add( player );
-            }
-
+            final Player player = Player.getByName( result.getPlayer() );
+            final int amount = (int)(Double.parseDouble( result.getAmount() ) * 100);
             new Result( player, newGame, amount );
         }
-        
         
         validateData();
         sortData();
@@ -268,7 +247,7 @@ public class QuickSplit
      * Write current state to file.
      * @throws Exception
      */
-    public static void writeResultsToFile( Path resultPath ) throws Exception
+    public static void writeResultsToFile( final Path resultPath ) throws Exception
     {
         System.out.println( "Writing data to file: " + resultPath );
         
@@ -278,11 +257,11 @@ public class QuickSplit
         	Files.createFile( resultPath );
         }
 
-        FileWriter writer = new FileWriter( resultPath.toFile() );
+        final FileWriter writer = new FileWriter( resultPath.toFile() );
 
         // write header
         writer.write( "Date,GameType" );
-        for( Player player : myPlayers )
+        for( final Player player : myPlayers )
         {
             writer.write( "," + player );
         }
@@ -290,7 +269,7 @@ public class QuickSplit
         writer.flush();
 
         // write each game
-        for( Game game : myGames )
+        for( final Game game : myGames )
         {
             // write date
             writer.write( formatDate( game.getDate() ) );
@@ -299,9 +278,9 @@ public class QuickSplit
             writer.write( "," + game.getGameType() );
 
             // write results
-            for( Player player : myPlayers )
+            for( final Player player : myPlayers )
             {
-                Result r = getResult( game, player );
+                final Result r = getResult( game, player );
                 writer.write( "," );
 
                 if( r != null )
@@ -320,14 +299,14 @@ public class QuickSplit
     /**
      * Read in season start & finish dates.
      */
-    public static void loadSeasonData( Path path ) throws Exception
+    public static void loadSeasonData( final Path path ) throws Exception
     {
         System.out.println( "Reading season dates from: " + path );
         
         if( !path.toFile().exists() )
         {
         	System.out.println( "Could not find season data file." );
-        	Season newSeason = new Season( "1", new SimpleDateFormat( DATE_PATTERN ).parse( "01/01/1900" ), new Date() );
+        	final Season newSeason = new Season( "1", new SimpleDateFormat( DATE_PATTERN ).parse( "01/01/1900" ), new Date() );
         	mySeasons.add( newSeason );
         	return;
         }
@@ -337,11 +316,11 @@ public class QuickSplit
             String line = null;
             while( ( line = reader.readLine() ) != null )
             {
-                String[] fields = line.split( "," );
-                String id = fields[0];
-                Date startDate = new SimpleDateFormat( DATE_PATTERN ).parse( fields[1] );
-                Date endDate = new SimpleDateFormat( DATE_PATTERN ).parse( fields[2] );
-                Season s = new Season( id, startDate, endDate );
+                final String[] fields = line.split( "," );
+                final String id = fields[0];
+                final Date startDate = new SimpleDateFormat( DATE_PATTERN ).parse( fields[1] );
+                final Date endDate = new SimpleDateFormat( DATE_PATTERN ).parse( fields[2] );
+                final Season s = new Season( id, startDate, endDate );
                 mySeasons.add( s );
             }
         }
@@ -355,13 +334,13 @@ public class QuickSplit
     {
         System.out.println( "Validating..." );
 
-        List<Game> games = new ArrayList<Game>();
+        final List<Game> games = new ArrayList<Game>();
 
         // check each game sums to zero
-        for( Game g : myGames )
+        for( final Game g : myGames )
         {
             int sum = 0;
-            for( Result r : g.getResults() )
+            for( final Result r : g.getResults() )
             {
                 sum += r.getAmount();
             }
@@ -384,11 +363,11 @@ public class QuickSplit
         Collections.sort( myGames );
     }
 
-    public static String formatAmount( int amount )
+    public static String formatAmount( final int amount )
     {
         return new DecimalFormat( AMOUNT_PATTERN ).format( amount/100.0 );
     }
-    public static String formatDate( Date d )
+    public static String formatDate( final Date d )
     {
         return new SimpleDateFormat( DATE_PATTERN ).format( d );
     }

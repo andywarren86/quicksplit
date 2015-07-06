@@ -77,5 +77,37 @@ public class Game
         }
         return players;
     }
+    
+    /*
+     * static utilities
+     */
+    
+    /**
+     * Return any Games for the specified date
+     */
+    public static List<Game> getByDate( final Date date )
+    {
+        final List<Game> games = new ArrayList<>();
+        for( final Game g : QuickSplit.getGameList() )
+        {
+            if( g.getDate().equals( date ) )
+            {
+                games.add( g );
+            }
+        } 
+        return games;
+    }
+    
+    public static Game getById( final long id )
+    {
+        for( final Game g : QuickSplit.getGameList() )
+        {
+            if( g.getId() == id )
+            {
+                return g;
+            }
+        } 
+        return null;    
+    }
 
 }

@@ -1,6 +1,5 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-
-<%@ page import="java.util.*" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -29,49 +28,11 @@
       
 	  <!-- Page JS -->
 	  <script type="text/javascript">
-	    var players;
 	    
 	    $(function(){
-	    	
-	    	// configure date field
-	    	/*
-				$("#datepicker").datepicker({
-					dateFormat: "dd/mm/yy",
-					defaultDate: new Date()
-				});
-	    	*/
-				
-				// get all player names for autocomplete
-				players = [];
-				<c:forEach items="${Players}" var="player">
-				  players.push( "${player.name}" );
-				</c:forEach>
-				
-			  // capture field values from request params
-			  var results = [];
-			  <c:forEach varStatus="loop" items="${paramValues.Player}">
-			  	results.push({
-			  		player: "${paramValues.Player[loop.index]}",
-			  		amount: "${paramValues.Result[loop.index]}" });
-			  </c:forEach>
-			  
+  
 			  // create new result row when last row is changed			  
 			  $( "form" ).on( "change", ".result-row input", addRow );
-			  
-			  // set autocomplete
-			  /*
-			  $( ".result-row input[name='Player']" ).autocomplete({
-				  source: players,
-		      delay: 0
-		    });
-			  */
-			  
-			  $( "input[name='Date']" ).on( "blur", function(){
-				  var val = $(this).val();
-				  if( val == "" )
-					  console.log( "Date Error >:(|)" );
-				  
-			  });
 			  
 		  });
 	    
@@ -85,8 +46,17 @@
 	    	
 	    	if( val )
 	    	{
-	    		var newRow = $( ".result-row:first" ).clone();
-	    		newRow.find( ":input" ).val( null );
+	    		var newRow = lastRow.clone();
+	    		var index = lastRow.data( "index" ) + 1;
+	    		newRow.attr( "data-index", index );
+	    		
+	    	  // rename input fields with new index
+	    		newRow.find( ":input" ).val( null ).each( function(){
+	    			var name = $(this).attr("name");
+	    			name = name.substring( 0, name.length-1 ) + index;
+	    			$(this).attr( "name", name );
+	    		});
+	    		
 	    		$( ".result-row:last" ).after( newRow );
 	    	}
 	    }
@@ -139,116 +109,69 @@
 	    
 	  <div class="container">
 	  
-		  <h1>Add Results</h1>
+		  <h1>Add Result</h1>
 				
-		  <p class="lead">Use this form to create a new result.</p>
-	 
-      <c:forEach items="${Errors}" var="error">
-	      <div class="alert alert-danger" role="alert">
-	        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-	        <p>${error}</p>
-	      </div>      
-	    </c:forEach>
-	    
-	    <c:forEach items="${Warnings}" var="warning">
-	      <div class="alert alert-warning" role="alert">
-	        <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
-	        <p>${warning}</p>
-	      </div>
-	    </c:forEach>
+		  <p class="lead">Use this form to add a new result into the system</p>
 			
-			<!-- <p class="bg-danger">Such error, very dog</p>-->
+			<form name="AddResultForm" method="post" action="AddResultAction">
+			  <input type="hidden" name="UUID" value="${UUID}"/>
 			
-			<form name="AddResultForm" method="get" action="AddResultAction">
-			
-				<div class="form-group has-error">
+				<div class="form-group ${not empty Model.errors.Date ? 'has-error has-feedback' : ''}">
 				  <label class="control-label">Game Date</label>
-				  <input type="date" class="form-control" name="Date" value="${CurrentDate}" />
-				  <span class="help-block"><strong>Error: </strong>Please enter a better date</span>
-				  <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
+				  <input type="date" class="form-control" name="Date" value="${Model.gameDate}" />
+				  <c:if test="${not empty Model.errors.Date}">
+				    <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
+				    <span class="help-block">* ${Model.errors.Date}</span>
+				  </c:if>
 				</div>
 				
-				<!-- 
-				<div class="form-group">
-					<label class="control-label">Game Type</label> 
-					<select name="GameType" class="form-control">
-						<c:forEach items="${GameTypes}" var="type">
-							<c:choose>
-								<c:when test="${type==param.GameType}">
-							    <option selected="selected">${type}</option>
-								</c:when>
-								<c:otherwise>
-								  <option>${type}</option>
-								</c:otherwise>
-						  </c:choose>
-						</c:forEach>
-					</select>
-					<span class="help-block">Help text!</span>
-			  </div>
-			  -->
 			  <input type="hidden" name="GameType" value="HOLDEM"/>
 			  
 			  <label>Results</label>
-			  <div class="form-inline result-row" style="margin-bottom:5px">
-			    <div class="form-group">
-			      <label class="sr-only">Player</label>
-			      <input type="text" list="players" class="form-control" name="Player" placeholder="Player"/>
-			      <!--<span class="help-block">Help text!</span>-->
-			    </div>
-          <div class="form-group">
-            <label class="sr-only">Amount</label>
-            <div class="input-group">
-              <div class="input-group-addon">$</div>
-              <input type="number" class="form-control" name="Amount" placeholder="Amount" step="0.05"/>
-            </div>
-          </div>			  
-        </div>
-        
+			  
+        <c:if test="${not empty Model.errors.Results}">
+          <div class="alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+            ${Model.errors.Results}
+          </div>      
+        </c:if>  
+        			  
+			  <c:forEach begin="1" end="${Model.results.size()+1}" var="i">
+	        <div class="form-inline result-row" data-index="${i}" style="margin-bottom:5px">
+	        
+	          <div class="form-group ${not empty Model.errors['Player'+=i] ? 'has-error has-feedback' : ''}">
+	            <label class="sr-only">Player</label>
+	            <input type="text" list="players" class="form-control" name="Player${i}" placeholder="Player" value="${Model.results[i-1].player}"/>
+	            <c:if test="${not empty Model.errors['Player'+=i]}">
+	              <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
+	              <span class="help-block">* ${Model.errors['Player'+=i]}</span>
+	            </c:if>
+	          </div>
+	          
+	          <div class="form-group ${not empty Model.errors['Amount'+=i] ? 'has-error has-feedback' : ''}">
+	            <label class="sr-only">Amount</label>
+	            <div class="input-group">
+	              <div class="input-group-addon">$</div>
+	              <input type="number" class="form-control" name="Amount${i}" placeholder="Amount" value="${Model.results[i-1].amount}" step="0.05"/>
+	            </div>
+              <c:if test="${not empty Model.errors['Amount'+=i]}">
+                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
+                <span class="help-block">* ${Model.errors['Amount'+=i]}</span>
+              </c:if>
+	          </div>
+	          
+	        </div>
+        </c:forEach>
+              
 				<br/>
 				
 				<input type="submit" class="btn btn-primary" value="Submit"/>
-				<input type="button" class="btn btn-default" value="Clear"/>
-
+        
 			</form>
-			
-			<h4>Request Scope Attributes</h4>
-			<table class="table">
-			  <thead>
-			    <tr>
-			      <th>Name</th>
-			      <th>Value</th>
-			    </tr>
-			  </thead>
-			  <tbody>
-			    <c:forEach items="${requestScope}" var="e">
-			      <tr>
-				      <td>${e.key}</td>
-				      <td>${e.value}</td>
-				    </tr>
-			    </c:forEach>
-			  </tbody>
-			</table>
-			
-			<h4>Request Params</h4>
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Value</th>
-          </tr>
-        </thead>
-        <tbody>
-          <c:forEach items="${param}" var="e">
-            <tr>
-              <td>${e.key}</td>
-              <td>${e.value}</td>
-            </tr>
-          </c:forEach>
-        </tbody>
-      </table>			
 			
 		</div>
 		
+    <t:debug/>
   </body>
   
 </html>

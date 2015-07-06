@@ -3,8 +3,8 @@ package quicksplit.servlet;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.UUID;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +14,7 @@ import org.apache.commons.lang3.time.FastDateFormat;
 
 import quicksplit.core.GameType;
 import quicksplit.core.QuickSplit;
+import quicksplit.servlet.model.AddResultModel;
 
 @AuthorisationRequired
 @WebServlet( "/AddResult" )
@@ -23,14 +24,26 @@ public class AddResult extends BaseServlet
     private final FastDateFormat myDateInputFormat = FastDateFormat.getInstance( "yyyy-MM-dd" );
 
     @Override
-    protected void processRequest( HttpServletRequest request, HttpServletResponse response )
+    protected void processRequest( final HttpServletRequest request, final HttpServletResponse response )
         throws ServletException, IOException
     {
+        String uuid = request.getParameter( "UUID" );
+        AddResultModel model = 
+            uuid == null ? null : (AddResultModel)request.getSession().getAttribute( uuid );
+        if( model == null )
+        {
+            model = new AddResultModel();
+            model.setGameDate( myDateInputFormat.format( new Date() ) );
+            model.setGameType( GameType.HOLDEM.name() );
+            uuid = UUID.randomUUID().toString();
+            request.getSession().setAttribute( uuid, model );
+        }
+        
+        request.setAttribute( "UUID", uuid );
+        request.setAttribute( "Model", model );
         request.setAttribute( "Players", QuickSplit.getPlayerList() );
         request.setAttribute( "GameTypes", Arrays.asList( GameType.values() ) );
         request.setAttribute( "CurrentDate", myDateInputFormat.format( new Date() ) );
-        RequestDispatcher dispatcher = 
-            request.getRequestDispatcher( "/jsp/AddResult.jsp" );
-        dispatcher.forward( request, response );
+        request.getRequestDispatcher( "jsp/AddResult.jsp" ).forward( request, response );
     }
 }

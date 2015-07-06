@@ -63,7 +63,6 @@ public class SummaryServlet extends BaseServlet
         req.setAttribute( "stats", statsMap );
         req.setAttribute( "season", season );
         req.setAttribute( "seasons", QuickSplit.getSeasonList() );
-        req.setAttribute( "dateFormat", QuickSplit.DATE_PATTERN );
         req.setAttribute( "lastUpdated", lastDate );
 
         req.getRequestDispatcher( "/jsp/Summary.jsp"  ).forward( req, resp );

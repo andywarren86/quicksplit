@@ -16,7 +16,11 @@ public class Startup
     {
         try
         {
-            QuickSplit.main( new String[]{} );
+            // start the application
+            QuickSplit.Startup();
+            
+            // set application scope attributes
+            getServletContext().setAttribute( "dateFormat", QuickSplit.DATE_PATTERN );
         }
         catch( Exception e )
         {

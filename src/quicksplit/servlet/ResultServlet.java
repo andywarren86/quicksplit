@@ -56,7 +56,6 @@ public class ResultServlet
         req.setAttribute( "resultsMap", resultsMap );
         req.setAttribute( "season", season );
         req.setAttribute( "seasons", QuickSplit.getSeasonList() );
-        req.setAttribute( "dateFormat", QuickSplit.DATE_PATTERN );
         
         req.getRequestDispatcher( "/jsp/Results.jsp"  ).forward( req, resp );
     }

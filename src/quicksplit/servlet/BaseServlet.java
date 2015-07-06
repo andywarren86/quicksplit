@@ -14,20 +14,20 @@ import quicksplit.core.QuickSplit;
 public abstract class BaseServlet extends HttpServlet
 {
     @Override
-    protected final void doGet( HttpServletRequest req, HttpServletResponse resp )
+    protected final void doGet( final HttpServletRequest req, final HttpServletResponse resp )
             throws ServletException, IOException
     {
         doGetPost( req, resp );
     }
 
     @Override
-    protected final void doPost( HttpServletRequest req, HttpServletResponse resp )
+    protected final void doPost( final HttpServletRequest req, final HttpServletResponse resp )
             throws ServletException, IOException
     {
         doGetPost( req, resp );
     }
     
-    protected final void doGetPost( HttpServletRequest req, HttpServletResponse resp )
+    protected final void doGetPost( final HttpServletRequest req, final HttpServletResponse resp )
             throws ServletException, IOException
     {
         if( !checkAuthorisation( req ) )
@@ -40,10 +40,10 @@ public abstract class BaseServlet extends HttpServlet
         System.out.println();
         System.out.println( "URI: " + req.getRequestURI() );
         System.out.println( "Remote Addr: " + req.getRemoteAddr() );
-        Enumeration<String> e = req.getParameterNames();
+        final Enumeration<String> e = req.getParameterNames();
         while( e.hasMoreElements() )
         {
-            String name = e.nextElement();
+            final String name = e.nextElement();
             System.out.println( name + " = " + 
                     Arrays.toString( req.getParameterMap().get( name ) ) );
         }
@@ -52,25 +52,26 @@ public abstract class BaseServlet extends HttpServlet
         {
         	processRequest( req, resp );
         }
-        catch( Exception ex )
+        catch( final Exception ex )
         {
         	System.err.println( "Exception occurred processing request" );
         	ex.printStackTrace();
+        	throw new ServletException( ex );
         }
     }
     
     protected abstract void processRequest( HttpServletRequest req, HttpServletResponse resp )
-        throws ServletException, IOException;
+        throws Exception;
 
     /**
      * If the Servlet is annotated with @AuthorisationRequired then check the request is coming
      * from one of the authorised IP addresses.
      */
-    private boolean checkAuthorisation( HttpServletRequest req )
+    private boolean checkAuthorisation( final HttpServletRequest req )
     {
         if( getClass().isAnnotationPresent( AuthorisationRequired.class ) )
         {
-            String remoteAddr = req.getRemoteAddr();
+            final String remoteAddr = req.getRemoteAddr();
             if( !Arrays.asList( QuickSplit.getAuthorisedAddresses() ).contains( remoteAddr ) )
             {
                 System.out.println( "Unauthorised Request: IP address " + req.getRemoteAddr() + " attempted to access " + getClass().getName() );
@@ -80,7 +81,7 @@ public abstract class BaseServlet extends HttpServlet
         return true;
     }
     
-    private void setUnauthorisedResponse( HttpServletResponse resp ) throws IOException
+    private void setUnauthorisedResponse( final HttpServletResponse resp ) throws IOException
     {
         resp.sendError( HttpServletResponse.SC_UNAUTHORIZED, 
                 "IP Address must be one of the following: " + Arrays.asList( QuickSplit.getAuthorisedAddresses() ) );
