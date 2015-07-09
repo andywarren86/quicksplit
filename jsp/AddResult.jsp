@@ -1,119 +1,68 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
 
 <!DOCTYPE html>
 <html lang="en">
 
-	<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-	
-	  <title>QuickSplit: Add Results</title>
-	  
-		<!-- jQuery -->
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-		<!--<script src="js/jquery-1.5.1.min.js"></script>-->
-		<script src="js/jquery-ui-1.8.14.custom.min.js"></script>
-    <link type="text/css" href="css/ui-lightness/jquery-ui-1.8.14.custom.css" rel="stylesheet" />
- 
-    <!-- Bootstrap -->
-    <script src="js/bootstrap.js"></script>
-    <link type="text/css" href="css/bootstrap.css" rel="stylesheet">
-    <link type="text/css" href="css/bootstrap-theme.css" rel="stylesheet">
-    
-    <!-- Quicksplit -->
-    <script src="js/quicksplit.js"></script>
-    <!-- <link type="text/css" href="css/style.css" rel="stylesheet" /> -->
+  <tags:head title="QuickSplit: Add Game">
+
+    <script type="text/javascript">
       
-	  <!-- Page JS -->
-	  <script type="text/javascript">
-	    
-	    $(function(){
-  
-			  // create new result row when last row is changed			  
-			  $( "form" ).on( "change", ".result-row input", addRow );
-			  
-		  });
-	    
-	    function addRow()
-	    {
-	    	var lastRow = $( ".result-row:last" );
-	    	var val = false;
-	    	lastRow.find( ":input" ).each( function(){
-	    		val = val || $(this).val();
-	    	});
-	    	
-	    	if( val )
-	    	{
-	    		var newRow = lastRow.clone();
-	    		var index = lastRow.data( "index" ) + 1;
-	    		newRow.attr( "data-index", index );
-	    		
-	    	  // rename input fields with new index
-	    		newRow.find( ":input" ).val( null ).each( function(){
-	    			var name = $(this).attr("name");
-	    			name = name.substring( 0, name.length-1 ) + index;
-	    			$(this).attr( "name", name );
-	    		});
-	    		
-	    		$( ".result-row:last" ).after( newRow );
-	    	}
-	    }
-		  
-		  function clearForm()
-		  {
-		    $( ".result-row:input" ).val( null );
-		  }
-		  
-	  </script>
-	</head>
+      $(function(){
+          // create new result row when last row is changed       
+        $( "form" ).on( "change", ".result-row input", addRow );
+      });
+      
+      function addRow()
+      {
+        var lastRow = $( ".result-row:last" );
+        var val = false;
+        lastRow.find( ":input" ).each( function(){
+          val = val || $(this).val();
+        });
+        
+        if( val )
+        {
+          var newRow = lastRow.clone();
+          var index = lastRow.data( "index" ) + 1;
+          newRow.attr( "data-index", index );
+          
+          // rename input fields with new index
+          newRow.find( ":input" ).val( null ).each( function(){
+            var name = $(this).attr("name");
+            name = name.substring( 0, name.length-1 ) + index;
+            $(this).attr( "name", name );
+          });
+          
+          $( ".result-row:last" ).after( newRow );
+        }
+      }
+      
+      function clearForm()
+      {
+        $( ".result-row:input" ).val( null );
+      }
+      
+    </script>
+  </tags:head>
 	
 	<body>
-	
-   <nav class="navbar navbar-default navbar-static-top">
-     <div class="container">
-     
-       <div class="navbar-header">
-         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-           <span class="sr-only">Toggle navigation</span>
-           <span class="icon-bar"></span>
-           <span class="icon-bar"></span>
-           <span class="icon-bar"></span>
-         </button>
-         <a class="navbar-brand" href="#">QuickSplit</a>
-       </div>
-       
-       <div id="navbar" class="navbar-collapse collapse">
-         <ul class="nav navbar-nav navbar-right">
-           <li><a href="#">Summary</a></li>
-           <li><a href="#">Results</a></li>
-           <li class="dropdown">
-             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Admin <span class="caret"></span></a>
-             <ul class="dropdown-menu" role="menu">
-               <li><a href="#" class="active">Add Result</a></li>
-               <li><a href="#">Add Player</a></li>
-             </ul>
-           </li>
-         </ul>
-       </div>
-       
-     </div>
-   </nav>
+	 
+    <tags:nav active="Admin"/>
    
-   <datalist id="players">
-     <c:forEach items="${Players}" var="player">
-       <option value="${player.name}"/>
-     </c:forEach>
-   </datalist>
+		<datalist id="players">
+		  <c:forEach items="${Players}" var="player">
+		    <option value="${player.name}"/>
+		  </c:forEach>
+		</datalist>
 	    
 	  <div class="container">
 	  
-		  <h1>Add Result</h1>
+		  <h1>Add Game</h1>
 				
-		  <p class="lead">Use this form to add a new result into the system</p>
+		  <p class="lead">Use this form to record a new game</p>
 			
-			<form name="AddResultForm" method="post" action="AddResultAction">
+			<form name="AddResultForm" method="post" action="AddResultAction" autocomplete="off">
 			  <input type="hidden" name="UUID" value="${UUID}"/>
 			
 				<div class="form-group ${not empty Model.errors.Date ? 'has-error has-feedback' : ''}">
@@ -171,7 +120,7 @@
 			
 		</div>
 		
-    <t:debug/>
+    <tags:debug/>
   </body>
   
 </html>

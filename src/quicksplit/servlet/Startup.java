@@ -9,8 +9,6 @@ import quicksplit.core.QuickSplit;
 public class Startup 
     extends HttpServlet
 {
-    private static final long serialVersionUID = 1L;
-
     @Override
     public void init()
     {
@@ -22,7 +20,7 @@ public class Startup
             // set application scope attributes
             getServletContext().setAttribute( "dateFormat", QuickSplit.DATE_PATTERN );
         }
-        catch( Exception e )
+        catch( final Exception e )
         {
             System.err.println( "Exception occured during startup" );
             e.printStackTrace();

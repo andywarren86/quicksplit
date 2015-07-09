@@ -48,6 +48,9 @@ public abstract class BaseServlet extends HttpServlet
                     Arrays.toString( req.getParameterMap().get( name ) ) );
         }
 
+        // turn off caching
+        resp.setHeader( "Cache-Control", "max-age=0, no-cache, no-store" );
+        
         try
         {
         	processRequest( req, resp );

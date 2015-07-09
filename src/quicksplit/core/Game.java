@@ -1,6 +1,7 @@
 package quicksplit.core;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -40,6 +41,18 @@ public class Game
     public List<Result> getResults()
     {
         return Collections.unmodifiableList( myResults );
+    }
+    
+    public List<Result> getResultsOrderByAmount()
+    {
+        final ArrayList<Result> results = new ArrayList<>( myResults );
+        Collections.sort( results, new Comparator<Result>(){
+            @Override
+            public int compare( final Result r1, final Result r2 ) {
+                return r2.getAmount() - r1.getAmount();
+            }
+        });
+        return results;
     }
 
 
