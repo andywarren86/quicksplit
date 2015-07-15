@@ -19,7 +19,7 @@ table.statTable th {
   font-size: 11px;
   background: url( tr_back.gif ) repeat-x scroll 0 0 #328AA4;
 	border: 1px solid #FFFFFF;
-	padding: 4px 0px;
+	padding: 4px 4px;
 }
 
 table.statTable td {
@@ -27,7 +27,7 @@ table.statTable td {
   font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
   font-size: 11px;
   border: 1px solid #FFFFFF;
-	padding: 3px 2px;
+	padding: 4px 4px;
 }
 
 table.statTable tr.even td {
@@ -37,23 +37,14 @@ table.statTable tr.odd td {
 	background: #F8FBFC;
 }
 
-table.playerList th span {
-  display: inline-block;
-  overflow: hidden;
-  white-space: nowrap;
+table.resultTable td {
+  text-align: right;
 }
 
 table.resultTable td:first-child {
 	text-align: center;
 }
 
-table.resultTable td {
-  text-align: right;
-}
-
-table.summaryTable th, table.summaryTable td {
-  padding: 4px 4px;
-}
 table.summaryTable th {
 	text-align: center;
 }

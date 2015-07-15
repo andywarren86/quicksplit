@@ -73,68 +73,71 @@
 		  <c:choose>
 		  	<c:when test="${not empty stats}">
 		  	
-					<table class="statTable summaryTable">
-						<thead>
-						  <tr style="cursor:pointer;">
-						    <th>Player</th>
-						    <th></th>
-						    <th>Count</th>
-						    <th>Total</th>
-						    <th>Average</th>
-						    <th></th>
-						    <th>Up<br/>Games</th>
-						    <th>Up %</th>
-						    <th>Avg. Won</th>
-						    <th>Most Won</th>
-						    <th></th>
-						    <th>Down<br/>Games</th>
-						    <th>Down %</th>
-						    <th>Avg. Lost</th>
-						    <th>Most Lost</th>
-						    <th></th>
-						    <th>Even<br/>Games</th>
-						    <th>Even %</th>
-						    <c:if test="${empty season}">
-				          <th></th>
-				          <th>Up<br/>Streak</th>
-				          <th>Up<br/>Streak $</th>
-				          <th>Down<br/>Streak</th>
-				          <th>Down<br/>Streak $</th>
-						    </c:if>
-						  </tr>
-						</thead>
-					  
-					  <tbody>
-					  	<c:forEach items="${playerList}" var="player">
-					  		<tr>
-					  			<td>${player.name}</td>
-					  			<td></td>
-					  			<td style="text-align:right;">${stats[player].count}</td>
-					  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].total/100}" pattern="0.00" /></td>
-					  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].average/100}" pattern="0.00" /></td>
-					  			<td></td>
-					  			<td style="text-align:right;">${stats[player].winCount}</td>
-					  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].winPercent}" pattern="0%" /></td>
-					  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].averageWon/100}" pattern="0.00" /></td>
-					  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].mostWon/100}" pattern="0.00" /></td>
-					  			<td></td>
-					  			<td style="text-align:right;">${stats[player].lostCount}</td>
-					  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].lostPercent}" pattern="0%" /></td>
-					  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].averageLost/100}" pattern="0.00" /></td>
-					  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].mostLost/100}" pattern="0.00" /></td>
-					  			<td></td>
-					  			<td style="text-align:right;">${stats[player].evenCount}</td>
-					  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].evenPercent}" pattern="0%" /></td>
-					  			<c:if test="${empty season}">
-				            <td></td>
-				            <td style="text-align:right;">${stats[player].winStreak}</td>
-				            <td style="text-align:right;"><fmt:formatNumber value="${stats[player].winStreakTotal/100}" pattern="0.00" /></td>
-				            <td style="text-align:right;">${stats[player].downStreak}</td>
-				            <td style="text-align:right;"><fmt:formatNumber value="${stats[player].downStreakTotal/100}" pattern="0.00" /></td>				  			</c:if>
-					  		</tr>
-					  	</c:forEach>
-					  </tbody>
-				  </table>
+		  	  <div class="table-responsive">
+						<table class="statTable summaryTable">
+							<thead>
+							  <tr style="cursor:pointer;">
+							    <th>Player</th>
+							    <th></th>
+							    <th>Count</th>
+							    <th>Total</th>
+							    <th>Average</th>
+							    <th></th>
+							    <th>Up<br/>Games</th>
+							    <th>Up %</th>
+							    <th>Avg. Won</th>
+							    <th>Most Won</th>
+							    <th></th>
+							    <th>Down<br/>Games</th>
+							    <th>Down %</th>
+							    <th>Avg. Lost</th>
+							    <th>Most Lost</th>
+							    <th></th>
+							    <th>Even<br/>Games</th>
+							    <th>Even %</th>
+							    <c:if test="${empty season}">
+					          <th></th>
+					          <th>Up<br/>Streak</th>
+					          <th>Up<br/>Streak $</th>
+					          <th>Down<br/>Streak</th>
+					          <th>Down<br/>Streak $</th>
+							    </c:if>
+							  </tr>
+							</thead>
+						  
+						  <tbody>
+						  	<c:forEach items="${playerList}" var="player">
+						  		<tr>
+						  			<td>${player.name}</td>
+						  			<td></td>
+						  			<td style="text-align:right;">${stats[player].count}</td>
+						  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].total/100}" pattern="0.00" /></td>
+						  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].average/100}" pattern="0.00" /></td>
+						  			<td></td>
+						  			<td style="text-align:right;">${stats[player].winCount}</td>
+						  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].winPercent}" pattern="0%" /></td>
+						  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].averageWon/100}" pattern="0.00" /></td>
+						  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].mostWon/100}" pattern="0.00" /></td>
+						  			<td></td>
+						  			<td style="text-align:right;">${stats[player].lostCount}</td>
+						  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].lostPercent}" pattern="0%" /></td>
+						  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].averageLost/100}" pattern="0.00" /></td>
+						  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].mostLost/100}" pattern="0.00" /></td>
+						  			<td></td>
+						  			<td style="text-align:right;">${stats[player].evenCount}</td>
+						  			<td style="text-align:right;"><fmt:formatNumber value="${stats[player].evenPercent}" pattern="0%" /></td>
+						  			<c:if test="${empty season}">
+					            <td></td>
+					            <td style="text-align:right;">${stats[player].winStreak}</td>
+					            <td style="text-align:right;"><fmt:formatNumber value="${stats[player].winStreakTotal/100}" pattern="0.00" /></td>
+					            <td style="text-align:right;">${stats[player].downStreak}</td>
+					            <td style="text-align:right;"><fmt:formatNumber value="${stats[player].downStreakTotal/100}" pattern="0.00" /></td>				  			</c:if>
+						  		</tr>
+						  	</c:forEach>
+						  </tbody>
+					  </table>
+				  </div>
+				  
 				</c:when>
 		  	<c:otherwise>
 		  		<h1><i>No Results Recorded</i></h1>

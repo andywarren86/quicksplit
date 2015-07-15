@@ -13,68 +13,11 @@
         colourNegativeCells( $( ".resultTable" ) );
         zebrafyTable( $( ".resultTable" ) );
         
-        // set the header to absolute position, and move the result table down the height of the header
-        $( ".playerList" )
-          .css( "position", "absolute" );
-        $( ".resultTable" )
-          .css( "position", "relative" )
-          .css( "top", $( ".playerList" ).outerHeight() )
-          .css( "z-index", -1 );
-        
-        var initialOffset = $( ".playerList" ).offset();
-        $( window ).scroll( function(e){
-          
-          // once we have scrolled passed this element fix it to the top of the screen
-          if( $( window ).scrollTop() > initialOffset.top )
-          {
-            $( ".playerList" ).css( "top", $( window ).scrollTop() );
-          }
-          else
-          {
-            $( ".playerList" ).offset( initialOffset );
-          }
-
-        });
-        
-        // set table widths
-        // needs to be manually set otherwise tables max out at 100% width
-        var playerCount = ${fn:length(playerList)};
-        var cellHeaderWidth = 80;
-        var cellWidth = 50;
-        var cellPadding = 
-          parseInt( $( ".resultTable td:first" ).css( "padding-left" ) ) +
-          parseInt( $( ".resultTable td:first" ).css( "padding-right" ) );
-        var cellBorder = 
-          parseInt( $( ".resultTable td:first" ).css( "border-right-width" ) ); // each cell only has one border due to border-collapse property
-        var tableWidth = cellHeaderWidth + cellWidth * playerCount + 1;
-        
-        $( ".playerList" ).css( "width", tableWidth );
-        $( ".playerList th" ).css( "width", cellWidth - cellBorder );
-        $( ".playerList th:first" ).css( "width", cellHeaderWidth - cellBorder );
-        $( ".playerList span" ).css( "width", cellWidth - cellBorder );
-        
-        $( ".resultTable" ).css( "width", tableWidth );
-        $( ".resultTable tr:first td" ).css( "width", cellWidth - ( cellPadding + cellBorder ) );
-        $( ".resultTable tr:first td:first" ).css( "width", cellHeaderWidth - ( cellPadding + cellBorder ) );
-        
-        // event handlers
-        $( "#GameType" ).change( function(){
-          document.GameFilterForm.submit();
-        })
-        
-        $( "input[name='PreviousSeason']" ).click( function(){
-          $( "#Season" ).val( parseInt( $( "#Season" ).val() ) - 1 );
-          document.GameFilterForm.submit();
-        });
-        
-        $( "input[name='NextSeason']" ).click( function(){
-          $( "#Season" ).val( parseInt( $( "#Season" ).val() ) + 1 );
-          document.GameFilterForm.submit();
-        });
-        
+       
       });
       
     </script>
+    
   </tags:head>
 	
 	<body>
@@ -101,32 +44,66 @@
 		  <c:choose>
 		  	<c:when test="${not empty playerList}">
 				
-					<table class="playerList">
-						<tr>
-							<th>&#160;</th>
-						  <c:forEach items="${playerList}" var="player">
-						  	<th><span><c:out value="${player.name}"/></span></th>
-						  </c:forEach>
-						</tr>
-					</table>
-					
-					<table class="statTable resultTable" style="margin-bottom: 3em;">
-					  <c:forEach items="${gameList}" var="game" varStatus="status">
+				<div class="hidden-xs" style="overflow-x:auto;">
+					<table class="playerList statTable resultTable">
+					  <thead>
 							<tr>
-								<td><fmt:formatDate pattern="${dateFormat}" value="${game.date}"/></td>
-								<c:forEach items="${resultsMap[game]}" var="result">
-								  <c:choose>
-								    <c:when test="${not empty result}">
-								      <td><fmt:formatNumber value="${result.amount/100}" pattern="0.00"/></td>
-								    </c:when>
-								    <c:otherwise>
-								      <td></td>
-								    </c:otherwise>
-								  </c:choose>
-								</c:forEach>
-						  </tr>
-						</c:forEach>
+								<th>&nbsp;</th>
+							  <c:forEach items="${playerList}" var="player">
+							  	<th><span><c:out value="${player.name}"/></span></th>
+							  </c:forEach>
+							</tr> 
+						</thead>
+						<tbody>
+						  <c:forEach items="${gameList}" var="game" varStatus="status">
+								<tr>
+									<td><fmt:formatDate pattern="${dateFormat}" value="${game.date}"/></td>
+									<c:forEach items="${resultsMap[game]}" var="result">
+							      <td>
+							        <c:if test="${not empty result}">
+							          <fmt:formatNumber value="${result.amount/100}" pattern="0.00"/>
+							        </c:if>
+							      </td>
+									</c:forEach>
+							  </tr>
+							</c:forEach>
+					  </tbody>
 					</table>
+			  </div>
+				
+				<div class="panel-group visible-xs-block" id="accordion">
+				  <c:forEach items="${gameList}" var="game" varStatus="status">
+						<div class="panel panel-default">
+						  <div class="panel-heading">
+						    <h4 class="panel-title">
+							    <a href="#resultPanel-${status.index}" data-toggle="collapse" data-parent="#accordion">
+							      <fmt:formatDate pattern="${dateFormat}" value="${game.date}"/>
+							    </a>
+						    </h4>
+						  </div>
+						  <div class="panel-collapse collapse" id="resultPanel-${status.index}">
+	              <div class="panel-body">
+	                <table class="table table-condensed">
+	                  <thead>
+	                    <tr>
+	                      <th>Player</th>
+	                      <th>Amount</th>
+	                    </tr>
+	                  </thead>
+	                  <tbody>
+	                    <c:forEach items="${game.results}" var="result">
+		                    <tr>
+		                      <td>${result.player}</td>
+		                      <td><fmt:formatNumber value="${result.amount/100}" pattern="0.00"/></td>
+		                    </tr>
+		                  </c:forEach>
+	                  </tbody>
+	                </table>
+	              </div>						  
+              </div>
+						</div>
+					</c:forEach>
+			  </div>
 					
 		  	</c:when>
 		  	<c:otherwise>
