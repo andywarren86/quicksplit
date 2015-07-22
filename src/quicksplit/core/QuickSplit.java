@@ -32,6 +32,7 @@ public class QuickSplit
 
     public static final String AMOUNT_PATTERN = "0.00";
     public static final String DATE_PATTERN = "dd/MM/yyyy";
+    public static final String DATE_PATTERN_LONG = "EEEE, dd/MM/yyyy";
 
     public static void Startup()
         throws Exception

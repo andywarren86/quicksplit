@@ -21,11 +21,11 @@ import quicksplit.core.Stats;
 public class SummaryServlet extends BaseServlet
 {
     @Override
-    protected void processRequest( HttpServletRequest req, HttpServletResponse resp )
+    protected void processRequest( final HttpServletRequest req, final HttpServletResponse resp )
         throws ServletException, IOException
     {
         Season season = null;
-        String seasonId = req.getParameter( "Season" );
+        final String seasonId = req.getParameter( "Season" );
         if( seasonId == null )
         {
             season = Season.getCurrentSeason();
@@ -49,8 +49,8 @@ public class SummaryServlet extends BaseServlet
         }
         
         // generate stats for each player
-        Map<Player,Stats> statsMap = new HashMap<Player,Stats>();
-        for( Player p : players )
+        final Map<Player,Stats> statsMap = new HashMap<Player,Stats>();
+        for( final Player p : players )
         {
             statsMap.put( p, new Stats( p, games ) );
         }
@@ -64,6 +64,18 @@ public class SummaryServlet extends BaseServlet
         req.setAttribute( "season", season );
         req.setAttribute( "seasons", QuickSplit.getSeasonList() );
         req.setAttribute( "lastUpdated", lastDate );
+        
+        if( season != null ) 
+        {
+            req.setAttribute( "FromDate", season.getStartDate() );
+            req.setAttribute( "ToDate", season.getEndDate() );
+        }
+        else 
+        {
+            req.setAttribute( "FromDate", games.get( 0 ).getDate() );
+            req.setAttribute( "ToDate", lastDate );
+        }
+        req.setAttribute( "GameCount", games.size() );
 
         req.getRequestDispatcher( "/jsp/Summary.jsp"  ).forward( req, resp );
         

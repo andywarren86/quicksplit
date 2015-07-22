@@ -27,6 +27,12 @@
       });
     </script>
     
+    <style type="text/css">
+      ul.pagination {
+        margin-top: 10px;
+      }
+    </style>
+    
   </tags:head>
   
 	<body>
@@ -34,41 +40,25 @@
     
     <div class="container">
 	
-			<h1>Summary - ${not empty season ? 'Season' : ''} ${not empty season ? season.id : 'ALL'}</h1>
+			<h1>
+			  Summary - ${not empty season ? 'Season ' += season.id : 'Overall' }
+			</h1>
 			<h3>
-			  <c:choose>
-			    <c:when test="${not empty season}">
-	          <fmt:formatDate pattern="${dateFormat}" value="${season.startDate}"/> to 
-	          <fmt:formatDate pattern="${dateFormat}" value="${season.endDate}"/>
-			    </c:when>
-			    <c:otherwise>Overall</c:otherwise>
-			  </c:choose>
-			</h3>
-		  
-	    <p>
-	      Season: 
-	      <c:forEach items="${seasons}" var="s">
-	        <c:choose>
-	          <c:when test="${s eq season}"><strong>${s.id}</strong></c:when>
-	          <c:otherwise><a href="?Season=${s.id}">${s.id}</a></c:otherwise>
-	        </c:choose>
-	      </c:forEach>
-	      <c:choose>
-	        <c:when test="${not empty season}"><a href="?Season=ALL">ALL</a></c:when>
-	        <c:otherwise><strong>ALL</strong></c:otherwise>
-	      </c:choose>
-	    </p>
-	    
-	    <div class="btn-toolbar" role="toolbar">
-				<div class="btn-group btn-group-sm" role="group">
-	        <c:forEach items="${seasons}" var="s">
-					  <a class="btn btn-default ${s eq season ? 'active': ''}" href="?Season=${s.id}" role="button">${s.id}</a>
-			    </c:forEach>
-			  </div>	
-		    <div class="btn-group btn-group-sm" role="group">
-		      <a class="btn btn-default ${empty season ? 'active': ''}" href="?Season=ALL" role="button">ALL</a>
-		    </div>
-			</div>
+			  <fmt:formatDate pattern="${dateFormat}" value="${FromDate}"/> to 
+	      <fmt:formatDate pattern="${dateFormat}" value="${ToDate}"/>
+	      (${GameCount} games)
+	    </h3>
+
+			<nav>
+			  <ul class="pagination pagination-sm">
+          <c:forEach items="${seasons}" var="s">
+            <li class="${s eq season ? 'active': ''}"><a href="?Season=${s.id}">${s.id}</a></li>
+          </c:forEach>
+			  </ul>
+			  <ul class="pagination pagination-sm">
+			    <li class="${empty season ? 'active' : ''}"><a href="?Season=ALL">Overall</a></li>
+			  </ul>
+			</nav>
 		  
 		  <c:choose>
 		  	<c:when test="${not empty stats}">
@@ -144,17 +134,6 @@
 		  		<br/>
 		  	</c:otherwise>
 		  </c:choose>
-		  
-      <div class="btn-toolbar" role="toolbar">
-        <div class="btn-group btn-group-sm" role="group">
-          <c:forEach items="${seasons}" var="s">
-            <a class="btn btn-default ${s eq season ? 'active': ''}" href="?Season=${s.id}" role="button">${s.id}</a>
-          </c:forEach>
-        </div>  
-        <div class="btn-group btn-group-sm" role="group">
-          <a class="btn btn-default ${empty season ? 'active': ''}" href="?Season=ALL" role="button">ALL</a>
-        </div>
-      </div>
 		  
 		  <p style="margin-top:1em;"><i>Last updated <fmt:formatDate pattern="${dateFormat}" value="${lastUpdated}"/></i></p>
 		</div>

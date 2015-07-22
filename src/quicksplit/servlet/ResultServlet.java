@@ -22,10 +22,10 @@ public class ResultServlet
     extends BaseServlet
 {
     @Override
-    protected void processRequest( HttpServletRequest req, HttpServletResponse resp )
+    protected void processRequest( final HttpServletRequest req, final HttpServletResponse resp )
         throws ServletException, IOException
     {
-        String seasonId = req.getParameter( "Season" );
+        final String seasonId = req.getParameter( "Season" );
         Season season;
         if( seasonId != null )
         {
@@ -36,15 +36,15 @@ public class ResultServlet
             season = Season.getCurrentSeason();
         }
         
-        List<Game> games = season.getGames();
-        List<Player> players = season.getPlayers();
+        final List<Game> games = season.getGames();
+        final List<Player> players = season.getPlayers();
 
         // construct the results map
-        Map<Game,List<Result>> resultsMap = new HashMap<Game,List<Result>>();
-        for( Game g : games )
+        final Map<Game,List<Result>> resultsMap = new HashMap<Game,List<Result>>();
+        for( final Game g : games )
         {
-            List<Result> results = new ArrayList<Result>();
-            for( Player p : players )
+            final List<Result> results = new ArrayList<Result>();
+            for( final Player p : players )
             {
                 results.add( QuickSplit.getResult( g, p ) );
             }

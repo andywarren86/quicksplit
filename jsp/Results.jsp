@@ -9,14 +9,17 @@
   <tags:head title="QuickSplit: Results">
     <script type="text/javascript">
       $(function(){
-        
         colourNegativeCells( $( ".resultTable" ) );
         zebrafyTable( $( ".resultTable" ) );
-        
-       
       });
       
     </script>
+    
+    <style type="text/css">
+      ul.pagination {
+        margin-top: 10px;
+      }
+    </style>
     
   </tags:head>
 	
@@ -31,20 +34,27 @@
 	      <fmt:formatDate pattern="${dateFormat}" value="${season.endDate}"/>
 	    </h3>
 	    
-			<p>
-			  Season: 
-				<c:forEach items="${seasons}" var="s">
-				  <c:choose>
-				    <c:when test="${s eq season}"><strong>${s.id}</strong></c:when>
-				    <c:otherwise><a href="Results?Season=${s.id}">${s.id}</a></c:otherwise>
-				  </c:choose>
-				</c:forEach>
-		  </p>
+      <nav>
+        <ul class="pagination pagination-sm">
+          <c:forEach items="${seasons}" var="s">
+            <li class="${s eq season ? 'active': ''}"><a href="?Season=${s.id}">${s.id}</a></li>
+          </c:forEach>
+        </ul>
+      </nav>
 		  
+      <c:if test="${not empty param['NewGame']}">
+        <div class="alert alert-success alert-dismissible" role="alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <strong>Well done!</strong> 
+          <span>You've added a new game!</span>
+          <span class="glyphicon glyphicon-thumbs-up"></span> 
+        </div>        
+      </c:if>
+      		  
 		  <c:choose>
 		  	<c:when test="${not empty playerList}">
 				
-				<div class="hidden-xs" style="overflow-x:auto;">
+				<div class="table-responsive hidden-xs">
 					<table class="playerList statTable resultTable">
 					  <thead>
 							<tr>
@@ -77,7 +87,7 @@
 						  <div class="panel-heading">
 						    <h4 class="panel-title">
 							    <a href="#resultPanel-${status.index}" data-toggle="collapse" data-parent="#accordion">
-							      <fmt:formatDate pattern="${dateFormat}" value="${game.date}"/>
+							      <fmt:formatDate pattern="${dateFormatLong}" value="${game.date}"/>
 							    </a>
 						    </h4>
 						  </div>

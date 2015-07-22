@@ -31,7 +31,10 @@ public class AddResultConfirmAction
         {
             final Game game = QuickSplit.addNewRecord( model );
             req.getSession().removeAttribute( uuid );
-            resp.sendRedirect( "ViewGame?Id=" + game.getId() + "&Success=true" );
+            
+            // add new game to session??
+            
+            resp.sendRedirect( "Results?Focus=" + game.getId() + "&NewGame=true" );
         }
         else if( "Back".equals( action ) )
         {

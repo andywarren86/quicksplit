@@ -28,6 +28,14 @@
            </li>
            
          </ul>
+         <p class="navbar-text navbar-right">
+           Size [
+           <span class="visible-xs-inline">XS</span>
+           <span class="visible-sm-inline">SM</span>
+           <span class="visible-md-inline">MD</span>
+           <span class="visible-lg-inline">LG</span>
+           ]
+         </p>
        </div>
        
      </div>

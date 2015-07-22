@@ -19,6 +19,7 @@ public class Startup
             
             // set application scope attributes
             getServletContext().setAttribute( "dateFormat", QuickSplit.DATE_PATTERN );
+            getServletContext().setAttribute( "dateFormatLong", QuickSplit.DATE_PATTERN_LONG );
         }
         catch( final Exception e )
         {
