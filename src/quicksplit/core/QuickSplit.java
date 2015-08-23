@@ -379,4 +379,10 @@ public class QuickSplit
         return new SimpleDateFormat( DATE_PATTERN ).format( d );
     }
 
+    public static Date getLastUpdated()
+    {
+        return QuickSplit.getGameList().isEmpty() ? null :
+            QuickSplit.getGameList().get( QuickSplit.getGameList().size()-1 ).getDate();
+    }
+
 }

@@ -1,7 +1,6 @@
 package quicksplit.servlet;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,16 +53,11 @@ public class SummaryServlet extends BaseServlet
         {
             statsMap.put( p, new Stats( p, games ) );
         }
-        
-        // get date of the most recent entry
-        final Date lastDate = QuickSplit.getGameList().isEmpty() ? null :
-        	QuickSplit.getGameList().get( QuickSplit.getGameList().size()-1 ).getDate();
 
         req.setAttribute( "playerList", players );
         req.setAttribute( "stats", statsMap );
         req.setAttribute( "season", season );
         req.setAttribute( "seasons", QuickSplit.getSeasonList() );
-        req.setAttribute( "lastUpdated", lastDate );
         
         if( season != null ) 
         {
@@ -73,7 +67,7 @@ public class SummaryServlet extends BaseServlet
         else 
         {
             req.setAttribute( "FromDate", games.get( 0 ).getDate() );
-            req.setAttribute( "ToDate", lastDate );
+            req.setAttribute( "ToDate", games.get( games.size()-1 ).getDate() );
         }
         req.setAttribute( "GameCount", games.size() );
 

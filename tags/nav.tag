@@ -15,9 +15,6 @@
            <span class="icon-bar"></span>
          </button>
          <a class="navbar-brand" href="Summary">Welcome to <strong>QuickSplit</strong></a>
-         <c:if test="${not empty CurrentUser}">
-           <p class="navbar-text">Signed in as <strong>${CurrentUser}</strong></p>
-         </c:if>
        </div>
        
        <div id="navbar" class="navbar-collapse collapse">

@@ -70,7 +70,7 @@
 		  <c:choose>
 		  	<c:when test="${not empty stats}">
 		  	
-		  	  <div class="table-responsive">
+		  	  <div class="table-responsive" style="margin-bottom: 1em;">
 						<table class="statTable summaryTable">
 							<thead>
 							  <tr style="cursor:pointer;">
@@ -142,7 +142,7 @@
 		  	</c:otherwise>
 		  </c:choose>
 		  
-		  <p style="margin-top:1em;"><i>Last updated <fmt:formatDate pattern="${dateFormat}" value="${lastUpdated}"/></i></p>
+      <tags:footer/>
 		</div>
 		
 		<tags:debug/>

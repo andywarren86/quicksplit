@@ -11,6 +11,9 @@
          <web-resource-name>Quicksplit admin pages</web-resource-name>
          <!-- Define the context-relative URL(s) to be protected -->
          <url-pattern>/AddResult</url-pattern>
+         <url-pattern>/AddResultAction</url-pattern>
+         <url-pattern>/AddResultConfirm</url-pattern>
+         <url-pattern>/AddResultConfirmAction</url-pattern>
          <!-- If you list http methods, only those methods are protected so -->
          <!-- the constraint below ensures all other methods are denied     -->
 

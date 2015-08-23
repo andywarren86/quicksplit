@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import quicksplit.core.QuickSplit;
+
 public abstract class BaseServlet extends HttpServlet
 {
     @Override
@@ -44,6 +46,7 @@ public abstract class BaseServlet extends HttpServlet
         resp.setHeader( "Cache-Control", "max-age=0, no-cache, no-store" );
         
         // add some crap into the request scope
+        req.setAttribute( "lastUpdated", QuickSplit.getLastUpdated() );
         if( req.getUserPrincipal() != null )
             req.setAttribute( "CurrentUser", req.getUserPrincipal().getName() );
         req.setAttribute( "IsTier1", req.isUserInRole( "tier1" ) );

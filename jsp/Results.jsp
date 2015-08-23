@@ -54,7 +54,7 @@
 		  <c:choose>
 		  	<c:when test="${not empty playerList}">
 				
-				<div class="table-responsive hidden-xs">
+				<div class="table-responsive hidden-xs" style="margin-bottom:1em;">
 					<table class="playerList statTable resultTable">
 					  <thead>
 							<tr>
@@ -81,7 +81,7 @@
 					</table>
 			  </div>
 				
-				<div class="panel-group visible-xs-block" id="accordion">
+				<div class="panel-group visible-xs-block" id="accordion" style="margin-bottom:1em;">
 				  <c:forEach items="${gameList}" var="game" varStatus="status">
 						<div class="panel panel-default">
 						  <div class="panel-heading">
@@ -127,6 +127,8 @@
 			<p><a href="ResultExport">Export all results (.csv)</a></p>
 			<br/><br/>
 			-->
+			
+			<tags:footer/>
     </div>
     
     <tags:debug/>
