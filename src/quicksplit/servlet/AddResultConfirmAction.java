@@ -1,5 +1,7 @@
 package quicksplit.servlet;
 
+import java.text.SimpleDateFormat;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -9,7 +11,6 @@ import quicksplit.core.Game;
 import quicksplit.core.QuickSplit;
 import quicksplit.servlet.model.AddResultModel;
 
-@AuthorisationRequired
 @WebServlet( "/AddResultConfirmAction" )
 public class AddResultConfirmAction
     extends BaseServlet
@@ -32,9 +33,10 @@ public class AddResultConfirmAction
             final Game game = QuickSplit.addNewRecord( model );
             req.getSession().removeAttribute( uuid );
             
-            // add new game to session??
-            
-            resp.sendRedirect( "Results?Focus=" + game.getId() + "&NewGame=true" );
+            req.getSession().setAttribute( 
+                "SuccessMessage", 
+                "New game added for " + new SimpleDateFormat( QuickSplit.DATE_PATTERN_LONG ).format( game.getDate() ) );
+            resp.sendRedirect( "Summary" );
         }
         else if( "Back".equals( action ) )
         {

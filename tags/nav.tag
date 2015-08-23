@@ -1,7 +1,9 @@
  <%@ tag description="Navigation Menu" pageEncoding="UTF-8" %>
+ <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
+ <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
  
    <%@ attribute name="active" required="false" %>
- 
+   
    <nav class="navbar navbar-default navbar-static-top">
      <div class="container">
      
@@ -13,6 +15,9 @@
            <span class="icon-bar"></span>
          </button>
          <a class="navbar-brand" href="Summary">Welcome to <strong>QuickSplit</strong></a>
+         <c:if test="${not empty CurrentUser}">
+           <p class="navbar-text">Signed in as <strong>${CurrentUser}</strong></p>
+         </c:if>
        </div>
        
        <div id="navbar" class="navbar-collapse collapse">
@@ -28,14 +33,6 @@
            </li>
            
          </ul>
-         <p class="navbar-text navbar-right">
-           Size [
-           <span class="visible-xs-inline">XS</span>
-           <span class="visible-sm-inline">SM</span>
-           <span class="visible-md-inline">MD</span>
-           <span class="visible-lg-inline">LG</span>
-           ]
-         </p>
        </div>
        
      </div>

@@ -15,20 +15,22 @@
     
       <h1>Confirm Game Details</h1>
       
-	    <p class="lead">Please review any warnings and confirm the details before saving</p>
+	    <p class="lead">Please confirm details before saving</p>
 	    
 	    <c:forEach items="${Warnings}" var="warning">
 	      <div class="alert alert-warning" role="alert">
 	        <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
-	        <p>${warning}</p>
+	        ${warning}
 	      </div>
 	    </c:forEach>
-        
-      <p><strong>Game Date:</strong> <fmt:formatDate pattern="${dateFormat}" value="${Model.gameDateAsDate}"/></p>
+      
+      <fmt:parseDate pattern="yyyy-MM-dd" value="${Model.gameDate}" var="GameDate"/>
+      <p><strong>Game Date:</strong> <fmt:formatDate pattern="${dateFormat}" value="${GameDate}"/></p>
+      
       <p><strong>Game Type:</strong> ${Model.gameType}</p>
       
       <h4>Results</h4>      
-      <table class="table">
+      <table class="table table-striped">
         <thead>
           <tr>
             <th>Player</th>

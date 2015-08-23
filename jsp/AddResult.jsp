@@ -8,42 +8,80 @@
 
     <script type="text/javascript">
       
-      $(function(){
-          // create new result row when last row is changed       
-        $( "form" ).on( "change", ".result-row input", addRow );
-      });
+      (function($){
+        $.fn.setError = function( error ){
+          console.log( "SetError" );
+          console.log( this );
+          console.log( error );
+          
+          if( error == null ){
+        	  this.closest( ".form-group" ).removeClass( "has-error" )
+        	    .find( "span.help-block" ).remove();
+          }
+          else {
+        	  this.closest( ".form-group" ).addClass( "has-error" )
+        	    .append( $( "<span>" ).addClass( "help-block" ).text( "* " + error ) );
+          }
+          return this;
+        }
+      }(jQuery));
       
-      function addRow()
-      {
-        var lastRow = $( ".result-row:last" );
-        var val = false;
-        lastRow.find( ":input" ).each( function(){
-          val = val || $(this).val();
+      function setIndex() {
+        $( ".result-row" ).each( function(i){
+          $(this).find( "input[name^='Player']" ).attr( "name", "Player"+(i+1) );
+          $(this).find( "input[name^='Amount']" ).attr( "name", "Amount"+(i+1) );
         });
-        
-        if( val )
-        {
-          var newRow = lastRow.clone();
-          var index = lastRow.data( "index" ) + 1;
-          newRow.attr( "data-index", index );
-          
-          // rename input fields with new index
-          newRow.find( ":input" ).val( null ).each( function(){
-            var name = $(this).attr("name");
-            name = name.substring( 0, name.length-1 ) + index;
-            $(this).attr( "name", name );
-          });
-          
-          $( ".result-row:last" ).after( newRow );
+      }
+      
+      function setRemoveButtons() {
+        if( $( ".result-row" ).size() == 1 ){
+          $( ".result-row .remove-result" ).addClass( "hidden" );
+        }
+        else {
+          $( ".result-row .remove-result" ).removeClass( "hidden" );
         }
       }
       
-      function clearForm()
-      {
-        $( ".result-row:input" ).val( null );
-      }
+      function addResultRow() {
+        var newRow = $( ".result-row:first" ).clone();
+        newRow.find( ":input" ).val( "" ); // clear field values
+        newRow.setError( null ); // clear errors
+        
+        $( ".result-row:last" ).after( newRow );
+        
+        setIndex();
+        setRemoveButtons();
+      } 
+    
+      $(document).ready(function(){
+    	  setIndex();
+    	  setRemoveButtons();
+    	  
+    	  // set field errors
+        <c:forEach items="${Model.errors}" var="e">
+          $( "input[name='${e.key}']" ).setError( "${e.value}" );
+        </c:forEach>
+    	  
+        $( "#add-result" ).on( "click", function(){
+        	addResultRow();
+        });
+        
+        $( "form" ).on( "click", ".remove-result", function(){
+        	$(this).closest( ".result-row" ).remove();
+        	setIndex();
+        	setRemoveButtons();
+        });
+        
+      });
       
     </script>
+    
+    <style>
+      .result-row > div {
+        padding-left: 0;
+      }
+    </style>
+    
   </tags:head>
 	
 	<body>
@@ -58,63 +96,70 @@
 	    
 	  <div class="container">
 	  
-		  <h1>Add Game</h1>
+		  <h1>Add Result</h1>
 				
-		  <p class="lead">Use this form to record a new game</p>
+		  <p class="lead">Enter details below</p>
+		  
+      <c:if test="${not empty Model.errors.Results}">
+        <div class="alert alert-danger" role="alert">
+          <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+          ${Model.errors.Results}
+        </div>      
+      </c:if>
 			
 			<form name="AddResultForm" method="post" action="AddResultAction" autocomplete="off">
 			  <input type="hidden" name="UUID" value="${UUID}"/>
 			
-				<div class="form-group ${not empty Model.errors.Date ? 'has-error has-feedback' : ''}">
+				<div class="form-group">
 				  <label class="control-label">Game Date</label>
 				  <input type="date" class="form-control" name="Date" value="${Model.gameDate}" />
-				  <c:if test="${not empty Model.errors.Date}">
-				    <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
-				    <span class="help-block">* ${Model.errors.Date}</span>
-				  </c:if>
 				</div>
 				
 			  <input type="hidden" name="GameType" value="HOLDEM"/>
 			  
 			  <label>Results</label>
 			  
-        <c:if test="${not empty Model.errors.Results}">
-          <div class="alert alert-danger" role="alert">
-            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-            ${Model.errors.Results}
-          </div>      
-        </c:if>  
-        			  
-			  <c:forEach begin="1" end="${Model.results.size()+1}" var="i">
-	        <div class="form-inline result-row" data-index="${i}" style="margin-bottom:5px">
+			  <c:forEach items="${Model.results}" var="r">
+	        <div class="result-row clearfix">
 	        
-	          <div class="form-group ${not empty Model.errors['Player'+=i] ? 'has-error has-feedback' : ''}">
-	            <label class="sr-only">Player</label>
-	            <input type="text" list="players" class="form-control" name="Player${i}" placeholder="Player" value="${Model.results[i-1].player}"/>
-	            <c:if test="${not empty Model.errors['Player'+=i]}">
-	              <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
-	              <span class="help-block">* ${Model.errors['Player'+=i]}</span>
-	            </c:if>
-	          </div>
+		        <div class="col-xs-5">
+		          <div class="form-group">
+		            <label class="sr-only">Player</label>
+		            <input type="text" list="players" class="form-control" name="Player" placeholder="Player" value="${r.player}"/>
+		          </div>
+		        </div>
 	          
-	          <div class="form-group ${not empty Model.errors['Amount'+=i] ? 'has-error has-feedback' : ''}">
-	            <label class="sr-only">Amount</label>
-	            <div class="input-group">
-	              <div class="input-group-addon">$</div>
-	              <input type="number" class="form-control" name="Amount${i}" placeholder="Amount" value="${Model.results[i-1].amount}" step="0.05"/>
-	            </div>
-              <c:if test="${not empty Model.errors['Amount'+=i]}">
-                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
-                <span class="help-block">* ${Model.errors['Amount'+=i]}</span>
-              </c:if>
+	          <div class="col-xs-5">
+		          <div class="form-group">
+		            <label class="sr-only">Amount</label>
+		            <div class="input-group">
+		              <div class="input-group-addon">$</div>
+		              <input type="number" class="form-control" name="Amount" placeholder="Amount" value="${r.amount}" step="0.05"/>
+		            </div>
+		          </div>
+		        </div>
+	          
+	          <div class="col-xs-2">
+		          <div class="form-group">
+				        <button type="button" class="btn btn-danger remove-result">
+				          <span class="glyphicon glyphicon-remove"></span>
+				        </button>
+		          </div>
 	          </div>
 	          
 	        </div>
-        </c:forEach>
-              
-				<br/>
+	        
+	      </c:forEach>
+	      
+        <div style="padding-bottom:1em;">
+	        
+					<button type="button" id="add-result" class="btn btn-success">
+					  <span class="glyphicon glyphicon-plus"></span> Add Record
+					</button>
+	              
+					<button type="submit" class="btn btn-primary">Submit</button>
 				
-				<input type="submit" class="btn btn-primary" value="Submit"/>
+        </div>
         
 			</form>
 			

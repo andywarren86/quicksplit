@@ -1,17 +1,13 @@
 package quicksplit.servlet.model;
 
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.time.FastDateFormat;
 
 public class AddResultModel
 {
@@ -35,7 +31,6 @@ public class AddResultModel
         }
     }
     
-    /** Create empty model **/
     public AddResultModel()
     {
     }
@@ -50,7 +45,7 @@ public class AddResultModel
     
     public void populateFromRequest( final HttpServletRequest req )
     {
-        // TODO reset
+        reset();
         gameDate = req.getParameter( "Date" );
         gameType = req.getParameter( "GameType" );
         
@@ -60,11 +55,7 @@ public class AddResultModel
         {
             final String player = req.getParameter( "Player"+i );
             final String amount = req.getParameter( "Amount"+i );
-            
-            if( !StringUtils.isBlank( player ) || !StringUtils.isBlank( amount ) )
-            {
-                addResult( player, amount );
-            }
+            addResult( player, amount );
             i++;
         }
     }
@@ -72,17 +63,6 @@ public class AddResultModel
     public String getGameDate()
     {
         return gameDate;
-    }
-    public Date getGameDateAsDate()
-    {
-        try
-        {
-            return FastDateFormat.getInstance( "yyyy-MM-dd" ).parse( gameDate );
-        }
-        catch( final ParseException e )
-        {
-            throw new RuntimeException( e );
-        }
     }
     public void setGameDate( final String gameDate )
     {

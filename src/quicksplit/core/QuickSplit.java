@@ -22,8 +22,8 @@ import quicksplit.servlet.model.AddResultModel.ResultModel;
 public class QuickSplit
 {
     private static final String NEW_LINE = "\r\n";
-    private static final String PROPERTIES_FILE = "quicksplit/resources/quicksplit.properties";
-    private static final String LOCAL_PROPERTIES_FILE = "quicksplit/resources/quicksplit.local.properties";
+    private static final String PROPERTIES_FILE = "quicksplit.properties";
+    private static final String LOCAL_PROPERTIES_FILE = "quicksplit.local.properties";
     
     private static List<Player> myPlayers = new ArrayList<Player>();
     private static List<Game> myGames = new ArrayList<Game>();
@@ -232,7 +232,13 @@ public class QuickSplit
         
         for( final ResultModel result : model.getResults() )
         {
-            final Player player = Player.getByName( result.getPlayer() );
+            Player player = Player.getByName( result.getPlayer() );
+            if( player == null )
+            {
+                player = new Player( result.getPlayer() );
+                myPlayers.add( player );
+            }
+            
             final int amount = (int)(Double.parseDouble( result.getAmount() ) * 100);
             new Result( player, newGame, amount );
         }

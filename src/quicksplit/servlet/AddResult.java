@@ -16,7 +16,6 @@ import quicksplit.core.GameType;
 import quicksplit.core.QuickSplit;
 import quicksplit.servlet.model.AddResultModel;
 
-@AuthorisationRequired
 @WebServlet( "/AddResult" )
 public class AddResult extends BaseServlet
 {
@@ -38,6 +37,8 @@ public class AddResult extends BaseServlet
             uuid = UUID.randomUUID().toString();
             request.getSession().setAttribute( uuid, model );
         }
+        if( model.getResults().isEmpty() )
+            model.addResult( "", "" );
         
         request.setAttribute( "UUID", uuid );
         request.setAttribute( "Model", model );

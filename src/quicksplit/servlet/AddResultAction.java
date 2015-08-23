@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,11 +16,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import quicksplit.core.Game;
 import quicksplit.core.GameType;
-import quicksplit.core.Player;
 import quicksplit.core.QuickSplit;
 import quicksplit.servlet.model.AddResultModel;
 
-@AuthorisationRequired
 @WebServlet("/AddResultAction")
 public class AddResultAction extends BaseServlet
 {
@@ -29,7 +29,6 @@ public class AddResultAction extends BaseServlet
     {
         final String uuid = request.getParameter( "UUID" );
         final AddResultModel model = (AddResultModel)request.getSession().getAttribute( uuid );
-        model.reset();
         model.populateFromRequest( request );
         
         if( validate( model ) )
@@ -86,6 +85,7 @@ public class AddResultAction extends BaseServlet
         }
         
         int sum = 0;
+        final Set<String> players = new HashSet<>();
         for( int i=0; i<model.getResults().size(); i++ )
         {
             final String player = model.getResults().get( i ).getPlayer();
@@ -97,10 +97,11 @@ public class AddResultAction extends BaseServlet
             {
                 model.addError( playerKey, "Mandatory" );
             }
-            else if( Player.getByName( player ) == null )
+            else if( players.contains( player ) )
             {
-                model.addError( playerKey, "Invalid player" );
-            } 
+                model.addError( playerKey, "Duplicate player" );
+            }
+            players.add( player );
             
             if( StringUtils.isEmpty( amountKey ) )
             {
@@ -120,13 +121,16 @@ public class AddResultAction extends BaseServlet
             }
         }
         
-        if( model.getResults().isEmpty() )
+        if( !model.hasErrors() )
         {
-            model.addError( "Results", "Must enter at least one result" );
-        }
-        else if( sum != 0 )
-        {
-            model.addError( "Results", "Total must equal zero. Total: $" + QuickSplit.formatAmount( sum ) );
+            if( model.getResults().isEmpty() )
+            {
+                model.addError( "Results", "Must enter at least one result" );
+            }
+            else if( sum != 0 )
+            {
+                model.addError( "Results", "Total must equal zero. Total: $" + QuickSplit.formatAmount( sum ) );
+            }
         }
 
         return !model.hasErrors();

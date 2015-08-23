@@ -2,7 +2,9 @@ package quicksplit.core;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class Player
     implements Comparable<Player>
@@ -10,7 +12,7 @@ public class Player
     private final String myName;
     private final List<Result> myResults;
 
-    Player(String name)
+    Player(final String name)
     {
         this.myName = name;
         myResults = new ArrayList<Result>();
@@ -25,9 +27,16 @@ public class Player
     {
         return Collections.unmodifiableList( myResults );
     }
+    
+    public long daysSinceLastPlayed()
+    {
+        final Date mostRecentGame = myResults.get( myResults.size()-1 ).getGame().getDate();
+        final long diff = new Date().getTime() - mostRecentGame.getTime();
+        return TimeUnit.DAYS.convert( diff, TimeUnit.MILLISECONDS );
+    }
 
     // package-private
-    void addResult( Result result )
+    void addResult( final Result result )
     {
         myResults.add( result );
     }
@@ -39,15 +48,15 @@ public class Player
     }
 
     @Override
-    public int compareTo( Player p )
+    public int compareTo( final Player p )
     {
         return myName.compareTo( p.getName() );
     }
     
     // static utilities
-    public static Player getByName( String name )
+    public static Player getByName( final String name )
     {
-        for( Player p : QuickSplit.getPlayerList() )
+        for( final Player p : QuickSplit.getPlayerList() )
         {
             if( p.getName().equals( name ) )
             {

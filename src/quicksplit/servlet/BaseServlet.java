@@ -9,8 +9,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import quicksplit.core.QuickSplit;
-
 public abstract class BaseServlet extends HttpServlet
 {
     @Override
@@ -29,13 +27,7 @@ public abstract class BaseServlet extends HttpServlet
     
     protected final void doGetPost( final HttpServletRequest req, final HttpServletResponse resp )
             throws ServletException, IOException
-    {
-        if( !checkAuthorisation( req ) )
-        {
-            setUnauthorisedResponse( resp );
-            return;
-        }
-        
+    {        
         // DEBUG
         System.out.println();
         System.out.println( "URI: " + req.getRequestURI() );
@@ -50,6 +42,19 @@ public abstract class BaseServlet extends HttpServlet
 
         // turn off caching
         resp.setHeader( "Cache-Control", "max-age=0, no-cache, no-store" );
+        
+        // add some crap into the request scope
+        if( req.getUserPrincipal() != null )
+            req.setAttribute( "CurrentUser", req.getUserPrincipal().getName() );
+        req.setAttribute( "IsTier1", req.isUserInRole( "tier1" ) );
+        
+        // pluck any success message out of session and add to request scope
+        final String successMessage = (String)req.getSession().getAttribute( "SuccessMessage" );
+        if( successMessage != null )
+        {
+            req.getSession().removeAttribute( "SuccessMessage" );
+            req.setAttribute( "SuccessMessage", successMessage );
+        }
         
         try
         {
@@ -66,27 +71,4 @@ public abstract class BaseServlet extends HttpServlet
     protected abstract void processRequest( HttpServletRequest req, HttpServletResponse resp )
         throws Exception;
 
-    /**
-     * If the Servlet is annotated with @AuthorisationRequired then check the request is coming
-     * from one of the authorised IP addresses.
-     */
-    private boolean checkAuthorisation( final HttpServletRequest req )
-    {
-        if( getClass().isAnnotationPresent( AuthorisationRequired.class ) )
-        {
-            final String remoteAddr = req.getRemoteAddr();
-            if( !Arrays.asList( QuickSplit.getAuthorisedAddresses() ).contains( remoteAddr ) )
-            {
-                System.out.println( "Unauthorised Request: IP address " + req.getRemoteAddr() + " attempted to access " + getClass().getName() );
-                return false;
-            }
-        }
-        return true;
-    }
-    
-    private void setUnauthorisedResponse( final HttpServletResponse resp ) throws IOException
-    {
-        resp.sendError( HttpServletResponse.SC_UNAUTHORIZED, 
-                "IP Address must be one of the following: " + Arrays.asList( QuickSplit.getAuthorisedAddresses() ) );
-    }
 }

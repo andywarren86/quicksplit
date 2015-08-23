@@ -1,13 +1,18 @@
 package quicksplit.servlet;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@AuthorisationRequired
+import quicksplit.core.Player;
+import quicksplit.servlet.model.AddResultModel;
+import quicksplit.servlet.model.AddResultModel.ResultModel;
+
 @WebServlet( "/AddResultConfirm" )
 public class AddResultConfirm
     extends BaseServlet
@@ -18,13 +23,31 @@ public class AddResultConfirm
         throws ServletException, IOException
     {
         final String uuid = req.getParameter( "UUID" );
-        final Object model = req.getSession().getAttribute( uuid );
-        if( model == null )
-            throw new ServletException( "No model with id " + uuid );
+        final AddResultModel model = (AddResultModel)req.getSession().getAttribute( uuid );
+        if( model == null ) 
+        {
+            req.getRequestDispatcher( "AddResult" ).forward( req, resp );
+            return;
+        }
+        
+        final List<String> warnings = new ArrayList<>();
+        for( final ResultModel resultModel : model.getResults() )
+        {
+            final Player player = Player.getByName( resultModel.getPlayer() );
+            if( player == null )
+            {
+                warnings.add( "Player '" + resultModel.getPlayer() + "' does not exist. " +
+                    "If you proceed a new record will be created for this player." );
+            }
+            else if( player.daysSinceLastPlayed() > 30 )
+            {
+                warnings.add( player.getName() + " hasn't played in a while. Do you have the right person?" );
+            }
+        }
         
         req.setAttribute( "UUID", uuid );
         req.setAttribute( "Model", model );
-        req.setAttribute( "Success", req.getParameter( "Success" ) );
+        req.setAttribute( "Warnings", warnings );
         req.getRequestDispatcher( "jsp/AddResultConfirm.jsp" ).forward( req, resp );
     }
 

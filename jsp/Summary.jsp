@@ -39,6 +39,13 @@
     <tags:nav active="Summary"/>
     
     <div class="container">
+    
+      <c:if test="${not empty SuccessMessage}">
+        <div class="alert alert-success" role="alert">
+          <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>
+          ${SuccessMessage}
+        </div>
+      </c:if>
 	
 			<h1>
 			  Summary - ${not empty season ? 'Season ' += season.id : 'Overall' }

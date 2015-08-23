@@ -69,7 +69,7 @@
   	<mkdir dir="${build.dir}" />
   	<delete file="${build.dir}/${war.filename}" />
   	
-    <war destfile="${build.dir}/${war.filename}" needxmlfile="false">
+    <war destfile="${build.dir}/${war.filename}" webxml="web.xml">
       <lib dir="jars"/>
     	<classes dir="bin"/>
     	<zipfileset dir="css" prefix="css"/>
@@ -80,5 +80,11 @@
   	</war>
 	
   </target>
+	
+	<target name="jsp">
+	 <copy todir="C:\apache-tomcat-8.0.20\webapps\quicksplit\jsp">
+		 <fileset dir="jsp"/>
+	 </copy>
+	</target>
   
 </project>
