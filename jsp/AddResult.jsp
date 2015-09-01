@@ -44,13 +44,14 @@
       
       function addResultRow() {
         var newRow = $( ".result-row:first" ).clone();
-        newRow.find( ":input" ).val( "" ); // clear field values
-        newRow.setError( null ); // clear errors
+        newRow.find( ":input" ).val( "" ).setError( null );
         
         $( ".result-row:last" ).after( newRow );
         
         setIndex();
         setRemoveButtons();
+        
+        newRow.find( ":input:first" ).focus();
       } 
     
       $(document).ready(function(){

@@ -81,8 +81,9 @@
 	
   </target>
 	
+	<!-- Just copies the jsp dir so restart is not necessary -->
 	<target name="jsp">
-	 <copy todir="C:\apache-tomcat-8.0.20\webapps\quicksplit\jsp">
+	 <copy todir="${tomcat.dir}/webapps/${project.name}/jsp">
 		 <fileset dir="jsp"/>
 	 </copy>
 	</target>
