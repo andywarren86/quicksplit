@@ -14,75 +14,64 @@ import quicksplit.core.QuickSplit;
 public abstract class BaseServlet extends HttpServlet
 {
     @Override
-    protected final void doGet( HttpServletRequest req, HttpServletResponse resp )
+    protected final void doGet( final HttpServletRequest req, final HttpServletResponse resp )
             throws ServletException, IOException
     {
         doGetPost( req, resp );
     }
 
     @Override
-    protected final void doPost( HttpServletRequest req, HttpServletResponse resp )
+    protected final void doPost( final HttpServletRequest req, final HttpServletResponse resp )
             throws ServletException, IOException
     {
         doGetPost( req, resp );
     }
     
-    protected final void doGetPost( HttpServletRequest req, HttpServletResponse resp )
+    protected final void doGetPost( final HttpServletRequest req, final HttpServletResponse resp )
             throws ServletException, IOException
-    {
-        if( !checkAuthorisation( req ) )
-        {
-            setUnauthorisedResponse( resp );
-            return;
-        }
-        
+    {        
         // DEBUG
         System.out.println();
         System.out.println( "URI: " + req.getRequestURI() );
         System.out.println( "Remote Addr: " + req.getRemoteAddr() );
-        Enumeration<String> e = req.getParameterNames();
+        final Enumeration<String> e = req.getParameterNames();
         while( e.hasMoreElements() )
         {
-            String name = e.nextElement();
+            final String name = e.nextElement();
             System.out.println( name + " = " + 
                     Arrays.toString( req.getParameterMap().get( name ) ) );
         }
 
+        // turn off caching
+        resp.setHeader( "Cache-Control", "max-age=0, no-cache, no-store" );
+        
+        // add some crap into the request scope
+        req.setAttribute( "lastUpdated", QuickSplit.getLastUpdated() );
+        if( req.getUserPrincipal() != null )
+            req.setAttribute( "CurrentUser", req.getUserPrincipal().getName() );
+        req.setAttribute( "IsTier1", req.isUserInRole( "tier1" ) );
+        
+        // pluck any success message out of session and add to request scope
+        final String successMessage = (String)req.getSession().getAttribute( "SuccessMessage" );
+        if( successMessage != null )
+        {
+            req.getSession().removeAttribute( "SuccessMessage" );
+            req.setAttribute( "SuccessMessage", successMessage );
+        }
+        
         try
         {
         	processRequest( req, resp );
         }
-        catch( Exception ex )
+        catch( final Exception ex )
         {
         	System.err.println( "Exception occurred processing request" );
         	ex.printStackTrace();
+        	throw new ServletException( ex );
         }
     }
     
     protected abstract void processRequest( HttpServletRequest req, HttpServletResponse resp )
-        throws ServletException, IOException;
+        throws Exception;
 
-    /**
-     * If the Servlet is annotated with @AuthorisationRequired then check the request is coming
-     * from one of the authorised IP addresses.
-     */
-    private boolean checkAuthorisation( HttpServletRequest req )
-    {
-        if( getClass().isAnnotationPresent( AuthorisationRequired.class ) )
-        {
-            String remoteAddr = req.getRemoteAddr();
-            if( !Arrays.asList( QuickSplit.getAuthorisedAddresses() ).contains( remoteAddr ) )
-            {
-                System.out.println( "Unauthorised Request: IP address " + req.getRemoteAddr() + " attempted to access " + getClass().getName() );
-                return false;
-            }
-        }
-        return true;
-    }
-    
-    private void setUnauthorisedResponse( HttpServletResponse resp ) throws IOException
-    {
-        resp.sendError( HttpServletResponse.SC_UNAUTHORIZED, 
-                "IP Address must be one of the following: " + Arrays.asList( QuickSplit.getAuthorisedAddresses() ) );
-    }
 }

@@ -69,14 +69,23 @@
   	<mkdir dir="${build.dir}" />
   	<delete file="${build.dir}/${war.filename}" />
   	
-    <war destfile="${build.dir}/${war.filename}" needxmlfile="false">
+    <war destfile="${build.dir}/${war.filename}" webxml="web.xml">
       <lib dir="jars"/>
     	<classes dir="bin"/>
     	<zipfileset dir="css" prefix="css"/>
     	<zipfileset dir="js" prefix="js"/>
     	<zipfileset dir="jsp" prefix="jsp"/>
+    	<zipfileset dir="fonts" prefix="fonts"/>
+    	<zipfileset dir="tags" prefix="WEB-INF/tags"/>
   	</war>
 	
   </target>
+	
+	<!-- Just copies the jsp dir so restart is not necessary -->
+	<target name="jsp">
+	 <copy todir="${tomcat.dir}/webapps/${project.name}/jsp">
+		 <fileset dir="jsp"/>
+	 </copy>
+	</target>
   
 </project>

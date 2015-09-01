@@ -9,16 +9,19 @@ import quicksplit.core.QuickSplit;
 public class Startup 
     extends HttpServlet
 {
-    private static final long serialVersionUID = 1L;
-
     @Override
     public void init()
     {
         try
         {
-            QuickSplit.main( new String[]{} );
+            // start the application
+            QuickSplit.Startup();
+            
+            // set application scope attributes
+            getServletContext().setAttribute( "dateFormat", QuickSplit.DATE_PATTERN );
+            getServletContext().setAttribute( "dateFormatLong", QuickSplit.DATE_PATTERN_LONG );
         }
-        catch( Exception e )
+        catch( final Exception e )
         {
             System.err.println( "Exception occured during startup" );
             e.printStackTrace();

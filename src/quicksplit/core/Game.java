@@ -1,6 +1,7 @@
 package quicksplit.core;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -41,6 +42,18 @@ public class Game
     {
         return Collections.unmodifiableList( myResults );
     }
+    
+    public List<Result> getResultsOrderByAmount()
+    {
+        final ArrayList<Result> results = new ArrayList<>( myResults );
+        Collections.sort( results, new Comparator<Result>(){
+            @Override
+            public int compare( final Result r1, final Result r2 ) {
+                return r2.getAmount() - r1.getAmount();
+            }
+        });
+        return results;
+    }
 
 
     void addResult( final Result result )
@@ -76,6 +89,38 @@ public class Game
             players.add( r.getPlayer() );
         }
         return players;
+    }
+    
+    /*
+     * static utilities
+     */
+    
+    /**
+     * Return any Games for the specified date
+     */
+    public static List<Game> getByDate( final Date date )
+    {
+        final List<Game> games = new ArrayList<>();
+        for( final Game g : QuickSplit.getGameList() )
+        {
+            if( g.getDate().equals( date ) )
+            {
+                games.add( g );
+            }
+        } 
+        return games;
+    }
+    
+    public static Game getById( final long id )
+    {
+        for( final Game g : QuickSplit.getGameList() )
+        {
+            if( g.getId() == id )
+            {
+                return g;
+            }
+        } 
+        return null;    
     }
 
 }

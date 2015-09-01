@@ -1,176 +1,172 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ page import="java.util.*" %>
-<%@ page import="quicksplit.core.*" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
 
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
-	<head>
-	  <title>QuickSplit: Add Results</title>
-	  <jsp:include page="common/includes.jsp" />
-	  
-	  <script type="text/javascript">
-	    var players;
-	    
-	    $(function(){
-	    	
-	    	// configure date field
-				$("#datepicker").datepicker({
-					dateFormat: "dd/mm/yy",
-					defaultDate: new Date()
-				});
-				
-				// get all player names for autocomplete
-				players = [];
-				<c:forEach items="${Players}" var="player">
-				  players.push( "${player.name}" );
-				</c:forEach>
-				
-			  // capture field values from request params
-			  var results = [];
-			  <c:forEach varStatus="loop" items="${paramValues.Player}">
-			  	results.push({
-			  		player: "${paramValues.Player[loop.index]}",
-			  		amount: "${paramValues.Result[loop.index]}" });
-			  </c:forEach>
-			  
-			  generateFields( results );
-		  });
-	    
-	    function resetHandlers()
-	    {
-				$( "input[type='text'][name='Player']" ).autocomplete({
-				  source: players,
-					delay: 0
-				});
-				
-				$( "input[type='text']" ).blur( function( e ){
-					addEmptyRow();
-			  });
-	    }
-		  
-		  function clearForm()
-		  {
-		    $( "input[type='text']" ).val( "" );
-		  }
-		  
-		  function generateFields( results )
-		  {
-			  for( var i=0; i<results.length; i++ )
-				{
-				  $( "#resultsTable tbody" ).append( getRowElement( results[i].player, results[i].amount ) );
-				}
-			  addEmptyRow();
-			  resetHandlers();
-		  }
-		  
-		  // adds an empty result row provided the final row isn't already empty
-		  function addEmptyRow()
-		  {
-			  if( $( "#resultsTable tbody tr:last input:first" ).val() != "" ||
-					  $( "#resultsTable tbody tr:last input:last" ).val() != "" )
-				{
-			  	$( "#resultsTable tbody" ).append( getRowElement( "", "" ) );
-			  	resetHandlers();
-				}
-		  }
-		  
-		  function getRowElement( player, result )
-		  {
-			  return $( 
-					  "<tr>" + 
-					    "<td><input type='text' name='Player' value='" + player + "'/></td>" + 
-					    "<td><input type='text' name='Result' value='" + result + "'/></td>" + 
-					  "</tr>" );
-		  }
-	  </script>
-	</head>
+  <tags:head title="QuickSplit: Add Game">
+
+    <script type="text/javascript">
+      
+      (function($){
+        $.fn.setError = function( error ){
+          console.log( "SetError" );
+          console.log( this );
+          console.log( error );
+          
+          if( error == null ){
+        	  this.closest( ".form-group" ).removeClass( "has-error" )
+        	    .find( "span.help-block" ).remove();
+          }
+          else {
+        	  this.closest( ".form-group" ).addClass( "has-error" )
+        	    .append( $( "<span>" ).addClass( "help-block" ).text( "* " + error ) );
+          }
+          return this;
+        }
+      }(jQuery));
+      
+      function setIndex() {
+        $( ".result-row" ).each( function(i){
+          $(this).find( "input[name^='Player']" ).attr( "name", "Player"+(i+1) );
+          $(this).find( "input[name^='Amount']" ).attr( "name", "Amount"+(i+1) );
+        });
+      }
+      
+      function setRemoveButtons() {
+        if( $( ".result-row" ).size() == 1 ){
+          $( ".result-row .remove-result" ).addClass( "hidden" );
+        }
+        else {
+          $( ".result-row .remove-result" ).removeClass( "hidden" );
+        }
+      }
+      
+      function addResultRow() {
+        var newRow = $( ".result-row:first" ).clone();
+        newRow.find( ":input" ).val( "" ).setError( null );
+        
+        $( ".result-row:last" ).after( newRow );
+        
+        setIndex();
+        setRemoveButtons();
+        
+        newRow.find( ":input:first" ).focus();
+      } 
+    
+      $(document).ready(function(){
+    	  setIndex();
+    	  setRemoveButtons();
+    	  
+    	  // set field errors
+        <c:forEach items="${Model.errors}" var="e">
+          $( "input[name='${e.key}']" ).setError( "${e.value}" );
+        </c:forEach>
+    	  
+        $( "#add-result" ).on( "click", function(){
+        	addResultRow();
+        });
+        
+        $( "form" ).on( "click", ".remove-result", function(){
+        	$(this).closest( ".result-row" ).remove();
+        	setIndex();
+        	setRemoveButtons();
+        });
+        
+      });
+      
+    </script>
+    
+    <style>
+      .result-row > div {
+        padding-left: 0;
+      }
+    </style>
+    
+  </tags:head>
 	
 	<body>
-		<h1>Add Results</h1>
-		
-		<c:if test="${not empty Errors}">
-	    <div class="ui-widget">
-				<div style="padding: 0pt 0.7em; margin-top: 20px;" class="ui-state-error ui-corner-all">
-				  <c:forEach items="${Errors}" var="error">
-						<p>
-							<span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-alert">&nbsp;</span>
-							${error}
-						</p>
-				  </c:forEach>
-				</div>
-			</div>
-	  </c:if>
-
-		<c:if test="${not empty Warnings}">
-	    <div class="ui-widget">
-				<div style="padding: 0pt 0.7em; margin-top: 20px;" class="ui-state-highlight ui-corner-all"> 
-					<c:forEach items="${Warnings}" var="warning">
-					  <p>
-					  	<span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-info">&nbsp;</span>
-						  ${warning}
-						</p>
-				  </c:forEach>
-				</div>
-			</div>
-		</c:if>
-		
-		<c:if test="${Success}">
-	    <div class="ui-widget">
-				<div style="padding: 0pt 0.7em; margin-top: 20px;" class="ui-state-success ui-corner-all"> 
-				  <p>
-				  	<span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-check">&nbsp;</span>
-					  New record has been added for ${NewGame}.
-					</p>
-				</div>
-			</div>
-		</c:if>
-		
-		
-		<br/>
-		<form name="AddResultForm" method="get" action="AddResultAction">
-		
-			<!-- Datepicker -->
-			<label>Game Date:</label>
-			<input type="text" id="datepicker" name="Date" size="15" value="${param.Date}" />
-			<br/>
-			
-			<label>Game Type:</label> 
-			<select name="GameType">
-				<c:forEach items="${GameTypes}" var="type">
-					<c:choose>
-						<c:when test="${type==param.GameType}">
-					    <option selected="selected">${type}</option>
-						</c:when>
-						<c:otherwise>
-						  <option>${type}</option>
-						</c:otherwise>
-				  </c:choose>
-				</c:forEach>
-			</select>
-			<br/><br/>
-			
-			<table id="resultsTable">
-				<thead>
-					<tr>
-						<th>Player</th>
-						<th>$</th>
-				  </tr>
-				</thead>
+	 
+    <tags:nav active="Admin"/>
+   
+		<datalist id="players">
+		  <c:forEach items="${Players}" var="player">
+		    <option value="${player.name}"/>
+		  </c:forEach>
+		</datalist>
+	    
+	  <div class="container">
+	  
+		  <h1>Add Result</h1>
 				
-				<!-- Table content dynamically generated by javascript -->
-				<tbody>
-				</tbody>
-				
-			</table>
+		  <p class="lead">Enter details below</p>
+		  
+      <c:if test="${not empty Model.errors.Results}">
+        <div class="alert alert-danger" role="alert">
+          <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+          ${Model.errors.Results}
+        </div>      
+      </c:if>
 			
-			<br/><br/>
-			<input type="submit" name="submit" value="Submit" />
-			<input type="button" value="Clear" onclick="javascript:clearForm();" />
-			<c:if test="${Confirm}">
-			  <input type="submit" name="submit" value="Confirm" />
-			</c:if>
-		</form>
+			<form name="AddResultForm" method="post" action="AddResultAction" autocomplete="off">
+			  <input type="hidden" name="UUID" value="${UUID}"/>
+			
+				<div class="form-group">
+				  <label class="control-label">Game Date</label>
+				  <input type="date" class="form-control" name="Date" value="${Model.gameDate}" />
+				</div>
+				
+			  <input type="hidden" name="GameType" value="HOLDEM"/>
+			  
+			  <label>Results</label>
+			  
+			  <c:forEach items="${Model.results}" var="r">
+	        <div class="result-row clearfix">
+	        
+		        <div class="col-xs-5">
+		          <div class="form-group">
+		            <label class="sr-only">Player</label>
+		            <input type="text" list="players" class="form-control" name="Player" placeholder="Player" value="${r.player}"/>
+		          </div>
+		        </div>
+	          
+	          <div class="col-xs-5">
+		          <div class="form-group">
+		            <label class="sr-only">Amount</label>
+		            <div class="input-group">
+		              <div class="input-group-addon">$</div>
+		              <input type="number" class="form-control" name="Amount" placeholder="Amount" value="${r.amount}" step="0.05"/>
+		            </div>
+		          </div>
+		        </div>
+	          
+	          <div class="col-xs-2">
+		          <div class="form-group">
+				        <button type="button" class="btn btn-danger remove-result">
+				          <span class="glyphicon glyphicon-remove"></span>
+				        </button>
+		          </div>
+	          </div>
+	          
+	        </div>
+	        
+	      </c:forEach>
+	      
+        <div style="padding-bottom:1em;">
+	        
+					<button type="button" id="add-result" class="btn btn-success">
+					  <span class="glyphicon glyphicon-plus"></span> Add Record
+					</button>
+	              
+					<button type="submit" class="btn btn-primary">Submit</button>
+				
+        </div>
+        
+			</form>
+			
+		</div>
 		
+    <tags:debug/>
   </body>
   
 </html>

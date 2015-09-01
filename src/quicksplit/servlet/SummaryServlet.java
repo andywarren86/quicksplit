@@ -1,7 +1,6 @@
 package quicksplit.servlet;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,11 +20,11 @@ import quicksplit.core.Stats;
 public class SummaryServlet extends BaseServlet
 {
     @Override
-    protected void processRequest( HttpServletRequest req, HttpServletResponse resp )
+    protected void processRequest( final HttpServletRequest req, final HttpServletResponse resp )
         throws ServletException, IOException
     {
         Season season = null;
-        String seasonId = req.getParameter( "Season" );
+        final String seasonId = req.getParameter( "Season" );
         if( seasonId == null )
         {
             season = Season.getCurrentSeason();
@@ -49,22 +48,28 @@ public class SummaryServlet extends BaseServlet
         }
         
         // generate stats for each player
-        Map<Player,Stats> statsMap = new HashMap<Player,Stats>();
-        for( Player p : players )
+        final Map<Player,Stats> statsMap = new HashMap<Player,Stats>();
+        for( final Player p : players )
         {
             statsMap.put( p, new Stats( p, games ) );
         }
-        
-        // get date of the most recent entry
-        final Date lastDate = QuickSplit.getGameList().isEmpty() ? null :
-        	QuickSplit.getGameList().get( QuickSplit.getGameList().size()-1 ).getDate();
 
         req.setAttribute( "playerList", players );
         req.setAttribute( "stats", statsMap );
         req.setAttribute( "season", season );
         req.setAttribute( "seasons", QuickSplit.getSeasonList() );
-        req.setAttribute( "dateFormat", QuickSplit.DATE_PATTERN );
-        req.setAttribute( "lastUpdated", lastDate );
+        
+        if( season != null ) 
+        {
+            req.setAttribute( "FromDate", season.getStartDate() );
+            req.setAttribute( "ToDate", season.getEndDate() );
+        }
+        else 
+        {
+            req.setAttribute( "FromDate", games.get( 0 ).getDate() );
+            req.setAttribute( "ToDate", games.get( games.size()-1 ).getDate() );
+        }
+        req.setAttribute( "GameCount", games.size() );
 
         req.getRequestDispatcher( "/jsp/Summary.jsp"  ).forward( req, resp );
         
