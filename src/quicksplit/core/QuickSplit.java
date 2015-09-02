@@ -24,7 +24,7 @@ public class QuickSplit
     private static final String NEW_LINE = "\r\n";
     private static final String PROPERTIES_FILE = "quicksplit.properties";
     private static final String LOCAL_PROPERTIES_FILE = "quicksplit.local.properties";
-    
+
     private static List<Player> myPlayers = new ArrayList<Player>();
     private static List<Game> myGames = new ArrayList<Game>();
     private static List<Season> mySeasons = new ArrayList<Season>();
@@ -42,18 +42,18 @@ public class QuickSplit
         loadProperties( LOCAL_PROPERTIES_FILE );
         loadSeasonData( Paths.get( getSeasonDataPath() ) );
         loadResultData( Paths.get( getResultDataPath() ) );
-        
+
         validateData();
         sortData();
-        
+
         System.out.println( "Seasons: " + mySeasons.size() );
         System.out.println( "Players: " + myPlayers.size() );
         System.out.println( "Games: " + myGames.size() );
         System.out.println( "Current Season: " + Season.getCurrentSeason() );
-        
+
         System.out.println( "Completed startup processing" );
     }
-    
+
     /**
      * Returns the list of all Seasons
      */
@@ -77,7 +77,7 @@ public class QuickSplit
     {
         return Collections.unmodifiableList( myGames );
     }
-    
+
 
     /**
      * Return result for a Game & Player
@@ -93,15 +93,15 @@ public class QuickSplit
         }
         return null;
     }
-    
+
     /**
      * Load properties from the named resource.
-     * @throws IOException 
+     * @throws IOException
      */
     private static void loadProperties( final String resourceName ) throws IOException
     {
         System.out.println( "Loading properties from resource: " + resourceName );
-        try( InputStream inputStream = 
+        try( InputStream inputStream =
                  QuickSplit.class.getClassLoader().getResourceAsStream( resourceName ) )
         {
             if( inputStream == null )
@@ -109,11 +109,11 @@ public class QuickSplit
                 System.out.println( "Could not find resource." );
                 return;
             }
-            myProperties.load( inputStream );            
+            myProperties.load( inputStream );
             myProperties.list( System.out );
         }
     }
-    
+
     /**
      * Returns a property value given a key.
      */
@@ -121,7 +121,7 @@ public class QuickSplit
     {
         return myProperties.getProperty( key );
     }
-    
+
     /**
      * Return an array of IP addresses that are authorised to access admin servlets
      */
@@ -129,12 +129,12 @@ public class QuickSplit
     {
         return getProperty( "authorisedAddresses" ).split( "," );
     }
-    
+
     public static String getSeasonDataPath()
     {
     	return getProperty( "season.data.path" );
     }
-    
+
     public static String getResultDataPath()
     {
     	return getProperty( "result.data.path" );
@@ -147,13 +147,13 @@ public class QuickSplit
         throws Exception
     {
         System.out.println( "Reading result data from: " + resultPath );
-        
+
         if( !resultPath.toFile().exists() )
         {
         	System.out.println( "Could not find result data file." );
         	return;
         }
-        
+
         try( BufferedReader reader = new BufferedReader( new FileReader( resultPath.toFile() ) ) )
         {
 	        int count = 0;
@@ -166,7 +166,7 @@ public class QuickSplit
 	            {
 	                break;
 	            }
-	
+
 	            // read in player names
 	            if( count == 1 )
 	            {
@@ -182,29 +182,29 @@ public class QuickSplit
 	                final GameType gameType = GameType.valueOf( fields[1] );
 	                final Game game = new Game( date, gameType );
 	                myGames.add( game );
-	                
+
 	                // add to season
 	                final Season season = Season.getSeasonFromDate( date );
 	                season.addGame( game );
-	
+
 	                // for each result
 	                for( int i=2; i<fields.length; i++ )
 	                {
 	                    final String amountStr = fields[i];
-	
+
 	                    // no result
 	                    if( amountStr.length() == 0 )
 	                    {
 	                        continue;
 	                    }
-	
+
 	                    final int centAmount = (int)Math.round( Double.parseDouble( amountStr ) * 100 );
-	
+
 	                    final Player player = myPlayers.get( i-2 );
 	                    new Result( player, game, centAmount );
 	                }
 	            }
-	
+
 	        }
         }
 
@@ -223,13 +223,13 @@ public class QuickSplit
 
         final Date date = new SimpleDateFormat( "yyyy-MM-dd" ).parse( model.getGameDate() );
         final GameType type = GameType.valueOf( model.getGameType() );
-        
+
         final Game newGame = new Game( date, type );
         myGames.add( newGame );
-        
+
         final Season season = Season.getSeasonFromDate( date );
         season.addGame( newGame );
-        
+
         for( final ResultModel result : model.getResults() )
         {
             Player player = Player.getByName( result.getPlayer() );
@@ -238,11 +238,11 @@ public class QuickSplit
                 player = new Player( result.getPlayer() );
                 myPlayers.add( player );
             }
-            
-            final int amount = (int)(Double.parseDouble( result.getAmount() ) * 100);
+
+            final int amount = (int)Math.round( Double.parseDouble( result.getAmount() ) ) * 100;
             new Result( player, newGame, amount );
         }
-        
+
         validateData();
         sortData();
 
@@ -257,7 +257,7 @@ public class QuickSplit
     public static void writeResultsToFile( final Path resultPath ) throws Exception
     {
         System.out.println( "Writing data to file: " + resultPath );
-        
+
         if( Files.notExists( resultPath ) )
         {
         	Files.createDirectories( resultPath.getParent() );
@@ -280,7 +280,7 @@ public class QuickSplit
         {
             // write date
             writer.write( formatDate( game.getDate() ) );
-            
+
             // write game type
             writer.write( "," + game.getGameType() );
 
@@ -309,7 +309,7 @@ public class QuickSplit
     public static void loadSeasonData( final Path path ) throws Exception
     {
         System.out.println( "Reading season dates from: " + path );
-        
+
         if( !path.toFile().exists() )
         {
         	System.out.println( "Could not find season data file." );
@@ -317,7 +317,7 @@ public class QuickSplit
         	mySeasons.add( newSeason );
         	return;
         }
-        
+
         try( BufferedReader reader = new BufferedReader( new FileReader( path.toFile() ) ) )
         {
             String line = null;

@@ -30,7 +30,7 @@ public class AddResultAction extends BaseServlet
         final String uuid = request.getParameter( "UUID" );
         final AddResultModel model = (AddResultModel)request.getSession().getAttribute( uuid );
         model.populateFromRequest( request );
-        
+
         if( validate( model ) )
         {
             // redirect to confirm
@@ -42,7 +42,7 @@ public class AddResultAction extends BaseServlet
             response.sendRedirect( "AddResult?UUID=" + uuid );
         }
     }
-    
+
     private boolean validate( final AddResultModel model )
     {
         final String gameDate = model.getGameDate();
@@ -65,8 +65,8 @@ public class AddResultAction extends BaseServlet
                 model.addError( "Date", "Invalid date format" );
             }
         }
-        
-        
+
+
         final String gameType = model.getGameType();
         if( StringUtils.isEmpty( gameType ) )
         {
@@ -83,7 +83,7 @@ public class AddResultAction extends BaseServlet
                 model.addError( "GameType", "Invalid game type" );
             }
         }
-        
+
         int sum = 0;
         final Set<String> players = new HashSet<>();
         for( int i=0; i<model.getResults().size(); i++ )
@@ -92,7 +92,7 @@ public class AddResultAction extends BaseServlet
             final String amount = model.getResults().get( i ).getAmount();
             final String playerKey = "Player"+(i+1);
             final String amountKey = "Amount"+(i+1);
-            
+
             if( StringUtils.isEmpty( player ) )
             {
                 model.addError( playerKey, "Mandatory" );
@@ -102,7 +102,7 @@ public class AddResultAction extends BaseServlet
                 model.addError( playerKey, "Duplicate player" );
             }
             players.add( player );
-            
+
             if( StringUtils.isEmpty( amountKey ) )
             {
                 model.addError( amountKey, "Mandatory" );
@@ -111,8 +111,7 @@ public class AddResultAction extends BaseServlet
             {
                 try
                 {
-                    final double amountDbl = Double.parseDouble( amount );
-                    sum += (int)(amountDbl*100);
+                    sum += Math.round( Double.parseDouble( amount ) );
                 }
                 catch( final NumberFormatException nfe )
                 {
@@ -120,12 +119,12 @@ public class AddResultAction extends BaseServlet
                 }
             }
         }
-        
+
         if( !model.hasErrors() )
         {
-            if( model.getResults().isEmpty() )
+            if( model.getResults().size() < 2 )
             {
-                model.addError( "Results", "Must enter at least one result" );
+                model.addError( "Results", "Must enter at least two results" );
             }
             else if( sum != 0 )
             {
@@ -135,5 +134,5 @@ public class AddResultAction extends BaseServlet
 
         return !model.hasErrors();
     }
-    
+
 }
