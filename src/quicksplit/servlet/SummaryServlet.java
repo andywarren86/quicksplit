@@ -16,7 +16,7 @@ import quicksplit.core.QuickSplit;
 import quicksplit.core.Season;
 import quicksplit.core.Stats;
 
-@WebServlet( "/Summary" )
+@WebServlet({ "/Summary", "/index.html" })
 public class SummaryServlet extends BaseServlet
 {
     @Override
@@ -33,7 +33,7 @@ public class SummaryServlet extends BaseServlet
         {
             season = Season.getSeasonById( seasonId );
         }
-        
+
         List<Player> players = null;
         List<Game> games = null;
         if( season == null )
@@ -46,7 +46,7 @@ public class SummaryServlet extends BaseServlet
             players = season.getPlayers();
             games = season.getGames();
         }
-        
+
         // generate stats for each player
         final Map<Player,Stats> statsMap = new HashMap<Player,Stats>();
         for( final Player p : players )
@@ -58,13 +58,13 @@ public class SummaryServlet extends BaseServlet
         req.setAttribute( "stats", statsMap );
         req.setAttribute( "season", season );
         req.setAttribute( "seasons", QuickSplit.getSeasonList() );
-        
-        if( season != null ) 
+
+        if( season != null )
         {
             req.setAttribute( "FromDate", season.getStartDate() );
             req.setAttribute( "ToDate", season.getEndDate() );
         }
-        else 
+        else
         {
             req.setAttribute( "FromDate", games.get( 0 ).getDate() );
             req.setAttribute( "ToDate", games.get( games.size()-1 ).getDate() );
@@ -72,6 +72,6 @@ public class SummaryServlet extends BaseServlet
         req.setAttribute( "GameCount", games.size() );
 
         req.getRequestDispatcher( "/jsp/Summary.jsp"  ).forward( req, resp );
-        
+
     }
 }
