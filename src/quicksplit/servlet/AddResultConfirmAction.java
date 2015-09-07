@@ -2,7 +2,6 @@ package quicksplit.servlet;
 
 import java.text.SimpleDateFormat;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,17 +23,18 @@ public class AddResultConfirmAction
         final AddResultModel model = (AddResultModel)req.getSession().getAttribute( uuid );
         if( model == null )
         {
-            throw new ServletException( "No model" );
+            req.getRequestDispatcher( "AddResult" ).forward( req, resp );
+            return;
         }
-        
+
         final String action = req.getParameter( "Action" );
         if( "Save".equals( action ) )
         {
             final Game game = QuickSplit.addNewRecord( model );
             req.getSession().removeAttribute( uuid );
-            
-            req.getSession().setAttribute( 
-                "SuccessMessage", 
+
+            req.getSession().setAttribute(
+                "SuccessMessage",
                 "New game added for " + new SimpleDateFormat( QuickSplit.DATE_PATTERN_LONG ).format( game.getDate() ) );
             resp.sendRedirect( "Summary" );
         }
@@ -42,7 +42,7 @@ public class AddResultConfirmAction
         {
             resp.sendRedirect( "AddResult?UUID=" + uuid );
         }
-     
+
     }
 
 }

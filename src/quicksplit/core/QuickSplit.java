@@ -239,7 +239,7 @@ public class QuickSplit
                 myPlayers.add( player );
             }
 
-            final int amount = (int)Math.round( Double.parseDouble( result.getAmount() ) ) * 100;
+            final int amount = (int)(Math.round( Double.parseDouble( result.getAmount() ) * 100 ));
             new Result( player, newGame, amount );
         }
 

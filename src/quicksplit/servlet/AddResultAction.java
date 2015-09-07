@@ -29,6 +29,12 @@ public class AddResultAction extends BaseServlet
     {
         final String uuid = request.getParameter( "UUID" );
         final AddResultModel model = (AddResultModel)request.getSession().getAttribute( uuid );
+        if( model == null )
+        {
+            request.getRequestDispatcher( "AddResult" ).forward( request, response );
+            return;
+        }
+
         model.populateFromRequest( request );
 
         if( validate( model ) )
@@ -111,7 +117,7 @@ public class AddResultAction extends BaseServlet
             {
                 try
                 {
-                    sum += Math.round( Double.parseDouble( amount ) );
+                    sum += Math.round( Double.parseDouble( amount ) * 100 );
                 }
                 catch( final NumberFormatException nfe )
                 {

@@ -27,7 +27,7 @@ public class AddResult extends BaseServlet
         throws ServletException, IOException
     {
         String uuid = request.getParameter( "UUID" );
-        AddResultModel model = 
+        AddResultModel model =
             uuid == null ? null : (AddResultModel)request.getSession().getAttribute( uuid );
         if( model == null )
         {
@@ -37,9 +37,13 @@ public class AddResult extends BaseServlet
             uuid = UUID.randomUUID().toString();
             request.getSession().setAttribute( uuid, model );
         }
+
+        // start with an empty row
         if( model.getResults().isEmpty() )
+        {
             model.addResult( "", "" );
-        
+        }
+
         request.setAttribute( "UUID", uuid );
         request.setAttribute( "Model", model );
         request.setAttribute( "Players", QuickSplit.getPlayerList() );
