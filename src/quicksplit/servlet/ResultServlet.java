@@ -18,7 +18,7 @@ import quicksplit.core.Result;
 import quicksplit.core.Season;
 
 @WebServlet( "/Results" )
-public class ResultServlet 
+public class ResultServlet
     extends BaseServlet
 {
     @Override
@@ -35,28 +35,28 @@ public class ResultServlet
         {
             season = Season.getCurrentSeason();
         }
-        
+
         final List<Game> games = season.getGames();
         final List<Player> players = season.getPlayers();
 
         // construct the results map
-        final Map<Game,List<Result>> resultsMap = new HashMap<Game,List<Result>>();
+        final Map<Game,List<Result>> resultsMap = new HashMap<>();
         for( final Game g : games )
         {
-            final List<Result> results = new ArrayList<Result>();
+            final List<Result> results = new ArrayList<>();
             for( final Player p : players )
             {
                 results.add( QuickSplit.getResult( g, p ) );
             }
             resultsMap.put( g, results );
         }
-    
+
         req.setAttribute( "playerList", players );
         req.setAttribute( "gameList", games );
         req.setAttribute( "resultsMap", resultsMap );
         req.setAttribute( "season", season );
         req.setAttribute( "seasons", QuickSplit.getSeasonList() );
-        
+
         req.getRequestDispatcher( "/jsp/Results.jsp"  ).forward( req, resp );
     }
 }

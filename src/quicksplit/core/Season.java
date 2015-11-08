@@ -90,7 +90,13 @@ public class Season implements Comparable<Season>
      */
     public static Season getCurrentSeason()
     {
-        return getSeasonFromDate( new Date() );
+        Season currentSeason = getSeasonFromDate( new Date() );
+        if( currentSeason == null )
+        {
+            currentSeason =
+                QuickSplit.getSeasonList().get( QuickSplit.getSeasonList().size()-1 );
+        }
+        return currentSeason;
     }
 
 	/**

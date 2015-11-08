@@ -11,3 +11,4 @@ tmp/
 .classpath
 
 local.properties
+quicksplit.local.properties

@@ -48,7 +48,7 @@ public class SummaryServlet extends BaseServlet
         }
 
         // generate stats for each player
-        final Map<Player,Stats> statsMap = new HashMap<Player,Stats>();
+        final Map<Player,Stats> statsMap = new HashMap<>();
         for( final Player p : players )
         {
             statsMap.put( p, new Stats( p, games ) );
