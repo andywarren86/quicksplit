@@ -1,14 +1,16 @@
 *.class
+*.jar
 *.war
 *.ear
 *.tmp
 *.bak
 
-bin/
-tmp/
+/.gradle/
+/.settings/
+/build/
+/bin/
 
 .project
 .classpath
 
-local.properties
 quicksplit.local.properties
