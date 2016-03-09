@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -15,6 +17,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+
+import org.apache.commons.io.IOUtils;
 
 import quicksplit.servlet.model.AddResultModel;
 import quicksplit.servlet.model.AddResultModel.ResultModel;
@@ -40,6 +44,8 @@ public class QuickSplit
         System.out.println( "Quicksplit Startup Initiated" );
         loadProperties( PROPERTIES_FILE );
         loadProperties( LOCAL_PROPERTIES_FILE );
+        initialiseDatabase();
+
         loadSeasonData( Paths.get( getSeasonDataPath() ) );
         loadResultData( Paths.get( getResultDataPath() ) );
 
@@ -52,6 +58,20 @@ public class QuickSplit
         System.out.println( "Current Season: " + Season.getCurrentSeason() );
 
         System.out.println( "Completed startup processing" );
+    }
+
+    private static void initialiseDatabase() throws Exception
+    {
+        System.out.println( "Initialising database" );
+        Class.forName( "org.h2.Driver" );
+        final Connection connection = DriverManager.getConnection( "jdbc:h2:~/blah" );
+
+        final String initSql =
+            IOUtils.toString(
+                QuickSplit.class.getClassLoader().getResourceAsStream( "/init.sql" ) );
+        final int result = connection.createStatement().executeUpdate( initSql );
+        connection.close();
+        System.out.println( "Updated: " + result );
     }
 
     /**
