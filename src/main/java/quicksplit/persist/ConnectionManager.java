@@ -5,12 +5,19 @@ import java.sql.DriverManager;
 
 public class ConnectionManager
 {
+    static {
+        try
+        {
+            Class.forName( "org.h2.Driver" );
+        }
+        catch( final ClassNotFoundException e )
+        {
+            throw new RuntimeException( e );
+        }
+    }
 
     public static Connection getConnection() throws Exception
     {
-        Class.forName( "org.h2.Driver" );
-        final Connection conn = DriverManager.getConnection( "jdbc:h2:~/test" );
-        return conn;
-        //conn.close();
+        return DriverManager.getConnection( "jdbc:h2:~/quicksplit" );
     }
 }

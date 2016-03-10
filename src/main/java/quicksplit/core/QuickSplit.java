@@ -9,7 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -20,6 +20,7 @@ import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
 
+import quicksplit.persist.ConnectionManager;
 import quicksplit.servlet.model.AddResultModel;
 import quicksplit.servlet.model.AddResultModel.ResultModel;
 
@@ -44,6 +45,7 @@ public class QuickSplit
         System.out.println( "Quicksplit Startup Initiated" );
         loadProperties( PROPERTIES_FILE );
         loadProperties( LOCAL_PROPERTIES_FILE );
+
         initialiseDatabase();
 
         loadSeasonData( Paths.get( getSeasonDataPath() ) );
@@ -62,16 +64,22 @@ public class QuickSplit
 
     private static void initialiseDatabase() throws Exception
     {
+        // let's just reload the juicy DB
         System.out.println( "Initialising database" );
-        Class.forName( "org.h2.Driver" );
-        final Connection connection = DriverManager.getConnection( "jdbc:h2:~/blah" );
+        try( Connection connection = ConnectionManager.getConnection() )
+        {
+            final String initSql =
+                IOUtils.toString(
+                    QuickSplit.class.getClassLoader().getResourceAsStream( "/init.sql" ) );
+            connection.createStatement().executeUpdate( initSql );
 
-        final String initSql =
-            IOUtils.toString(
-                QuickSplit.class.getClassLoader().getResourceAsStream( "/init.sql" ) );
-        final int result = connection.createStatement().executeUpdate( initSql );
-        connection.close();
-        System.out.println( "Updated: " + result );
+            final PreparedStatement insertPlayer =
+                connection.prepareStatement( "insert into player values ( ?, ?, ? )" );
+            insertPlayer.setInt( parameterIndex, x );
+
+            connection.commit();
+        }
+        System.out.println( "Finished initialising database." );
     }
 
     /**
