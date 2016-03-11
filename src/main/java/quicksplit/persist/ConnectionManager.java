@@ -8,7 +8,9 @@ public class ConnectionManager
     static {
         try
         {
+            System.out.println( "Load driver" );
             Class.forName( "org.h2.Driver" );
+            System.out.println( "Load driver finish" );
         }
         catch( final ClassNotFoundException e )
         {

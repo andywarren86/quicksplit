@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,6 +18,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.TreeSet;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
 
@@ -30,9 +33,9 @@ public class QuickSplit
     private static final String PROPERTIES_FILE = "quicksplit.properties";
     private static final String LOCAL_PROPERTIES_FILE = "quicksplit.local.properties";
 
-    private static List<Player> myPlayers = new ArrayList<Player>();
-    private static List<Game> myGames = new ArrayList<Game>();
-    private static List<Season> mySeasons = new ArrayList<Season>();
+    private static List<Player> myPlayers = new ArrayList<>();
+    private static List<Game> myGames = new ArrayList<>();
+    private static List<Season> mySeasons = new ArrayList<>();
     private static Properties myProperties = new Properties();
 
     public static final String AMOUNT_PATTERN = "0.00";
@@ -43,6 +46,24 @@ public class QuickSplit
         throws Exception
     {
         System.out.println( "Quicksplit Startup Initiated" );
+        System.out.println( "Current dir: " + Paths.get( "." ).toAbsolutePath() );
+        System.out.println( "System properties: " );
+        final TreeSet<?> keys = new TreeSet<>( System.getProperties().keySet() );
+        keys.forEach( k ->
+            System.out.println( "\t" + k + " = " + System.getProperty( (String)k ) ) );
+
+        ClassLoader classLoader = QuickSplit.class.getClassLoader();
+        while( classLoader != null ) {
+            System.out.println( "Classloader: " + classLoader );
+            if( classLoader instanceof URLClassLoader ) {
+                @SuppressWarnings("resource")
+                final URLClassLoader urlClassLoader = (URLClassLoader)classLoader;
+                Stream.of( urlClassLoader.getURLs() ).forEachOrdered( url ->
+                    System.out.println( "\t" + url ) );
+            }
+            classLoader = classLoader.getParent();
+        }
+
         loadProperties( PROPERTIES_FILE );
         loadProperties( LOCAL_PROPERTIES_FILE );
 
@@ -59,7 +80,7 @@ public class QuickSplit
         System.out.println( "Games: " + myGames.size() );
         System.out.println( "Current Season: " + Season.getCurrentSeason() );
 
-        System.out.println( "Completed startup processing" );
+        System.out.println( "Startup complete!" );
     }
 
     private static void initialiseDatabase() throws Exception
@@ -75,11 +96,11 @@ public class QuickSplit
 
             final PreparedStatement insertPlayer =
                 connection.prepareStatement( "insert into player values ( ?, ?, ? )" );
-            insertPlayer.setInt( parameterIndex, x );
+            //insertPlayer.setInt( parameterIndex, x );
 
             connection.commit();
         }
-        System.out.println( "Finished initialising database." );
+        System.out.println( "Finished initialising database" );
     }
 
     /**
