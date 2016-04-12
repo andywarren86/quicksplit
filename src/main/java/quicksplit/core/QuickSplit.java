@@ -5,12 +5,12 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -18,8 +18,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
-import java.util.TreeSet;
-import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
 
@@ -46,23 +44,6 @@ public class QuickSplit
         throws Exception
     {
         System.out.println( "Quicksplit Startup Initiated" );
-        System.out.println( "Current dir: " + Paths.get( "." ).toAbsolutePath() );
-        System.out.println( "System properties: " );
-        final TreeSet<?> keys = new TreeSet<>( System.getProperties().keySet() );
-        keys.forEach( k ->
-            System.out.println( "\t" + k + " = " + System.getProperty( (String)k ) ) );
-
-        ClassLoader classLoader = QuickSplit.class.getClassLoader();
-        while( classLoader != null ) {
-            System.out.println( "Classloader: " + classLoader );
-            if( classLoader instanceof URLClassLoader ) {
-                @SuppressWarnings("resource")
-                final URLClassLoader urlClassLoader = (URLClassLoader)classLoader;
-                Stream.of( urlClassLoader.getURLs() ).forEachOrdered( url ->
-                    System.out.println( "\t" + url ) );
-            }
-            classLoader = classLoader.getParent();
-        }
 
         loadProperties( PROPERTIES_FILE );
         loadProperties( LOCAL_PROPERTIES_FILE );
@@ -85,19 +66,29 @@ public class QuickSplit
 
     private static void initialiseDatabase() throws Exception
     {
-        // let's just reload the juicy DB
+        // check if DB exists and initialise if necessary
         System.out.println( "Initialising database" );
         try( Connection connection = ConnectionManager.getConnection() )
         {
-            final String initSql =
-                IOUtils.toString(
-                    QuickSplit.class.getClassLoader().getResourceAsStream( "/init.sql" ) );
-            connection.createStatement().executeUpdate( initSql );
+            try
+            {
+                final ResultSet resultSet =
+                    connection.createStatement().executeQuery( "select count(*) from player" );
+                final long playerCount = resultSet.getLong( 0 );
+                System.out.println( "Player count: " + playerCount );
+            }
+            catch( final SQLException e )
+            {
+                e.printStackTrace();
 
-            final PreparedStatement insertPlayer =
-                connection.prepareStatement( "insert into player values ( ?, ?, ? )" );
-            //insertPlayer.setInt( parameterIndex, x );
+                System.out.println( "Player table does not exist. Running init script." );
+                final String initSql =
+                    IOUtils.toString(
+                        QuickSplit.class.getClassLoader().getResourceAsStream( "/init.sql" ) );
+                connection.createStatement().executeUpdate( initSql );
 
+                // TODO load data from github?
+            }
             connection.commit();
         }
         System.out.println( "Finished initialising database" );
