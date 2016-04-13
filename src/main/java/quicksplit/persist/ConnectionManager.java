@@ -18,6 +18,7 @@ public class ConnectionManager
 
     public static Connection getConnection() throws Exception
     {
-        return DriverManager.getConnection( "jdbc:h2:~/quicksplit;AUTO_SERVER=TRUE" );
+        return DriverManager.getConnection(
+            "jdbc:h2:~/quicksplit;AUTO_SERVER=TRUE;TRACE_LEVEL_SYSTEM_OUT=2" );
     }
 }

@@ -2,8 +2,7 @@
 CREATE TABLE IF NOT EXISTS player
 (
     id_player NUMBER PRIMARY KEY,
-    nm_player VARCHAR( 255 ) NOT NULL,
-    nm_alias VARCHAR( 255 )
+    nm_player VARCHAR( 255 ) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS season

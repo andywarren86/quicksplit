@@ -5,6 +5,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,6 +24,7 @@ import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
 
+import quicksplit.dao.PlayerDaoJdbc;
 import quicksplit.persist.ConnectionManager;
 import quicksplit.servlet.model.AddResultModel;
 import quicksplit.servlet.model.AddResultModel.ResultModel;
@@ -74,20 +78,32 @@ public class QuickSplit
             {
                 final ResultSet resultSet =
                     connection.createStatement().executeQuery( "select count(*) from player" );
-                final long playerCount = resultSet.getLong( 0 );
+                final long playerCount = resultSet.getLong( 1 );
                 System.out.println( "Player count: " + playerCount );
             }
             catch( final SQLException e )
             {
-                e.printStackTrace();
-
-                System.out.println( "Player table does not exist. Running init script." );
+                System.out.println( "Data does not exist. Running init script." );
                 final String initSql =
                     IOUtils.toString(
                         QuickSplit.class.getClassLoader().getResourceAsStream( "/init.sql" ) );
                 connection.createStatement().executeUpdate( initSql );
 
                 // TODO load data from github?
+                final String dataUrl =
+                    "https://raw.githubusercontent.com/andywarren86/quicksplit-data/master/Results.csv";
+                System.out.println( "Loading data from: " + dataUrl );
+                final URL url = new URL( dataUrl );
+                final BufferedReader reader =
+                    new BufferedReader(
+                        new InputStreamReader( url.openStream(), StandardCharsets.ISO_8859_1 ) );
+                final String players = reader.readLine();
+                System.out.println( players );
+                for( final String playerName : players.split( "," ) )
+                {
+                    final PlayerDaoJdbc playerDao = new PlayerDaoJdbc();
+                    playerDao.insert( playerName );
+                }
             }
             connection.commit();
         }
