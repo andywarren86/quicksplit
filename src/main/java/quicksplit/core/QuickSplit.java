@@ -23,9 +23,10 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
+import org.h2.jdbcx.JdbcConnectionPool;
 
-import quicksplit.dao.PlayerDaoJdbc;
-import quicksplit.persist.ConnectionManager;
+import quicksplit.dao.DaoFactory;
+import quicksplit.dao.PlayerDao;
 import quicksplit.servlet.model.AddResultModel;
 import quicksplit.servlet.model.AddResultModel.ResultModel;
 
@@ -70,14 +71,23 @@ public class QuickSplit
 
     private static void initialiseDatabase() throws Exception
     {
+        final String dbUrl = 
+            "jdbc:h2:~/quicksplit;AUTO_SERVER=TRUE;TRACE_LEVEL_SYSTEM_OUT=1";
+        final String username = "sa";
+        final String password = "sa";
+        final JdbcConnectionPool cp = 
+            JdbcConnectionPool.create( dbUrl, username, password );
+        DaoFactory.init( cp );
+        
         // check if DB exists and initialise if necessary
         System.out.println( "Initialising database" );
-        try( Connection connection = ConnectionManager.getConnection() )
+        try( Connection connection = cp.getConnection() )
         {
             try
             {
                 final ResultSet resultSet =
                     connection.createStatement().executeQuery( "select count(*) from player" );
+                resultSet.next();
                 final long playerCount = resultSet.getLong( 1 );
                 System.out.println( "Player count: " + playerCount );
             }
@@ -99,9 +109,9 @@ public class QuickSplit
                         new InputStreamReader( url.openStream(), StandardCharsets.ISO_8859_1 ) );
                 final String players = reader.readLine();
                 System.out.println( players );
+                final PlayerDao playerDao = DaoFactory.getInstance().getPlayerDao();
                 for( final String playerName : players.split( "," ) )
                 {
-                    final PlayerDaoJdbc playerDao = new PlayerDaoJdbc();
                     playerDao.insert( playerName );
                 }
             }

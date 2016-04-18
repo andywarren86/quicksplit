@@ -20,14 +20,14 @@ repositories {
 
 dependencies {
     compile 'org.apache.commons:commons-lang3:3.4',
-            'org.apache.commons:commons-io:1.3.2'
+            'org.apache.commons:commons-io:1.3.2',
+            'com.h2database:h2:1.4.191'
     
     providedCompile 'javax.servlet:javax.servlet-api:3.1.0',
                     'javax.servlet.jsp:javax.servlet.jsp-api:2.3.2-b02',
                     'javax.el:javax.el-api:3.0.1-b04'
                     
-    runtime 'javax.servlet:jstl:1.2',
-            'com.h2database:h2:1.4.191'
+    runtime 'javax.servlet:jstl:1.2'
     
     def tomcatVersion = '8.0.32'
     tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",

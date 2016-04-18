@@ -4,17 +4,24 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import org.h2.jdbcx.JdbcConnectionPool;
+
 import quicksplit.model.PlayerModel;
-import quicksplit.persist.ConnectionManager;
 
 public class PlayerDaoJdbc
     implements PlayerDao
-{
+{   
+    private final JdbcConnectionPool myConnectionPool;
+    
+    public PlayerDaoJdbc( final JdbcConnectionPool connectionPool )
+    {
+        myConnectionPool = connectionPool;
+    }
 
     @Override
     public PlayerModel insert( final String name )
     {
-        try( Connection connection = ConnectionManager.getConnection() )
+        try( Connection connection = myConnectionPool.getConnection() )
         {
             final ResultSet rs =
                 connection.createStatement().executeQuery( "select count(id_player)+1 from player" );
@@ -36,7 +43,7 @@ public class PlayerDaoJdbc
     @Override
     public void delete( final long id )
     {
-        try( Connection connection = ConnectionManager.getConnection() )
+        try( Connection connection = myConnectionPool.getConnection() )
         {
             final String sql = "delete from player where id_player = " + id;
             connection.createStatement().executeUpdate( sql );
@@ -50,7 +57,7 @@ public class PlayerDaoJdbc
     @Override
     public PlayerModel findById( final long id )
     {
-        try( Connection connection = ConnectionManager.getConnection() )
+        try( Connection connection = myConnectionPool.getConnection() )
         {
             final String sql = "select * from player where id_player = " + id;
             final ResultSet resultSet = connection.createStatement().executeQuery( sql );
@@ -69,7 +76,7 @@ public class PlayerDaoJdbc
     @Override
     public PlayerModel findByName( final String name )
     {
-        try( Connection connection = ConnectionManager.getConnection() )
+        try( Connection connection = myConnectionPool.getConnection() )
         {
             final String sql = "select * from player where nm_player = " + name;
             final ResultSet resultSet = connection.createStatement().executeQuery( sql );
