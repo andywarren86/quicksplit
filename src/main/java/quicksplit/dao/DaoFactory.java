@@ -1,21 +1,21 @@
 package quicksplit.dao;
 
-import org.h2.jdbcx.JdbcConnectionPool;
+import javax.sql.DataSource;
 
 public class DaoFactory
 {
     private static DaoFactory theInstance;
     
-    private final JdbcConnectionPool myConnectionPool;
+    private final DataSource myDataSource;
     
-    private DaoFactory( final JdbcConnectionPool connectionPool )
+    private DaoFactory( final DataSource dataSource )
     {
-        myConnectionPool = connectionPool;
+        myDataSource = dataSource;
     }
     
-    public static void init( final JdbcConnectionPool connectionPool )
+    public static void init( final DataSource dataSource )
     {
-        theInstance = new DaoFactory( connectionPool );
+        theInstance = new DaoFactory( dataSource );
     }
     
     public static DaoFactory getInstance()
@@ -26,6 +26,18 @@ public class DaoFactory
     }
     
     public PlayerDao getPlayerDao(){
-        return new PlayerDaoJdbc( myConnectionPool );
+        return new PlayerDaoJdbc( myDataSource );
+    }
+    
+    public SeasonDao getSeasonDao(){
+        return new SeasonDaoJdbc( myDataSource );
+    }
+    
+    public GameDao getGameDao(){
+        return new GameDaoJdbc( myDataSource );
+    }
+    
+    public ResultDao getResultDao(){
+        return new ResultDaoJdbc( myDataSource );
     }
 }

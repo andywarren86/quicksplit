@@ -7,13 +7,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,11 +19,17 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
+import javax.sql.DataSource;
+
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.h2.jdbcx.JdbcConnectionPool;
 
 import quicksplit.dao.DaoFactory;
+import quicksplit.dao.GameDao;
 import quicksplit.dao.PlayerDao;
+import quicksplit.dao.ResultDao;
+import quicksplit.dao.SeasonDao;
 import quicksplit.servlet.model.AddResultModel;
 import quicksplit.servlet.model.AddResultModel.ResultModel;
 
@@ -72,15 +75,16 @@ public class QuickSplit
     private static void initialiseDatabase() throws Exception
     {
         final String dbUrl = 
-            "jdbc:h2:~/quicksplit;AUTO_SERVER=TRUE;TRACE_LEVEL_SYSTEM_OUT=1";
+            "jdbc:h2:~/quicksplit;AUTO_SERVER=TRUE;TRACE_LEVEL_SYSTEM_OUT=2";
         final String username = "sa";
-        final String password = "sa";
+        final String password = "";
         final JdbcConnectionPool cp = 
             JdbcConnectionPool.create( dbUrl, username, password );
         DaoFactory.init( cp );
         
         // check if DB exists and initialise if necessary
         System.out.println( "Initialising database" );
+        /*
         try( Connection connection = cp.getConnection() )
         {
             try
@@ -93,31 +97,87 @@ public class QuickSplit
             }
             catch( final SQLException e )
             {
-                System.out.println( "Data does not exist. Running init script." );
-                final String initSql =
-                    IOUtils.toString(
-                        QuickSplit.class.getClassLoader().getResourceAsStream( "/init.sql" ) );
-                connection.createStatement().executeUpdate( initSql );
-
-                // TODO load data from github?
-                final String dataUrl =
-                    "https://raw.githubusercontent.com/andywarren86/quicksplit-data/master/Results.csv";
-                System.out.println( "Loading data from: " + dataUrl );
-                final URL url = new URL( dataUrl );
-                final BufferedReader reader =
-                    new BufferedReader(
-                        new InputStreamReader( url.openStream(), StandardCharsets.ISO_8859_1 ) );
-                final String players = reader.readLine();
-                System.out.println( players );
-                final PlayerDao playerDao = DaoFactory.getInstance().getPlayerDao();
-                for( final String playerName : players.split( "," ) )
-                {
-                    playerDao.insert( playerName );
-                }
+                
             }
+
             connection.commit();
         }
+        */
+        loadData( cp );
         System.out.println( "Finished initialising database" );
+    }
+    
+    private static void loadData( final DataSource dataSource)
+    {
+        try( Connection connection = dataSource.getConnection() )
+        {
+            System.out.println( "Data does not exist. Running init script." );
+            final String initSql =
+                IOUtils.toString(
+                    QuickSplit.class.getClassLoader().getResourceAsStream( "/init.sql" ) );
+            connection.createStatement().executeUpdate( initSql );
+            
+            // load data from github               
+            final String seasonUrl = 
+                "https://raw.githubusercontent.com/andywarren86/quicksplit-data/master/SeasonDates.csv";
+            System.out.println( "Loading data from: " + seasonUrl );
+            final SeasonDao seasonDao = DaoFactory.getInstance().getSeasonDao();
+            final BufferedReader seasonReader =
+                new BufferedReader( new InputStreamReader( new URL( seasonUrl ).openStream() ) );
+            String line;
+            while( ( line = seasonReader.readLine() ) != null ) 
+            {
+                final String[] fields = line.split( "," );
+                final long id = Long.parseLong( fields[0] );
+                final Date startDate = new SimpleDateFormat( DATE_PATTERN ).parse( fields[1] );
+                final Date endDate = new SimpleDateFormat( DATE_PATTERN ).parse( fields[2] );
+                seasonDao.insert( id, startDate, endDate );
+            }
+            seasonReader.close();
+            
+            final String resultUrl =
+                "https://raw.githubusercontent.com/andywarren86/quicksplit-data/master/Results.csv";
+            System.out.println( "Loading data from: " + resultUrl );
+            final BufferedReader resultReader =
+                new BufferedReader( new InputStreamReader( new URL( resultUrl ).openStream() ) );
+            
+            // insert players
+            final PlayerDao playerDao = DaoFactory.getInstance().getPlayerDao();
+            line = resultReader.readLine();
+            String[] fields = line.split( "," );
+            for( int i=2; i<fields.length; i++ )
+            {
+                playerDao.insert( i-1, fields[i] );
+            }
+    
+            // insert results
+            final GameDao gameDao = DaoFactory.getInstance().getGameDao();
+            final ResultDao resultDao = DaoFactory.getInstance().getResultDao();
+            long gameId = 1;
+            while( ( line = resultReader.readLine() ) != null )
+            {
+                fields = line.split( "," );
+                final Date gameDate = 
+                    new SimpleDateFormat( DATE_PATTERN ).parse( fields[0] );
+                final long seasonId = seasonDao.findByDate( gameDate ).getId();
+                gameDao.insert( gameId, seasonId, gameDate );
+                final String gameType = fields[1];
+                for( int i=2; i<fields.length; i++ )
+                {
+                    if( StringUtils.isEmpty( fields[i] ) )
+                        continue;
+                    final long amount = 
+                        (Math.round( Double.parseDouble( fields[i] ) * 100 ));
+                    resultDao.insert( i-1, gameId, amount );
+                }
+                gameId++;
+            }
+            resultReader.close();
+        }
+        catch( final Exception e )
+        {
+            throw new RuntimeException( e );
+        }
     }
 
     /**
