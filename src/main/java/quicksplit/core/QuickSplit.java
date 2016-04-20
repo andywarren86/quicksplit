@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -74,58 +75,71 @@ public class QuickSplit
 
     private static void initialiseDatabase() throws Exception
     {
-        final String dbUrl = 
+        final String dbUrl =
             "jdbc:h2:~/quicksplit;AUTO_SERVER=TRUE;TRACE_LEVEL_SYSTEM_OUT=2";
         final String username = "sa";
         final String password = "";
-        final JdbcConnectionPool cp = 
+        final JdbcConnectionPool cp =
             JdbcConnectionPool.create( dbUrl, username, password );
         DaoFactory.init( cp );
-        
+
         // check if DB exists and initialise if necessary
-        System.out.println( "Initialising database" );
-        /*
+        System.out.println( "Initialising database." );
+
         try( Connection connection = cp.getConnection() )
         {
-            try
+            ResultSet rs = connection.createStatement().executeQuery(
+                "select * from information_schema.tables where table_name = 'PLAYER'" );
+            if( !rs.next() )
             {
-                final ResultSet resultSet =
-                    connection.createStatement().executeQuery( "select count(*) from player" );
-                resultSet.next();
-                final long playerCount = resultSet.getLong( 1 );
-                System.out.println( "Player count: " + playerCount );
-            }
-            catch( final SQLException e )
-            {
-                
+                runDbInitScript( cp );
             }
 
-            connection.commit();
+            rs = connection.createStatement().executeQuery( "select count(*) from player" );
+            rs.next();
+            final long playerCount = rs.getLong( 1 );
+
+            if( playerCount == 0 )
+            {
+                loadData( cp );
+            }
+
         }
-        */
-        loadData( cp );
-        System.out.println( "Finished initialising database" );
+        System.out.println( "Finished initialising database." );
     }
-    
-    private static void loadData( final DataSource dataSource)
+
+    private static void runDbInitScript( final DataSource dataSource )
     {
         try( Connection connection = dataSource.getConnection() )
         {
-            System.out.println( "Data does not exist. Running init script." );
+            System.out.println( "Running init script." );
             final String initSql =
                 IOUtils.toString(
                     QuickSplit.class.getClassLoader().getResourceAsStream( "/init.sql" ) );
             connection.createStatement().executeUpdate( initSql );
-            
-            // load data from github               
-            final String seasonUrl = 
+            System.out.println( "Finished running init script." );
+        }
+        catch( final Exception e )
+        {
+            throw new RuntimeException( e );
+        }
+    }
+
+    private static void loadData( final DataSource dataSource )
+    {
+        try( Connection connection = dataSource.getConnection() )
+        {
+            System.out.println( "Loading data from GitHub." );
+
+            // load data from github
+            final String seasonUrl =
                 "https://raw.githubusercontent.com/andywarren86/quicksplit-data/master/SeasonDates.csv";
             System.out.println( "Loading data from: " + seasonUrl );
             final SeasonDao seasonDao = DaoFactory.getInstance().getSeasonDao();
             final BufferedReader seasonReader =
                 new BufferedReader( new InputStreamReader( new URL( seasonUrl ).openStream() ) );
             String line;
-            while( ( line = seasonReader.readLine() ) != null ) 
+            while( ( line = seasonReader.readLine() ) != null )
             {
                 final String[] fields = line.split( "," );
                 final long id = Long.parseLong( fields[0] );
@@ -134,13 +148,13 @@ public class QuickSplit
                 seasonDao.insert( id, startDate, endDate );
             }
             seasonReader.close();
-            
+
             final String resultUrl =
                 "https://raw.githubusercontent.com/andywarren86/quicksplit-data/master/Results.csv";
             System.out.println( "Loading data from: " + resultUrl );
             final BufferedReader resultReader =
                 new BufferedReader( new InputStreamReader( new URL( resultUrl ).openStream() ) );
-            
+
             // insert players
             final PlayerDao playerDao = DaoFactory.getInstance().getPlayerDao();
             line = resultReader.readLine();
@@ -149,7 +163,7 @@ public class QuickSplit
             {
                 playerDao.insert( i-1, fields[i] );
             }
-    
+
             // insert results
             final GameDao gameDao = DaoFactory.getInstance().getGameDao();
             final ResultDao resultDao = DaoFactory.getInstance().getResultDao();
@@ -157,7 +171,7 @@ public class QuickSplit
             while( ( line = resultReader.readLine() ) != null )
             {
                 fields = line.split( "," );
-                final Date gameDate = 
+                final Date gameDate =
                     new SimpleDateFormat( DATE_PATTERN ).parse( fields[0] );
                 final long seasonId = seasonDao.findByDate( gameDate ).getId();
                 gameDao.insert( gameId, seasonId, gameDate );
@@ -165,14 +179,18 @@ public class QuickSplit
                 for( int i=2; i<fields.length; i++ )
                 {
                     if( StringUtils.isEmpty( fields[i] ) )
+                    {
                         continue;
-                    final long amount = 
+                    }
+                    final long amount =
                         (Math.round( Double.parseDouble( fields[i] ) * 100 ));
                     resultDao.insert( i-1, gameId, amount );
                 }
                 gameId++;
             }
             resultReader.close();
+
+            System.out.println( "Finished loading data." );
         }
         catch( final Exception e )
         {

@@ -1,22 +1,22 @@
-drop table player;
-drop table season;
-drop table game;
-drop table result;
+drop table if exists player;
+drop table if exists season;
+drop table if exists game;
+drop table if exists result;
 
-CREATE TABLE IF NOT EXISTS player
+CREATE TABLE player
 (
   id_player NUMBER NOT NULL PRIMARY KEY,
   nm_player VARCHAR( 255 ) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS season
+CREATE TABLE season
 (
   id_season NUMBER NOT NULL PRIMARY KEY,
   dt_start DATE NOT NULL,
   dt_end DATE NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS game
+CREATE TABLE game
 (
   id_game NUMBER NOT NULL PRIMARY KEY,
   id_season NUMBER NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS game
   constraint fk_season foreign key ( id_season ) references season ( id_season )
 );
 
-CREATE TABLE IF NOT EXISTS result
+CREATE TABLE result
 (
   id_game NUMBER NOT NULL,
   id_player NUMBER NOT NULL,
