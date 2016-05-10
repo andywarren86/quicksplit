@@ -1,6 +1,7 @@
 package quicksplit.servlet;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,11 +11,10 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import quicksplit.core.Game;
-import quicksplit.core.Player;
-import quicksplit.core.QuickSplit;
-import quicksplit.core.Season;
 import quicksplit.core.Stats;
+import quicksplit.dao.DaoFactory;
+import quicksplit.model.PlayerModel;
+import quicksplit.model.SeasonModel;
 
 @WebServlet({ "/Summary", "/index.html" })
 public class SummaryServlet extends BaseServlet
@@ -23,42 +23,47 @@ public class SummaryServlet extends BaseServlet
     protected void processRequest( final HttpServletRequest req, final HttpServletResponse resp )
         throws ServletException, IOException
     {
-        Season season = null;
-        final String seasonId = req.getParameter( "Season" );
-        if( seasonId == null )
-        {
-            season = Season.getCurrentSeason();
-        }
-        else if( !"ALL".equals( seasonId ) )
-        {
-            season = Season.getSeasonById( seasonId );
-        }
+        final DaoFactory daoFactory = DaoFactory.getInstance();
 
-        List<Player> players = null;
-        List<Game> games = null;
-        if( season == null )
+        final String seasonIdStr = req.getParameter( "Season" );
+        SeasonModel season = null;
+        if( seasonIdStr == null )
         {
-            players = QuickSplit.getPlayerList();
-            games = QuickSplit.getGameList();
+            season = daoFactory.getSeasonDao().findByDate( new Date() );
         }
-        else
+        else if( !"ALL".equals( seasonIdStr ) )
         {
-            players = season.getPlayers();
-            games = season.getGames();
+            season = daoFactory.getSeasonDao().findById( Long.parseLong( seasonIdStr ) );
         }
 
         // generate stats for each player
-        final Map<Player,Stats> statsMap = new HashMap<>();
-        for( final Player p : players )
+        final Map<PlayerModel,Stats> statsMap = new HashMap<>();
+        List<PlayerModel> players;
+        if( season == null )
         {
-            statsMap.put( p, new Stats( p, games ) );
+            players = daoFactory.getPlayerDao().list();
+            for( final PlayerModel p : players )
+            {
+                final PlayerStatGenerator statGenerator = new PlayerStatGenerator( p.getId() );
+                statsMap.put( p, statGenerator.generateStats() );
+            }
+        }
+        else
+        {
+            players = daoFactory.getPlayerDao().listBySeason( season.getId() );
+            for( final PlayerModel p : players )
+            {
+                final PlayerStatGenerator statGenerator = new PlayerStatGenerator( p.getId() );
+                statsMap.put( p, statGenerator.generateStats( season.getId()) );
+            }
         }
 
         req.setAttribute( "playerList", players );
         req.setAttribute( "stats", statsMap );
         req.setAttribute( "season", season );
-        req.setAttribute( "seasons", QuickSplit.getSeasonList() );
+        req.setAttribute( "seasons", daoFactory.getSeasonDao().list() );
 
+        /*
         if( season != null )
         {
             req.setAttribute( "FromDate", season.getStartDate() );
@@ -69,7 +74,8 @@ public class SummaryServlet extends BaseServlet
             req.setAttribute( "FromDate", games.get( 0 ).getDate() );
             req.setAttribute( "ToDate", games.get( games.size()-1 ).getDate() );
         }
-        req.setAttribute( "GameCount", games.size() );
+        */
+        //req.setAttribute( "GameCount", games.size() );
 
         req.getRequestDispatcher( "/jsp/Summary.jsp"  ).forward( req, resp );
 

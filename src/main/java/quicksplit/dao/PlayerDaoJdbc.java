@@ -3,6 +3,8 @@ package quicksplit.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -10,9 +12,9 @@ import quicksplit.model.PlayerModel;
 
 public class PlayerDaoJdbc
     implements PlayerDao
-{   
+{
     private final DataSource myDataSource;
-    
+
     public PlayerDaoJdbc( final DataSource dataSource )
     {
         myDataSource = dataSource;
@@ -58,10 +60,13 @@ public class PlayerDaoJdbc
         try( Connection connection = myDataSource.getConnection() )
         {
             final String sql = "select * from player where id_player = " + id;
-            final ResultSet resultSet = connection.createStatement().executeQuery( sql );
-            if( resultSet.next() )
+            final ResultSet rs = connection.createStatement().executeQuery( sql );
+            if( rs.next() )
             {
-                return new PlayerModel( resultSet.getLong( 1 ), resultSet.getString( 2 ) );
+                final PlayerModel model = new PlayerModel();
+                model.setId( rs.getLong( "id_player" ) );
+                model.setName( rs.getString( "nm_player" ) );
+                return model;
             }
             return null;
         }
@@ -77,12 +82,67 @@ public class PlayerDaoJdbc
         try( Connection connection = myDataSource.getConnection() )
         {
             final String sql = "select * from player where nm_player = " + name;
-            final ResultSet resultSet = connection.createStatement().executeQuery( sql );
-            if( resultSet.next() )
+            final ResultSet rs = connection.createStatement().executeQuery( sql );
+            if( rs.next() )
             {
-                return new PlayerModel( resultSet.getLong( 1 ), resultSet.getString( 2 ) );
+                final PlayerModel model = new PlayerModel();
+                model.setId( rs.getLong( "id_player" ) );
+                model.setName( rs.getString( "nm_player" ) );
+                return model;
             }
             return null;
+        }
+        catch( final Exception e )
+        {
+            throw new RuntimeException( e );
+        }
+    }
+
+    @Override
+    public List<PlayerModel> list()
+    {
+        try( Connection connection = myDataSource.getConnection() )
+        {
+            final String sql = "select * from player";
+            final ResultSet rs = connection.createStatement().executeQuery( sql );
+            final List<PlayerModel> players = new ArrayList<>();
+            while( rs.next() )
+            {
+                final PlayerModel model = new PlayerModel();
+                model.setId( rs.getLong( "id_player" ) );
+                model.setName( rs.getString( "nm_player" ) );
+                players.add( model );
+            }
+            return players;
+        }
+        catch( final Exception e )
+        {
+            throw new RuntimeException( e );
+        }
+    }
+
+    @Override
+    public List<PlayerModel> listBySeason( final Long seasonId )
+    {
+        try( Connection connection = myDataSource.getConnection() )
+        {
+            final String sql = "select distinct p.* from player p " +
+                "inner join result r on r.id_player = p.id_player " +
+                "inner join game g on r.id_game = g.id_game " +
+                "inner join season s on s.id_season = g.id_season " +
+                "where s.id_season = ?";
+            final PreparedStatement stmt = connection.prepareStatement( sql );
+            stmt.setLong( 1, seasonId );
+            final ResultSet rs = stmt.executeQuery();
+            final List<PlayerModel> players = new ArrayList<>();
+            while( rs.next() )
+            {
+                final PlayerModel model = new PlayerModel();
+                model.setId( rs.getLong( "id_player" ) );
+                model.setName( rs.getString( "nm_player" ) );
+                players.add( model );
+            }
+            return players;
         }
         catch( final Exception e )
         {
