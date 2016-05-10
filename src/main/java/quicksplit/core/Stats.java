@@ -1,219 +1,187 @@
 package quicksplit.core;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 /**
  * Represents statistics for a player over a series of games.
  */
 public class Stats
 {
-    int count = 0;
-    int total = 0;
+    long count = 0;
+    long total = 0;
     double average = 0;
-    
-    int winCount = 0;
-    int winTotal = 0;
+
+    long winCount = 0;
+    long winTotal = 0;
     double winPercent = 0;
     double averageWon = 0;
-    int mostWon = 0;
-    
-    int lostCount = 0;
-    int lostTotal = 0;
+    long mostWon = 0;
+
+    long lostCount = 0;
+    long lostTotal = 0;
     double lostPercent = 0;
     double averageLost = 0;
-    int mostLost = 0;
-    
-    int evenCount = 0;
+    long mostLost = 0;
+
+    long evenCount = 0;
     double evenPercent = 0;
-    
-    int winStreak = 0;
-    int winStreakTotal = 0;
-    int downStreak = 0;
-    int downStreakTotal = 0;
-    
-    public Stats( Player p, Collection<Game> games )
-    {
-        int tempWinStreak = 0;
-        int tempWinStreakTotal = 0;
-        List<Integer> winStreaks = new ArrayList<Integer>();
-        List<Integer> winStreakTotals = new ArrayList<Integer>();
-        
-        int tempDownStreak = 0;
-        int tempDownStreakTotal = 0;
-        List<Integer> downStreaks = new ArrayList<Integer>();
-        List<Integer> downStreakTotals = new ArrayList<Integer>();
-        
-        for( Game g : games )
-        {
-            if( g.getPlayers().contains( p ) )
-            {
-                Result r = QuickSplit.getResult( g, p );
-                count++;
-                total += r.getAmount();
-                        
-                if( r.getAmount() > 0 )
-                {
-                    winCount++;
-                    winTotal += r.getAmount();
-                    mostWon = r.getAmount() > mostWon ? r.getAmount() : mostWon;
-                    
-                    tempWinStreak++;
-                    tempWinStreakTotal += r.getAmount();
-                    
-                    downStreaks.add( tempDownStreak );
-                    downStreakTotals.add( tempDownStreakTotal );
-                    tempDownStreak = 0;
-                    tempDownStreakTotal = 0;
-                }
-                else if( r.getAmount() < 0 )
-                {
-                    lostCount++;
-                    lostTotal += r.getAmount();
-                    mostLost = r.getAmount() < mostLost ? r.getAmount() : mostLost;
-                    
-                    winStreaks.add( tempWinStreak );
-                    winStreakTotals.add( tempWinStreakTotal );
-                    tempWinStreak = 0;
-                    tempWinStreakTotal = 0;
-                    
-                    tempDownStreak++;
-                    tempDownStreakTotal += r.getAmount();
-                }
-                else
-                {
-                    evenCount++;
-                    
-                    winStreaks.add( tempWinStreak );
-                    winStreakTotals.add( tempWinStreakTotal );
-                    tempWinStreak = 0;
-                    tempWinStreakTotal = 0;
-                    
-                    downStreaks.add( tempDownStreak );
-                    downStreakTotals.add( tempDownStreakTotal );
-                    tempDownStreak = 0;
-                    tempDownStreakTotal = 0;
-                }
-            }
-        }
-        
-        winStreaks.add( tempWinStreak );
-        winStreakTotals.add( tempWinStreakTotal );
-        downStreaks.add( tempDownStreak );
-        downStreakTotals.add( tempDownStreakTotal );
-        
-        average = Double.valueOf( total ) / Double.valueOf( count );
-        winPercent = Double.valueOf( winCount ) / Double.valueOf( count );
-        lostPercent = Double.valueOf( lostCount ) / Double.valueOf( count );
-        evenPercent = Double.valueOf( evenCount ) / Double.valueOf( count );
-        averageWon = Double.valueOf( winTotal ) / Double.valueOf( winCount );
-        averageLost = Double.valueOf( lostTotal ) / Double.valueOf( lostCount );
-        
-        Collections.sort( winStreaks, Collections.reverseOrder() );
-        Collections.sort( winStreakTotals, Collections.reverseOrder() );
-        winStreak = winStreaks.isEmpty() ? 0 : winStreaks.get( 0 );
-        winStreakTotal = winStreakTotals.isEmpty() ? 0 : winStreakTotals.get( 0 );
-        
-        Collections.sort( downStreaks, Collections.reverseOrder() );
-        Collections.sort( downStreakTotals );
-        downStreak = downStreaks.isEmpty() ? 0 : downStreaks.get( 0 );
-        downStreakTotal = downStreakTotals.isEmpty() ? 0 : downStreakTotals.get( 0 );
-    }
-    
-    public int getCount()
+
+    long winStreak = 0;
+    long winStreakTotal = 0;
+    long downStreak = 0;
+    long downStreakTotal = 0;
+
+    public long getCount()
     {
         return count;
     }
-
-    public int getTotal()
+    public void setCount( final long count )
+    {
+        this.count = count;
+    }
+    public long getTotal()
     {
         return total;
     }
-
+    public void setTotal( final long total )
+    {
+        this.total = total;
+    }
     public double getAverage()
     {
         return average;
     }
-
-    public int getWinCount()
+    public void setAverage( final double average )
+    {
+        this.average = average;
+    }
+    public long getWinCount()
     {
         return winCount;
     }
-
-    public int getWinTotal()
+    public void setWinCount( final long winCount )
+    {
+        this.winCount = winCount;
+    }
+    public long getWinTotal()
     {
         return winTotal;
     }
-
+    public void setWinTotal( final long winTotal )
+    {
+        this.winTotal = winTotal;
+    }
     public double getWinPercent()
     {
         return winPercent;
     }
-
+    public void setWinPercent( final double winPercent )
+    {
+        this.winPercent = winPercent;
+    }
     public double getAverageWon()
     {
         return averageWon;
     }
-
-    public int getMostWon()
+    public void setAverageWon( final double averageWon )
+    {
+        this.averageWon = averageWon;
+    }
+    public long getMostWon()
     {
         return mostWon;
     }
-
-    public int getLostCount()
+    public void setMostWon( final long mostWon )
+    {
+        this.mostWon = mostWon;
+    }
+    public long getLostCount()
     {
         return lostCount;
     }
-
-    public int getLostTotal()
+    public void setLostCount( final long lostCount )
+    {
+        this.lostCount = lostCount;
+    }
+    public long getLostTotal()
     {
         return lostTotal;
     }
-
+    public void setLostTotal( final long lostTotal )
+    {
+        this.lostTotal = lostTotal;
+    }
     public double getLostPercent()
     {
         return lostPercent;
     }
-
+    public void setLostPercent( final double lostPercent )
+    {
+        this.lostPercent = lostPercent;
+    }
     public double getAverageLost()
     {
         return averageLost;
     }
-
-    public int getMostLost()
+    public void setAverageLost( final double averageLost )
+    {
+        this.averageLost = averageLost;
+    }
+    public long getMostLost()
     {
         return mostLost;
     }
-
-    public int getEvenCount()
+    public void setMostLost( final long mostLost )
+    {
+        this.mostLost = mostLost;
+    }
+    public long getEvenCount()
     {
         return evenCount;
     }
-
+    public void setEvenCount( final long evenCount )
+    {
+        this.evenCount = evenCount;
+    }
     public double getEvenPercent()
     {
         return evenPercent;
     }
-
-    public int getWinStreak()
+    public void setEvenPercent( final double evenPercent )
+    {
+        this.evenPercent = evenPercent;
+    }
+    public long getWinStreak()
     {
         return winStreak;
     }
-
-    public int getWinStreakTotal()
+    public void setWinStreak( final long winStreak )
+    {
+        this.winStreak = winStreak;
+    }
+    public long getWinStreakTotal()
     {
         return winStreakTotal;
     }
-
-    public int getDownStreak()
+    public void setWinStreakTotal( final long winStreakTotal )
+    {
+        this.winStreakTotal = winStreakTotal;
+    }
+    public long getDownStreak()
     {
         return downStreak;
     }
-
-    public int getDownStreakTotal()
+    public void setDownStreak( final long downStreak )
+    {
+        this.downStreak = downStreak;
+    }
+    public long getDownStreakTotal()
     {
         return downStreakTotal;
     }
+    public void setDownStreakTotal( final long downStreakTotal )
+    {
+        this.downStreakTotal = downStreakTotal;
+    }
+
+
+
 }

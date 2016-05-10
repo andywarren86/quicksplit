@@ -4,7 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -17,6 +19,29 @@ public class GameDaoJdbc implements GameDao
     public GameDaoJdbc( final DataSource dataSource )
     {
         myDataSource = dataSource;
+    }
+
+    @Override
+    public List<GameModel> findAll()
+    {
+        try( Connection connection = myDataSource.getConnection() )
+        {
+            final ResultSet rs =
+                connection.createStatement().executeQuery( "select * from game" );
+            final List<GameModel> games = new ArrayList<>();
+            while( rs.next() ) {
+                final GameModel model = new GameModel();
+                model.setId( rs.getLong( "id_game" ) );
+                model.setDate( rs.getDate( "dt_game" ) );
+                model.setSeasonId( rs.getLong( "id_season" ) );
+                games.add( model );
+            }
+            return games;
+        }
+        catch( final SQLException e )
+        {
+            throw new RuntimeException( e );
+        }
     }
 
     @Override
@@ -38,7 +63,7 @@ public class GameDaoJdbc implements GameDao
         {
             throw new RuntimeException( e );
         }
-        
+
     }
 
     @Override
@@ -46,7 +71,7 @@ public class GameDaoJdbc implements GameDao
     {
         try( Connection connection = myDataSource.getConnection() )
         {
-            final PreparedStatement stmt = 
+            final PreparedStatement stmt =
                 connection.prepareStatement( "insert into game values ( ?, ?, ? )" );
             stmt.setLong( 1, id );
             stmt.setLong( 2, seasonId );
@@ -58,6 +83,5 @@ public class GameDaoJdbc implements GameDao
             throw new RuntimeException( e );
         }
     }
-    
-    
+
 }
