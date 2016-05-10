@@ -8,5 +8,5 @@ public interface SeasonDao
 {
     public SeasonModel findById( long id );
     public SeasonModel findByDate( Date date );
-    public void insert( long id, Date startDate, Date endDate );
+    public long insert( Date startDate, Date endDate );
 }

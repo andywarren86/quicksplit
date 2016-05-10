@@ -5,20 +5,20 @@ drop table if exists result;
 
 CREATE TABLE player
 (
-  id_player NUMBER NOT NULL PRIMARY KEY,
+  id_player NUMBER NOT NULL PRIMARY KEY auto_increment,
   nm_player VARCHAR( 255 ) NOT NULL
 );
 
 CREATE TABLE season
 (
-  id_season NUMBER NOT NULL PRIMARY KEY,
+  id_season NUMBER NOT NULL PRIMARY KEY auto_increment,
   dt_start DATE NOT NULL,
   dt_end DATE NOT NULL
 );
 
 CREATE TABLE game
 (
-  id_game NUMBER NOT NULL PRIMARY KEY,
+  id_game NUMBER NOT NULL PRIMARY KEY auto_increment,
   id_season NUMBER NOT NULL,
   dt_game DATE NOT NULL,
   
@@ -37,6 +37,3 @@ CREATE TABLE result
   CONSTRAINT fk_game FOREIGN KEY ( id_game )
     REFERENCES game ( id_game ) 
 );
-
-CREATE SEQUENCE IF NOT EXISTS player_seq;
-CREATE SEQUENCE IF NOT EXISTS game_seq;

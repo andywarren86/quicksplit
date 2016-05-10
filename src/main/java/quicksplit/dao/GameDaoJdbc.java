@@ -42,16 +42,19 @@ public class GameDaoJdbc implements GameDao
     }
 
     @Override
-    public void insert( final long id, final long seasonId, final Date date )
+    public long insert( final long seasonId, final Date date )
     {
         try( Connection connection = myDataSource.getConnection() )
         {
             final PreparedStatement stmt = 
-                connection.prepareStatement( "insert into game values ( ?, ?, ? )" );
-            stmt.setLong( 1, id );
-            stmt.setLong( 2, seasonId );
-            stmt.setDate( 3, new java.sql.Date( date.getTime() ) );
+                connection.prepareStatement( "insert into game values ( default, ?, ? )" );
+            stmt.setLong( 1, seasonId );
+            stmt.setDate( 2, new java.sql.Date( date.getTime() ) );
             stmt.executeUpdate();
+            
+            final ResultSet rs = stmt.getGeneratedKeys();
+            rs.next();
+            return rs.getLong( 1 );
         }
         catch( final SQLException e )
         {

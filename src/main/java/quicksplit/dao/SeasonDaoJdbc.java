@@ -61,16 +61,19 @@ public class SeasonDaoJdbc
     }
 
     @Override
-    public void insert( final long id, final Date startDate, final Date endDate )
+    public long insert( final Date startDate, final Date endDate )
     {
         try( Connection connection = myDataSource.getConnection() )
         {
             final PreparedStatement stmt = 
-                connection.prepareStatement( "insert into season values ( ?, ?, ? )" );
-            stmt.setLong( 1, id );
-            stmt.setDate( 2, new java.sql.Date( startDate.getTime() ) );
-            stmt.setDate( 3, new java.sql.Date( endDate.getTime() ) );
+                connection.prepareStatement( "insert into season values ( default, ?, ? )" );
+            stmt.setDate( 1, new java.sql.Date( startDate.getTime() ) );
+            stmt.setDate( 2, new java.sql.Date( endDate.getTime() ) );
             stmt.executeUpdate();
+            
+            final ResultSet rs = stmt.getGeneratedKeys();
+            rs.next();
+            return rs.getLong( 1 );
         }
         catch( final SQLException e )
         {

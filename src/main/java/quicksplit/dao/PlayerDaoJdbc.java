@@ -19,22 +19,18 @@ public class PlayerDaoJdbc
     }
 
     @Override
-    public PlayerModel insert( final long id, final String name )
+    public long insert( final String name )
     {
         try( Connection connection = myDataSource.getConnection() )
         {
-            /*
-            final ResultSet rs =
-                connection.createStatement().executeQuery( "select count(id_player)+1 from player" );
-            rs.next();
-            final long id = rs.getLong( 1 );
-            */
             final PreparedStatement stmt =
-                connection.prepareStatement( "insert into player values ( ?, ? )" );
-            stmt.setLong( 1, id );
-            stmt.setString( 2, name );
+                connection.prepareStatement( "insert into player values ( default, ? )" );
+            stmt.setString( 1, name );
             stmt.executeUpdate();
-            return findById( id );
+            
+            final ResultSet rs = stmt.getGeneratedKeys();
+            rs.next();
+            return rs.getLong( 1 );
         }
         catch( final Exception e )
         {

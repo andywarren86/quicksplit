@@ -7,5 +7,5 @@ import quicksplit.model.GameModel;
 public interface GameDao
 {
     public GameModel findById( long id );
-    public void insert( long id, long seasonId, Date date );
+    public long insert( long seasonId, Date date );
 }
