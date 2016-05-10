@@ -9,7 +9,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import quicksplit.core.Player;
+import quicksplit.dao.DaoFactory;
+import quicksplit.model.PlayerModel;
 import quicksplit.servlet.model.AddResultModel;
 import quicksplit.servlet.model.AddResultModel.ResultModel;
 
@@ -33,16 +34,19 @@ public class AddResultConfirm
         final List<String> warnings = new ArrayList<>();
         for( final ResultModel resultModel : model.getResults() )
         {
-            final Player player = Player.getByName( resultModel.getPlayer() );
+            final PlayerModel player = 
+                DaoFactory.getInstance().getPlayerDao().findByName( resultModel.getPlayer() );
             if( player == null )
             {
                 warnings.add( "Player '" + resultModel.getPlayer() + "' does not exist. " +
                     "If you proceed a new record will be created for this player." );
             }
+            /*
             else if( player.daysSinceLastPlayed() > 30 )
             {
                 warnings.add( player.getName() + " hasn't played in a while. Do you have the right person?" );
             }
+            */
         }
         
         req.setAttribute( "UUID", uuid );

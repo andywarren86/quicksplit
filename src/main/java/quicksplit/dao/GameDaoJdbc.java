@@ -43,6 +43,34 @@ public class GameDaoJdbc implements GameDao
             throw new RuntimeException( e );
         }
     }
+    
+    @Override
+    public List<GameModel> listBySeason( final long seasonId )
+    {
+        try( Connection connection = myDataSource.getConnection() )
+        {
+            final PreparedStatement stmt =
+                connection.prepareStatement(
+                    "select * from game " +
+                    "where id_season = ?" );
+            stmt.setLong( 1, seasonId );
+            final ResultSet rs = stmt.executeQuery();
+            
+            final List<GameModel> games = new ArrayList<>();
+            while( rs.next() ) {
+                final GameModel model = new GameModel();
+                model.setId( rs.getLong( "id_game" ) );
+                model.setDate( rs.getDate( "dt_game" ) );
+                model.setSeasonId( rs.getLong( "id_season" ) );
+                games.add( model );
+            }
+            return games;
+        }
+        catch( final SQLException e )
+        {
+            throw new RuntimeException( e );
+        }
+    }
 
     @Override
     public GameModel findById( final long id )
@@ -86,5 +114,6 @@ public class GameDaoJdbc implements GameDao
             throw new RuntimeException( e );
         }
     }
+
 
 }

@@ -12,8 +12,6 @@ import org.apache.commons.io.IOUtils;
 import org.h2.jdbcx.JdbcConnectionPool;
 
 import quicksplit.dao.DaoFactory;
-import quicksplit.model.GameModel;
-import quicksplit.servlet.model.AddResultModel;
 
 public class QuickSplit
 {
@@ -106,47 +104,6 @@ public class QuickSplit
         {
             throw new RuntimeException( e );
         }
-    }
-
-    /**
-     * Add a new record in to memory, recalculates summary data and writes the current state to file.
-     * Assumes all data has already been validated.
-     */
-    public static GameModel addNewRecord( final AddResultModel model ) throws Exception
-    {
-        System.out.println( "Creating new record." );
-        System.out.println( "Date: " + model.getGameDate() );
-        System.out.println( "GameType: " + model.getGameType() );
-        System.out.println( "Results: " + model.getResults() );
-
-        /*
-        final Date date = new SimpleDateFormat( "yyyy-MM-dd" ).parse( model.getGameDate() );
-        final GameType type = GameType.valueOf( model.getGameType() );
-
-        final Game newGame = new Game( date, type );
-        myGames.add( newGame );
-
-        final Season season = Season.getSeasonFromDate( date );
-        season.addGame( newGame );
-
-        for( final ResultModel result : model.getResults() )
-        {
-            Player player = Player.getByName( result.getPlayer() );
-            if( player == null )
-            {
-                player = new Player( result.getPlayer() );
-                myPlayers.add( player );
-            }
-
-            final int amount = (int)(Math.round( Double.parseDouble( result.getAmount() ) * 100 ));
-            new Result( player, newGame, amount );
-        }
-
-
-        //writeResultsToFile( Paths.get( getResultDataPath() ) );
-        return newGame;
-        */
-        return null;
     }
 
     public static String formatAmount( final int amount )

@@ -1,7 +1,6 @@
 package quicksplit.servlet;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
 
@@ -12,8 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.time.FastDateFormat;
 
-import quicksplit.core.GameType;
-import quicksplit.core.QuickSplit;
+import quicksplit.dao.DaoFactory;
 import quicksplit.servlet.model.AddResultModel;
 
 @WebServlet( "/AddResult" )
@@ -33,7 +31,6 @@ public class AddResult extends BaseServlet
         {
             model = new AddResultModel();
             model.setGameDate( myDateInputFormat.format( new Date() ) );
-            model.setGameType( GameType.HOLDEM.name() );
             uuid = UUID.randomUUID().toString();
             request.getSession().setAttribute( uuid, model );
         }
@@ -46,8 +43,7 @@ public class AddResult extends BaseServlet
 
         request.setAttribute( "UUID", uuid );
         request.setAttribute( "Model", model );
-        request.setAttribute( "Players", QuickSplit.getPlayerList() );
-        request.setAttribute( "GameTypes", Arrays.asList( GameType.values() ) );
+        request.setAttribute( "Players", DaoFactory.getInstance().getPlayerDao().list() );
         request.setAttribute( "CurrentDate", myDateInputFormat.format( new Date() ) );
         request.getRequestDispatcher( "jsp/AddResult.jsp" ).forward( request, response );
     }

@@ -3,7 +3,6 @@ package quicksplit.servlet;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,8 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 
-import quicksplit.core.Game;
-import quicksplit.core.GameType;
 import quicksplit.core.QuickSplit;
 import quicksplit.servlet.model.AddResultModel;
 
@@ -60,33 +57,11 @@ public class AddResultAction extends BaseServlet
         {
             try
             {
-                final Date date = new SimpleDateFormat( "yyyy-MM-dd" ).parse( gameDate );
-                if( !Game.getByDate( date ).isEmpty() )
-                {
-                    model.addError( "Date", "A game already exists for this date" );
-                }
+                new SimpleDateFormat( "yyyy-MM-dd" ).parse( gameDate );
             }
             catch( final ParseException e )
             {
                 model.addError( "Date", "Invalid date format" );
-            }
-        }
-
-
-        final String gameType = model.getGameType();
-        if( StringUtils.isEmpty( gameType ) )
-        {
-            model.addError( "GameType", "Mandatory" );
-        }
-        else
-        {
-            try
-            {
-                GameType.valueOf( gameType );
-            }
-            catch( final IllegalArgumentException e )
-            {
-                model.addError( "GameType", "Invalid game type" );
             }
         }
 
