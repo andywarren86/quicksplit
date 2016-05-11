@@ -29,7 +29,7 @@ public class PlayerDaoJdbc
                 connection.prepareStatement( "insert into player values ( default, ? )" );
             stmt.setString( 1, name );
             stmt.executeUpdate();
-            
+
             final ResultSet rs = stmt.getGeneratedKeys();
             rs.next();
             return rs.getLong( 1 );
@@ -103,7 +103,7 @@ public class PlayerDaoJdbc
     {
         try( Connection connection = myDataSource.getConnection() )
         {
-            final String sql = "select * from player";
+            final String sql = "select * from player order by nm_player";
             final ResultSet rs = connection.createStatement().executeQuery( sql );
             final List<PlayerModel> players = new ArrayList<>();
             while( rs.next() )
@@ -130,7 +130,8 @@ public class PlayerDaoJdbc
                 "inner join result r on r.id_player = p.id_player " +
                 "inner join game g on r.id_game = g.id_game " +
                 "inner join season s on s.id_season = g.id_season " +
-                "where s.id_season = ?";
+                "where s.id_season = ? " +
+                "order by nm_player";
             final PreparedStatement stmt = connection.prepareStatement( sql );
             stmt.setLong( 1, seasonId );
             final ResultSet rs = stmt.executeQuery();

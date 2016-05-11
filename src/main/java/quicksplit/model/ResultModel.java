@@ -1,11 +1,13 @@
 package quicksplit.model;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 public class ResultModel
 {
     private long playerId;
     private long gameId;
     private long amount;
-    
+
     public long getPlayerId()
     {
         return playerId;
@@ -29,5 +31,11 @@ public class ResultModel
     public void setAmount( final long amount )
     {
         this.amount = amount;
+    }
+
+    @Override
+    public String toString()
+    {
+        return ToStringBuilder.reflectionToString( this );
     }
 }

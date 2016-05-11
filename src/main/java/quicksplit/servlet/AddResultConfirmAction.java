@@ -24,7 +24,7 @@ public class AddResultConfirmAction
         throws Exception
     {
         final DaoFactory daoFactory = DaoFactory.getInstance();
-        
+
         final String uuid = req.getParameter( "UUID" );
         final AddResultModel model = (AddResultModel)req.getSession().getAttribute( uuid );
         if( model == null )
@@ -39,21 +39,21 @@ public class AddResultConfirmAction
             final SeasonModel season = daoFactory.getSeasonDao().findByDate( new Date() );
             final Date date = new SimpleDateFormat( "yyyy-MM-dd" ).parse( model.getGameDate() );
             final long gameId = daoFactory.getGameDao().insert( season.getId(), date );
-            
+
             for( final ResultModel result : model.getResults() )
             {
-                final PlayerModel player = 
+                final PlayerModel player =
                     daoFactory.getPlayerDao().findByName( result.getPlayer() );
-                final long amount = 
+                final long amount =
                     Math.round( Double.parseDouble( result.getAmount() ) * 100 );
                 daoFactory.getResultDao().insert( player.getId(), gameId, amount );
             }
-            
+
             req.getSession().removeAttribute( uuid );
             req.getSession().setAttribute(
                 "SuccessMessage",
-                "New game added for " + 
-                    new SimpleDateFormat( QuickSplit.DATE_PATTERN_LONG ).format( model.getGameDate() ) );
+                "New game added for " +
+                    new SimpleDateFormat( QuickSplit.DATE_PATTERN ).format( model.getGameDate() ) );
             resp.sendRedirect( "Summary" );
         }
         else if( "Back".equals( action ) )

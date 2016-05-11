@@ -5,10 +5,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.lang3.StringUtils;
+
+import quicksplit.model.GameModel;
+import quicksplit.model.PlayerModel;
 import quicksplit.model.ResultModel;
 
 public class ResultDaoJdbc
@@ -117,6 +123,59 @@ public class ResultDaoJdbc
                 results.add( model );
             }
             return results;
+        }
+        catch( final SQLException e )
+        {
+            throw new RuntimeException( e );
+        }
+    }
+
+    @Override
+    public Map<GameModel,List<Long>> generateResultTable( final long seasonId )
+    {
+        try( final Connection connection = myDataSource.getConnection() )
+        {
+            final List<PlayerModel> players =
+                DaoFactory.getInstance().getPlayerDao().listBySeason( seasonId );
+
+            String select = "select g.id_game, g.id_season, g.dt_game";
+            String resultJoins = "";
+            for( int i=0; i<players.size(); i++ ) {
+                final String alias = "r"+(i+1);
+                final long playerId = players.get( i ).getId();
+                select += ", " + alias + ".no_result";
+                resultJoins +=
+                    "left outer join result " + alias +
+                    " on " + alias + ".id_game = g.id_game "
+                        + "and " + alias + ".id_player = " + playerId + " ";
+            }
+
+            final String sql = select + " " +
+                "from game g " +
+                "inner join season s on s.id_season = g.id_season " +
+                StringUtils.join( resultJoins ) +
+                "where s.id_season = ? " +
+                "order by g.dt_game, g.id_game";
+
+            final PreparedStatement stmt = connection.prepareStatement( sql );
+            stmt.setLong( 1, seasonId );
+            final ResultSet rs = stmt.executeQuery();
+
+            final int colCount = rs.getMetaData().getColumnCount();
+            final Map<GameModel,List<Long>> resultTable = new LinkedHashMap<>();
+            while( rs.next() ) {
+                final GameModel game = new GameModel();
+                game.setId( rs.getLong( "id_game" ) );
+                game.setSeasonId( rs.getLong( "id_season" ) );
+                game.setDate( rs.getDate( "dt_game" ) );
+                final List<Long> amounts = new ArrayList<>();
+                for( int i=4; i<=colCount; i++ ) {
+                    final long amount = rs.getLong( i );
+                    amounts.add( rs.wasNull() ? null : amount );
+                }
+                resultTable.put( game, amounts );
+            }
+            return resultTable;
         }
         catch( final SQLException e )
         {

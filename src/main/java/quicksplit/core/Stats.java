@@ -1,5 +1,7 @@
 package quicksplit.core;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 /**
  * Represents statistics for a player over a series of games.
  */
@@ -182,6 +184,10 @@ public class Stats
         this.downStreakTotal = downStreakTotal;
     }
 
-
+    @Override
+    public String toString()
+    {
+        return ToStringBuilder.reflectionToString( this );
+    }
 
 }

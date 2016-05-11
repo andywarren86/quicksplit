@@ -16,8 +16,7 @@ import quicksplit.dao.DaoFactory;
 public class QuickSplit
 {
     public static final String AMOUNT_PATTERN = "0.00";
-    public static final String DATE_PATTERN = "dd/MM/yyyy";
-    public static final String DATE_PATTERN_LONG = "EEEE, dd/MM/yyyy";
+    public static final String DATE_PATTERN = "EEE, dd/MM/yyyy";
 
     public static void Startup()
         throws Exception
@@ -114,13 +113,5 @@ public class QuickSplit
     {
         return new SimpleDateFormat( DATE_PATTERN ).format( d );
     }
-
-    /*
-    public static Date getLastUpdated()
-    {
-        return QuickSplit.getGameList().isEmpty() ? null :
-            QuickSplit.getGameList().get( QuickSplit.getGameList().size()-1 ).getDate();
-    }
-    */
 
 }

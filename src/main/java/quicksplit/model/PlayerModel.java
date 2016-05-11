@@ -1,5 +1,7 @@
 package quicksplit.model;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 public class PlayerModel
 {
     private long id;
@@ -20,6 +22,12 @@ public class PlayerModel
     public void setName( final String name )
     {
         this.name = name;
+    }
+
+    @Override
+    public String toString()
+    {
+        return ToStringBuilder.reflectionToString( this );
     }
 
 }

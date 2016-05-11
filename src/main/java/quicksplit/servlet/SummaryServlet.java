@@ -44,8 +44,8 @@ public class SummaryServlet extends BaseServlet
             players = daoFactory.getPlayerDao().list();
             for( final PlayerModel p : players )
             {
-                final PlayerStatGenerator statGenerator = new PlayerStatGenerator( p.getId() );
-                statsMap.put( p, statGenerator.generateStats() );
+                statsMap.put( p,
+                    new PlayerStatGenerator( p.getId() ).generateStats() );
             }
         }
         else
@@ -53,8 +53,8 @@ public class SummaryServlet extends BaseServlet
             players = daoFactory.getPlayerDao().listBySeason( season.getId() );
             for( final PlayerModel p : players )
             {
-                final PlayerStatGenerator statGenerator = new PlayerStatGenerator( p.getId() );
-                statsMap.put( p, statGenerator.generateStats( season.getId()) );
+                statsMap.put( p,
+                    new PlayerStatGenerator( p.getId() ).generateStats( season.getId()) );
             }
         }
 
@@ -62,22 +62,6 @@ public class SummaryServlet extends BaseServlet
         req.setAttribute( "stats", statsMap );
         req.setAttribute( "season", season );
         req.setAttribute( "seasons", daoFactory.getSeasonDao().list() );
-
-        /*
-        if( season != null )
-        {
-            req.setAttribute( "FromDate", season.getStartDate() );
-            req.setAttribute( "ToDate", season.getEndDate() );
-        }
-        else
-        {
-            req.setAttribute( "FromDate", games.get( 0 ).getDate() );
-            req.setAttribute( "ToDate", games.get( games.size()-1 ).getDate() );
-        }
-        */
-        //req.setAttribute( "GameCount", games.size() );
-
         req.getRequestDispatcher( "/jsp/Summary.jsp"  ).forward( req, resp );
-
     }
 }

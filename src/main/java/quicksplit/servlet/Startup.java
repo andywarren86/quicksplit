@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServlet;
 import quicksplit.core.QuickSplit;
 
 @WebServlet( urlPatterns="/Startup", loadOnStartup=1 )
-public class Startup 
+public class Startup
     extends HttpServlet
 {
     @Override
@@ -16,15 +16,13 @@ public class Startup
         {
             // start the application
             QuickSplit.Startup();
-            
+
             // set application scope attributes
             getServletContext().setAttribute( "dateFormat", QuickSplit.DATE_PATTERN );
-            getServletContext().setAttribute( "dateFormatLong", QuickSplit.DATE_PATTERN_LONG );
         }
         catch( final Exception e )
         {
-            System.err.println( "Exception occured during startup" );
-            e.printStackTrace();
+            throw new RuntimeException( "Exception occured during startup", e );
         }
     }
 }

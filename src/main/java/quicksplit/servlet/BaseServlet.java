@@ -24,10 +24,10 @@ public abstract class BaseServlet extends HttpServlet
     {
         doGetPost( req, resp );
     }
-    
+
     protected final void doGetPost( final HttpServletRequest req, final HttpServletResponse resp )
             throws ServletException, IOException
-    {        
+    {
         // DEBUG
         System.out.println();
         System.out.println( "URI: " + req.getRequestURI() );
@@ -36,19 +36,21 @@ public abstract class BaseServlet extends HttpServlet
         while( e.hasMoreElements() )
         {
             final String name = e.nextElement();
-            System.out.println( name + " = " + 
+            System.out.println( name + " = " +
                     Arrays.toString( req.getParameterMap().get( name ) ) );
         }
 
         // turn off caching
         resp.setHeader( "Cache-Control", "max-age=0, no-cache, no-store" );
-        
+
         // add some crap into the request scope
         //req.setAttribute( "lastUpdated", QuickSplit.getLastUpdated() );
         if( req.getUserPrincipal() != null )
+        {
             req.setAttribute( "CurrentUser", req.getUserPrincipal().getName() );
+        }
         req.setAttribute( "IsTier1", req.isUserInRole( "tier1" ) );
-        
+
         // pluck any success message out of session and add to request scope
         final String successMessage = (String)req.getSession().getAttribute( "SuccessMessage" );
         if( successMessage != null )
@@ -56,7 +58,7 @@ public abstract class BaseServlet extends HttpServlet
             req.getSession().removeAttribute( "SuccessMessage" );
             req.setAttribute( "SuccessMessage", successMessage );
         }
-        
+
         try
         {
         	processRequest( req, resp );
@@ -68,7 +70,7 @@ public abstract class BaseServlet extends HttpServlet
         	throw new ServletException( ex );
         }
     }
-    
+
     protected abstract void processRequest( HttpServletRequest req, HttpServletResponse resp )
         throws Exception;
 

@@ -2,12 +2,14 @@ package quicksplit.model;
 
 import java.util.Date;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 public class SeasonModel
 {
     private Long id;
     private Date startDate;
     private Date endDate;
-    
+
     public SeasonModel( final Long id, final Date startDate, final Date endDate )
     {
         this.id = id;
@@ -39,5 +41,11 @@ public class SeasonModel
     {
         this.endDate = endDate;
     }
-    
+
+    @Override
+    public String toString()
+    {
+        return ToStringBuilder.reflectionToString( this );
+    }
+
 }

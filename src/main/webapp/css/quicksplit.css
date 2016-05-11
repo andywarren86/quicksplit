@@ -1,16 +1,15 @@
-.ui-datepicker {
-  font-size: 12px;
-}
-
 /*
  * Tables
  */
-table.statTable td.negative { 
-  color: #CC1122; 
-}
 
 table.statTable { 
 	border-collapse: collapse;
+}
+table.statTable tr:nth-child(even) td {
+  background: #E5F1F4;
+}
+table.statTable tr:nth-child(odd) td {
+  background: #F8FBFC;
 }
 
 table.statTable th {
@@ -20,6 +19,8 @@ table.statTable th {
   background: url( tr_back.gif ) repeat-x scroll 0 0 #328AA4;
 	border: 1px solid #FFFFFF;
 	padding: 4px 4px;
+	text-align: center;
+	white-space: nowrap;
 }
 
 table.statTable td {
@@ -28,25 +29,12 @@ table.statTable td {
   font-size: 11px;
   border: 1px solid #FFFFFF;
 	padding: 4px 4px;
+	text-align: right;
+	white-space: nowrap;
 }
 
-table.statTable tr.even td {
-	background: #E5F1F4;
-}
-table.statTable tr.odd td {
-	background: #F8FBFC;
-}
-
-table.resultTable td {
-  text-align: right;
-}
-
-table.resultTable td:first-child {
-	text-align: center;
-}
-
-table.summaryTable th {
-	text-align: center;
+table.statTable td.negative { 
+  color: #CC1122; 
 }
 
 /*
@@ -54,4 +42,11 @@ table.summaryTable th {
  */
 table th.ascending, table th.descending {
 	background: url( tr_back_sorted.gif ) repeat-x scroll 0 0 #56A9BE;
+}
+
+/*
+ * Pagination
+ */
+ul.pagination {
+  margin-top: 10px;
 }

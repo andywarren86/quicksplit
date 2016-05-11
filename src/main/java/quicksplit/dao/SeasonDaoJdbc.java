@@ -69,16 +69,22 @@ public class SeasonDaoJdbc
     }
 
     @Override
+    public SeasonModel findCurrentSeason()
+    {
+        return findByDate( DateUtils.truncate( new Date(), Calendar.DATE ) );
+    }
+
+    @Override
     public long insert( final Date startDate, final Date endDate )
     {
         try( Connection connection = myDataSource.getConnection() )
         {
-            final PreparedStatement stmt = 
+            final PreparedStatement stmt =
                 connection.prepareStatement( "insert into season values ( default, ?, ? )" );
             stmt.setDate( 1, new java.sql.Date( startDate.getTime() ) );
             stmt.setDate( 2, new java.sql.Date( endDate.getTime() ) );
             stmt.executeUpdate();
-            
+
             final ResultSet rs = stmt.getGeneratedKeys();
             rs.next();
             return rs.getLong( 1 );

@@ -52,8 +52,8 @@ public class PlayerStatGenerator
         stats.setWinCount( winSummary.getCount() );
         stats.setWinTotal( winSummary.getSum() );
         stats.setAverageWon( winSummary.getAverage() );
-        stats.setWinPercent( winSummary.getCount() / summary.getCount() );
-        stats.setMostWon( winSummary.getMax() );
+        stats.setWinPercent( (double)winSummary.getCount() / summary.getCount() );
+        stats.setMostWon( winSummary.getCount() > 0 ? winSummary.getMax() : 0 );
 
         final LongSummaryStatistics lossSummary =
             results.stream().filter( r -> r.getAmount() < 0 ).mapToLong( r -> r.getAmount() )
@@ -61,16 +61,16 @@ public class PlayerStatGenerator
         stats.setLostCount( lossSummary.getCount() );
         stats.setLostTotal( lossSummary.getSum() );
         stats.setAverageLost( lossSummary.getAverage() );
-        stats.setLostPercent( lossSummary.getCount() / summary.getCount() );
-        stats.setMostLost( lossSummary.getMin() );
+        stats.setLostPercent( (double)lossSummary.getCount() / summary.getCount() );
+        stats.setMostLost( lossSummary.getCount() > 0 ? lossSummary.getMin() : 0 );
 
         final LongSummaryStatistics evenSummary =
             results.stream().filter( r -> r.getAmount() == 0 ).mapToLong( r -> r.getAmount() )
             .summaryStatistics();
         stats.setEvenCount( evenSummary.getCount() );
-        stats.setEvenPercent( evenSummary.getCount() / summary.getCount() );
+        stats.setEvenPercent( (double)evenSummary.getCount() / summary.getCount() );
 
-        // caluclate streaks
+        // calculate streaks
         long winStreak = 0;
         long winStreakAmount = 0;
         long winStreakMax = 0;
