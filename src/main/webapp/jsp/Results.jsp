@@ -30,15 +30,6 @@
         </ul>
       </nav>
 		  
-      <c:if test="${not empty param['NewGame']}">
-        <div class="alert alert-success alert-dismissible" role="alert">
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <strong>Well done!</strong> 
-          <span>You've added a new game!</span>
-          <span class="glyphicon glyphicon-thumbs-up"></span> 
-        </div>        
-      </c:if>
-      		  
 		  <c:choose>
 		  	<c:when test="${not empty playerList}">
 				

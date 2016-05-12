@@ -1,5 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -10,10 +11,6 @@
       
       (function($){
         $.fn.setError = function( error ){
-          console.log( "SetError" );
-          console.log( this );
-          console.log( error );
-          
           if( error == null ){
         	  this.closest( ".form-group" ).removeClass( "has-error" )
         	    .find( "span.help-block" ).remove();
@@ -26,51 +23,30 @@
         }
       }(jQuery));
       
-      function setIndex() {
+      function resetIndex() {
         $( ".result-row" ).each( function(i){
-          $(this).find( "input[name^='Player']" ).attr( "name", "Player"+(i+1) );
-          $(this).find( "input[name^='Amount']" ).attr( "name", "Amount"+(i+1) );
+          $(this).find( ":input[name^='Player']" ).attr( "name", "Player"+(i+1) );
+          $(this).find( ":input[name^='Amount']" ).attr( "name", "Amount"+(i+1) );
         });
       }
       
-      function setRemoveButtons() {
-        if( $( ".result-row" ).size() == 1 ){
-          $( ".result-row .remove-result" ).addClass( "hidden" );
-        }
-        else {
-          $( ".result-row .remove-result" ).removeClass( "hidden" );
-        }
-      }
-      
-      function addResultRow() {
-        var newRow = $( ".result-row:first" ).clone();
-        newRow.find( ":input" ).val( "" ).setError( null );
-        
-        $( ".result-row:last" ).after( newRow );
-        
-        setIndex();
-        setRemoveButtons();
-        
-        newRow.find( ":input:first" ).focus();
-      } 
-    
       $(document).ready(function(){
-    	  setIndex();
-    	  setRemoveButtons();
     	  
     	  // set field errors
-        <c:forEach items="${Model.errors}" var="e">
-          $( "input[name='${e.key}']" ).setError( "${e.value}" );
+        <c:forEach items="${Errors}" var="e">
+          $( ":input[name='${e.key}']" ).setError( "${e.value}" );
         </c:forEach>
-    	  
-        $( "#add-result" ).on( "click", function(){
-        	addResultRow();
-        });
         
-        $( "form" ).on( "click", ".remove-result", function(){
-        	$(this).closest( ".result-row" ).remove();
-        	setIndex();
-        	setRemoveButtons();
+        // add new row
+        $( "form" ).on( "change", ".result-row :input", function(){
+          var playerVal = $( ".result-row:last :input[name^='Player']" ).val();
+          var amountVal = $( ".result-row:last :input[name^='Amount']" ).val();
+          if( playerVal != "" || amountVal != "" ){
+            var newRow = $( ".result-row:first" ).clone();
+            newRow.find( ":input" ).val( "" ).setError(null);
+            $( ".result-row:last" ).after( newRow );
+            resetIndex();
+          }
         });
         
       });
@@ -88,16 +64,17 @@
 	<body>
 	 
     <tags:nav active="Admin"/>
-   
-		<datalist id="players">
-		  <c:forEach items="${Players}" var="player">
-		    <option value="${player.name}"/>
-		  </c:forEach>
-		</datalist>
-	    
+      
 	  <div class="container">
 	  
-		  <h1>Add Result</h1>
+      <c:if test="${not empty NewGame}">
+        <div class="alert alert-success" role="alert">
+          <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>
+          New game created for <fmt:formatDate pattern="${dateFormat}" value="${NewGame.date}"/>
+        </div>
+      </c:if>
+	  
+		  <h1>Create Game</h1>
 				
 		  <p class="lead">Enter details below</p>
 		  
@@ -109,24 +86,26 @@
       </c:if>
 			
 			<form name="AddResultForm" method="post" action="AddResultAction" autocomplete="off">
-			  <input type="hidden" name="UUID" value="${UUID}"/>
 			
 				<div class="form-group">
 				  <label class="control-label">Game Date</label>
 				  <input type="date" class="form-control" name="Date" value="${Model.gameDate}" />
 				</div>
 				
-			  <input type="hidden" name="GameType" value="HOLDEM"/>
-			  
 			  <label>Results</label>
 			  
-			  <c:forEach items="${Model.results}" var="r">
+			  <c:forEach items="${Model.results}" var="result" varStatus="status">
 	        <div class="result-row clearfix">
 	        
-		        <div class="col-xs-5">
+		        <div class="col-xs-7">
 		          <div class="form-group">
 		            <label class="sr-only">Player</label>
-		            <input type="text" list="players" class="form-control" name="Player" placeholder="Player" value="${r.player}"/>
+		            <select class="form-control" name="Player${status.count}">
+		              <option value=""></option>
+		              <c:forEach items="${Players}" var="player">
+		                <option value="${player.id}" ${player.id == result.playerId ? 'selected' : ''}>${player.name}</option>
+		              </c:forEach>
+		            </select>
 		          </div>
 		        </div>
 	          
@@ -135,31 +114,17 @@
 		            <label class="sr-only">Amount</label>
 		            <div class="input-group">
 		              <div class="input-group-addon">$</div>
-		              <input type="number" class="form-control" name="Amount" placeholder="Amount" value="${r.amount}" step="0.05"/>
+		              <input type="number" class="form-control" name="Amount${status.count}" placeholder="Amount" value="${result.amount}" step="0.05"/>
 		            </div>
 		          </div>
 		        </div>
-	          
-	          <div class="col-xs-2">
-		          <div class="form-group">
-				        <button type="button" class="btn btn-danger remove-result">
-				          <span class="glyphicon glyphicon-remove"></span>
-				        </button>
-		          </div>
-	          </div>
 	          
 	        </div>
 	        
 	      </c:forEach>
 	      
         <div style="padding-bottom:1em;">
-	        
-					<button type="button" id="add-result" class="btn btn-success">
-					  <span class="glyphicon glyphicon-plus"></span> Add Record
-					</button>
-	              
-					<button type="submit" class="btn btn-primary">Submit</button>
-				
+					<button type="submit" class="btn btn-primary">Create Game</button>
         </div>
         
 			</form>

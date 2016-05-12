@@ -34,13 +34,6 @@
     
     <div class="container">
     
-      <c:if test="${not empty SuccessMessage}">
-        <div class="alert alert-success" role="alert">
-          <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>
-          ${SuccessMessage}
-        </div>
-      </c:if>
-	    
 	    <c:choose>
 	      <c:when test="${not empty season}">
 	        <h1>Summary - Season ${season.id}</h1>

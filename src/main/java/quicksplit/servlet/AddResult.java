@@ -2,7 +2,6 @@ package quicksplit.servlet;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.UUID;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -18,33 +17,31 @@ import quicksplit.servlet.model.AddResultModel;
 public class AddResult extends BaseServlet
 {
     // HTML5 date input format - don't change
-    private final FastDateFormat myDateInputFormat = FastDateFormat.getInstance( "yyyy-MM-dd" );
+    public static final FastDateFormat INPUT_DATE_FORMAT =
+        FastDateFormat.getInstance( "yyyy-MM-dd" );
 
     @Override
     protected void processRequest( final HttpServletRequest request, final HttpServletResponse response )
         throws ServletException, IOException
     {
-        String uuid = request.getParameter( "UUID" );
-        AddResultModel model =
-            uuid == null ? null : (AddResultModel)request.getSession().getAttribute( uuid );
+        AddResultModel model = (AddResultModel)request.getAttribute( "Model" );
         if( model == null )
         {
             model = new AddResultModel();
-            model.setGameDate( myDateInputFormat.format( new Date() ) );
-            uuid = UUID.randomUUID().toString();
-            request.getSession().setAttribute( uuid, model );
+            model.setGameDate( INPUT_DATE_FORMAT.format( new Date() ) );
         }
+        model.addResult( "", "" );
 
-        // start with an empty row
-        if( model.getResults().isEmpty() )
-        {
-            model.addResult( "", "" );
-        }
-
-        request.setAttribute( "UUID", uuid );
         request.setAttribute( "Model", model );
+        request.setAttribute( "Errors", model.getErrors() );
         request.setAttribute( "Players", DaoFactory.getInstance().getPlayerDao().list() );
-        request.setAttribute( "CurrentDate", myDateInputFormat.format( new Date() ) );
+
+        if( request.getParameter( "NewGameId" ) != null )
+        {
+            final Long newGameId = Long.parseLong( request.getParameter( "NewGameId" ) );
+            request.setAttribute( "NewGame",
+                DaoFactory.getInstance().getGameDao().findById( newGameId ) );
+        }
         request.getRequestDispatcher( "jsp/AddResult.jsp" ).forward( request, response );
     }
 }

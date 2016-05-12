@@ -148,6 +148,7 @@
 	</div>
 	
 	<script type="text/javascript">
+	  <!-- CTRL + D -->
 	  $(document).keydown( function(e){ 
 		  if( e.which == 68 && e.ctrlKey ){
 		    e.preventDefault();
