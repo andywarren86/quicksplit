@@ -31,9 +31,7 @@ CREATE TABLE result
   id_player NUMBER NOT NULL,
   no_result NUMBER NOT NULL,
   
-  PRIMARY KEY ( id_game, id_player ),
-  CONSTRAINT fk_player FOREIGN KEY ( id_player )
-    REFERENCES player ( id_player ) ,
-  CONSTRAINT fk_game FOREIGN KEY ( id_game )
-    REFERENCES game ( id_game ) 
+  primary key ( id_game, id_player ),
+  constraint fk_player foreign key ( id_player ) references player ( id_player ),
+  constraint fk_game foreign key ( id_game ) references game ( id_game ) on delete cascade
 );
