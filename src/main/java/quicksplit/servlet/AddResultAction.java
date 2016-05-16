@@ -2,10 +2,12 @@ package quicksplit.servlet;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletException;
@@ -15,14 +17,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 
-import quicksplit.core.QuickSplit;
 import quicksplit.dao.DaoFactory;
 import quicksplit.dao.GameDao;
 import quicksplit.dao.ResultDao;
 import quicksplit.dao.SeasonDao;
 import quicksplit.model.SeasonModel;
-import quicksplit.servlet.model.AddResultModel;
-import quicksplit.servlet.model.AddResultModel.ResultModel;
+import quicksplit.servlet.forms.AddResultForm;
+import quicksplit.servlet.forms.AddResultForm.PlayerResult;
 
 @WebServlet("/AddResultAction")
 public class AddResultAction extends BaseServlet
@@ -32,127 +33,130 @@ public class AddResultAction extends BaseServlet
     protected void processRequest( final HttpServletRequest request, final HttpServletResponse response )
         throws ServletException, IOException
     {
-        final AddResultModel model = createModelFromRequest( request );
+        final Map<String,String> errors = new HashMap<>();
+        final AddResultForm model = createModelFromRequest( request, errors );
 
-        if( validate( model ) )
+        if( errors.isEmpty() )
         {
+            // create records for new game
             final GameDao gameDao = DaoFactory.getInstance().getGameDao();
             final ResultDao resultDao = DaoFactory.getInstance().getResultDao();
             final SeasonDao seasonDao = DaoFactory.getInstance().getSeasonDao();
-            final SeasonModel currentSeason = seasonDao.findCurrentSeason();
 
-            Date gameDate;
-            try
+            final SeasonModel season = seasonDao.findByDate( model.getGameDate() );
+            if( season == null )
             {
-                gameDate = AddResult.INPUT_DATE_FORMAT.parse( model.getGameDate() );
-            }
-            catch( final ParseException e )
-            {
-                throw new RuntimeException( e );
+                throw new IllegalStateException( "No season for date: " + model.getGameDate() );
             }
 
-            final long gameId = gameDao.insert( currentSeason.getId(), gameDate );
-            for( final ResultModel addResultModel : model.getResults() )
+            final Date gameDate = model.getGameDate();
+            final long gameId = gameDao.insert( season.getId(), gameDate );
+            for( final PlayerResult addResultModel : model.getResults() )
             {
-                final long playerId = Long.parseLong( addResultModel.getPlayerId() );
-                final long amount = new BigDecimal( addResultModel.getAmount() )
+                final long playerId = addResultModel.getPlayerId();
+                final long amount = addResultModel.getAmount()
                     .multiply( BigDecimal.valueOf( 100 ) )
                     .longValue();
                 resultDao.insert( playerId, gameId, amount );
             }
-            request.setAttribute( "Model", model );
             response.sendRedirect( "AddResult?NewGameId=" + gameId );
         }
         else
         {
-            // redirect back to enter details
+            // validation errors - forward back to enter details
+            request.setAttribute( "Model", model );
+            request.setAttribute( "Errors", errors );
             request.getRequestDispatcher( "/AddResult" ).forward( request, response );
         }
     }
 
-    private AddResultModel createModelFromRequest( final HttpServletRequest request )
+    private AddResultForm createModelFromRequest( final HttpServletRequest request,
+                                                  final Map<String,String> errors )
     {
-        final AddResultModel model = new AddResultModel();
-        model.setGameDate( request.getParameter( "Date" ) );
+        final AddResultForm model = new AddResultForm();
 
-        int i=1;
-        while( !StringUtils.isEmpty( request.getParameter( "Player"+i ) ) ||
-            !StringUtils.isEmpty( request.getParameter( "Amount"+i ) ) )
+        try
         {
-            model.addResult( request.getParameter( "Player"+i ), request.getParameter( "Amount"+i ) );
-            i++;
+            model.setGameDate(
+                AddResult.INPUT_DATE_FORMAT.parse( request.getParameter( "Date" ) ) );
         }
-        return model;
-    }
-
-    private boolean validate( final AddResultModel model )
-    {
-        final String gameDate = model.getGameDate();
-        if( StringUtils.isEmpty( gameDate ) )
+        catch( final ParseException e )
         {
-            model.addError( "Date", "Mandatory" );
-        }
-        else
-        {
-            try
-            {
-                new SimpleDateFormat( "yyyy-MM-dd" ).parse( gameDate );
-            }
-            catch( final ParseException e )
-            {
-                model.addError( "Date", "Invalid date format" );
-            }
+            errors.put( "Date", "Invalid date" );
         }
 
-        int sum = 0;
-        final Set<String> players = new HashSet<>();
-        for( int i=0; i<model.getResults().size(); i++ )
-        {
-            final String playerId = model.getResults().get( i ).getPlayerId();
-            final String amount = model.getResults().get( i ).getAmount();
-            final String playerKey = "Player"+(i+1);
-            final String amountKey = "Amount"+(i+1);
-
-            if( StringUtils.isEmpty( playerId ) )
-            {
-                model.addError( playerKey, "Mandatory" );
+        final String[] playerVals = request.getParameterValues( "Player" );
+        final String[] amountVals = request.getParameterValues( "Amount" );
+        final Set<Long> playerIds = new HashSet<>();
+        for( int i=0; i<playerVals.length; i++ ) {
+            final String playerStr = playerVals[i];
+            final String amountStr = amountVals[i];
+            if( StringUtils.isEmpty( playerStr ) && StringUtils.isEmpty( amountStr ) ) {
+                continue;
             }
-            else if( players.contains( playerId ) )
-            {
-                model.addError( playerKey, "Duplicate player" );
-            }
-            players.add( playerId );
 
-            if( StringUtils.isEmpty( amountKey ) )
+            Long playerId = null;
+            BigDecimal amount = null;
+            if( StringUtils.isEmpty( playerStr ) )
             {
-                model.addError( amountKey, "Mandatory" );
+                errors.put( "Player[" + i + "]", "Field is required" );
             }
             else
             {
                 try
                 {
-                    sum += Math.round( Double.parseDouble( amount ) * 100 );
+                    playerId = Long.parseLong( playerStr );
+                    if( !playerIds.add( playerId ) )
+                    {
+                        errors.put( "Player[" + i + "]", "Duplicate player" );
+                    }
                 }
-                catch( final NumberFormatException nfe )
+                catch( final NumberFormatException e )
                 {
-                    model.addError( amountKey, "Invalid amount" );
+                    errors.put( "Player[" + i + "]", "Invalid player" );
                 }
             }
+
+            if( StringUtils.isEmpty( amountStr ) )
+            {
+                errors.put( "Amount[" + i + "]", "Field is required" );
+            }
+            else
+            {
+                try
+                {
+                    amount = new BigDecimal( amountStr );
+                }
+                catch( final NumberFormatException e )
+                {
+                    errors.put( "Amount[" + i + "]", "Invalid amount" );
+                }
+            }
+
+            model.addResult( playerId, amount );
         }
 
-        if( !model.hasErrors() )
+        // form level validation
+        if( errors.isEmpty() )
         {
             if( model.getResults().size() < 2 )
             {
-                model.addError( "Results", "Must enter at least two results" );
+                errors.put( "Form", "Must contain at least two results" );
             }
-            else if( sum != 0 )
+            else
             {
-                model.addError( "Results", "Total must equal zero. Total: $" + QuickSplit.formatAmount( sum ) );
+                // check total equals 0
+                final BigDecimal sum = model.getResults().stream()
+                    .map( PlayerResult::getAmount )
+                    .reduce( BigDecimal::add ).get();
+                if( sum.compareTo( BigDecimal.ZERO ) != 0 )
+                {
+                    errors.put( "Form", "Total must equal zero but was " +
+                        new DecimalFormat( "0.00" ).format( sum.doubleValue() ) );
+                }
             }
         }
-
-        return !model.hasErrors();
+        return model;
     }
 
 }

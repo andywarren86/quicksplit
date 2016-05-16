@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.time.FastDateFormat;
 
 import quicksplit.dao.DaoFactory;
-import quicksplit.servlet.model.AddResultModel;
+import quicksplit.servlet.forms.AddResultForm;
 
 @WebServlet( "/AddResult" )
 public class AddResult extends BaseServlet
@@ -24,18 +24,16 @@ public class AddResult extends BaseServlet
     protected void processRequest( final HttpServletRequest request, final HttpServletResponse response )
         throws ServletException, IOException
     {
-        AddResultModel model = (AddResultModel)request.getAttribute( "Model" );
+        AddResultForm model = (AddResultForm)request.getAttribute( "Model" );
         if( model == null )
         {
-            model = new AddResultModel();
-            model.setGameDate( INPUT_DATE_FORMAT.format( new Date() ) );
+            model = new AddResultForm();
+            model.setGameDate( new Date() );
+            request.setAttribute( "Model", model );
         }
-        model.addResult( "", "" );
+        model.addResult( null, null );
 
-        request.setAttribute( "Model", model );
-        request.setAttribute( "Errors", model.getErrors() );
         request.setAttribute( "Players", DaoFactory.getInstance().getPlayerDao().list() );
-
         if( request.getParameter( "NewGameId" ) != null )
         {
             final Long newGameId = Long.parseLong( request.getParameter( "NewGameId" ) );

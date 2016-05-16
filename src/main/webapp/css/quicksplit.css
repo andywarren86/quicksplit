@@ -50,3 +50,13 @@ table th.ascending, table th.descending {
 ul.pagination {
   margin-top: 10px;
 }
+
+/*
+ * Forms
+ */
+.has-error .help-block {
+	font-weight: bold;
+}
+.has-error .help-block::before {
+  content: "* ";
+}
