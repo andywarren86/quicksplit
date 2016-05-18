@@ -43,22 +43,6 @@ public abstract class BaseServlet extends HttpServlet
         // turn off caching
         resp.setHeader( "Cache-Control", "max-age=0, no-cache, no-store" );
 
-        // add some crap into the request scope
-        //req.setAttribute( "lastUpdated", QuickSplit.getLastUpdated() );
-        if( req.getUserPrincipal() != null )
-        {
-            req.setAttribute( "CurrentUser", req.getUserPrincipal().getName() );
-        }
-        req.setAttribute( "IsTier1", req.isUserInRole( "tier1" ) );
-
-        // pluck any success message out of session and add to request scope
-        final String successMessage = (String)req.getSession().getAttribute( "SuccessMessage" );
-        if( successMessage != null )
-        {
-            req.getSession().removeAttribute( "SuccessMessage" );
-            req.setAttribute( "SuccessMessage", successMessage );
-        }
-
         try
         {
         	processRequest( req, resp );
