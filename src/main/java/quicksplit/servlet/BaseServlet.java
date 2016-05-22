@@ -25,32 +25,36 @@ public abstract class BaseServlet extends HttpServlet
         doGetPost( req, resp );
     }
 
-    protected final void doGetPost( final HttpServletRequest req, final HttpServletResponse resp )
+    protected final void doGetPost( final HttpServletRequest request, 
+                                    final HttpServletResponse response )
             throws ServletException, IOException
     {
         // DEBUG
         System.out.println();
-        System.out.println( "URI: " + req.getRequestURI() );
-        System.out.println( "Remote Addr: " + req.getRemoteAddr() );
-        final Enumeration<String> e = req.getParameterNames();
+        System.out.println( "URI: " + request.getRequestURI() );
+        System.out.println( "Remote Addr: " + request.getRemoteAddr() );
+        final Enumeration<String> e = request.getParameterNames();
         while( e.hasMoreElements() )
         {
             final String name = e.nextElement();
             System.out.println( name + " = " +
-                    Arrays.toString( req.getParameterMap().get( name ) ) );
+                    Arrays.toString( request.getParameterMap().get( name ) ) );
         }
 
         // turn off caching
-        resp.setHeader( "Cache-Control", "max-age=0, no-cache, no-store" );
+        //response.setHeader( "Cache-Control", "max-age=0, no-cache, no-store" );
+        response.setContentType("text/html;charset=UTF-8");
+        response.setHeader("Pragma", "no-cache");
+        response.setHeader("Cache-Control", "no-cache");
+        response.setDateHeader("Expires", 0);
 
         try
         {
-        	processRequest( req, resp );
+        	processRequest( request, response );
         }
         catch( final Exception ex )
         {
         	System.err.println( "Exception occurred processing request" );
-        	ex.printStackTrace();
         	throw new ServletException( ex );
         }
     }

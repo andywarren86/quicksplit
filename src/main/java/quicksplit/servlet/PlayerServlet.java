@@ -28,19 +28,10 @@ public class PlayerServlet
          */
         request.setAttribute( "Players", 
             DaoFactory.getInstance().getPlayerDao().list() );
-        
-        /*
-         * Write the response headers
-         */
-        response.setContentType("text/html;charset=UTF-8");
-        response.setHeader("Pragma", "no-cache");
-        response.setHeader("Cache-Control", "no-cache");
-        response.setDateHeader("Expires", 0);
-        
+               
         /*
          * Obtain the TemplateEngine instance.
          */
-        
         final ServletContextTemplateResolver templateResolver = 
             new ServletContextTemplateResolver( request.getServletContext() );
         // XHTML is the default mode, but we set it anyway for better understanding of code
