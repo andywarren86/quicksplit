@@ -15,7 +15,7 @@ public class Startup
         try
         {
             // start the application
-            QuickSplit.Startup();
+            QuickSplit.initialise( getServletContext() );
 
             // set application scope attributes
             getServletContext().setAttribute( "dateFormat", QuickSplit.DATE_PATTERN );

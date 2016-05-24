@@ -6,8 +6,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import quicksplit.dao.DaoFactory;
 
-@WebServlet("/players")
-public class PlayerServlet
+@WebServlet( "/seasons" )
+public class SeasonServlet
     extends BaseServlet
 {
 
@@ -16,12 +16,9 @@ public class PlayerServlet
                                    final HttpServletResponse response )
         throws Exception
     {
-        // Populate request attributes
-        request.setAttribute( "Players", 
-            DaoFactory.getInstance().getPlayerDao().list() );
-        
-        // process thymeleaf template
-        processTemplate( request, response, "players" );
+        request.setAttribute( "Seasons", 
+            DaoFactory.getInstance().getSeasonDao().list() );
+        processTemplate( request, response, "seasons" );
     }
 
 }

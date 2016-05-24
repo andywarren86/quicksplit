@@ -1,7 +1,6 @@
 package quicksplit.servlet;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +28,7 @@ public class SummaryServlet extends BaseServlet
         SeasonModel season = null;
         if( seasonIdStr == null )
         {
-            season = daoFactory.getSeasonDao().findByDate( new Date() );
+            season = daoFactory.getSeasonDao().findLatestSeason();
         }
         else if( !"ALL".equals( seasonIdStr ) )
         {

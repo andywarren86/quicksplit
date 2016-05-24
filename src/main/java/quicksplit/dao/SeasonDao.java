@@ -9,7 +9,7 @@ public interface SeasonDao
 {
     public SeasonModel findById( long id );
     public SeasonModel findByDate( Date date );
-    public SeasonModel findCurrentSeason();
+    public SeasonModel findLatestSeason();
     public List<SeasonModel> list();
     public long insert( Date startDate, Date endDate );
 }

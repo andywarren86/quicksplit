@@ -9,6 +9,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.thymeleaf.context.WebContext;
+
+import quicksplit.core.QuickSplit;
+
 public abstract class BaseServlet extends HttpServlet
 {
     @Override
@@ -57,6 +61,16 @@ public abstract class BaseServlet extends HttpServlet
         	System.err.println( "Exception occurred processing request" );
         	throw new ServletException( ex );
         }
+    }
+    
+    protected void processTemplate( final HttpServletRequest request, 
+                                    final HttpServletResponse response,
+                                    final String template ) throws IOException
+    {
+        final WebContext context = 
+            new WebContext( request, response, request.getServletContext(), request.getLocale() );
+        QuickSplit.getTemplateEngine()
+            .process( template, context, response.getWriter() );
     }
 
     protected abstract void processRequest( HttpServletRequest req, HttpServletResponse resp )

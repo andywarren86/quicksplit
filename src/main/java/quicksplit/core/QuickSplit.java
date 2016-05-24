@@ -6,10 +6,14 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 
 import org.apache.commons.io.IOUtils;
 import org.h2.jdbcx.JdbcConnectionPool;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.templatemode.TemplateMode;
+import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 import quicksplit.dao.DaoFactory;
 
@@ -17,19 +21,21 @@ public class QuickSplit
 {
     public static final String AMOUNT_PATTERN = "0.00";
     public static final String DATE_PATTERN = "EEE, dd/MM/yyyy";
+    
+    private static TemplateEngine templateEngine;
 
-    public static void Startup()
+    public static void initialise( final ServletContext servletContext )
         throws Exception
     {
         System.out.println( "Quicksplit Startup Initiated" );
         initialiseDatabase();
+        initialiseTemplateEngine( servletContext );
         System.out.println( "Startup complete!" );
     }
 
     private static void initialiseDatabase() throws Exception
     {
-        final String dbUrl =
-            "jdbc:h2:~/quicksplit;AUTO_SERVER=TRUE;TRACE_LEVEL_SYSTEM_OUT=2";
+        final String dbUrl = "jdbc:h2:C:/data/quicksplit;AUTO_SERVER=TRUE";
         final String username = "sa";
         final String password = "";
         final JdbcConnectionPool cp =
@@ -60,6 +66,24 @@ public class QuickSplit
         }
         System.out.println( "Finished initialising database." );
     }
+    
+    private static void initialiseTemplateEngine( final ServletContext servletContext )
+    {
+        System.out.println( "Initialising template engine." );
+        final ServletContextTemplateResolver templateResolver = 
+            new ServletContextTemplateResolver( servletContext );
+        templateResolver.setTemplateMode( TemplateMode.HTML ); 
+        templateResolver.setPrefix( "/WEB-INF/templates/" );
+        templateResolver.setSuffix( ".html" );
+        
+        templateEngine = new TemplateEngine();
+        templateEngine.setTemplateResolver(templateResolver);
+    }
+    
+    public static TemplateEngine getTemplateEngine()
+    {
+        return templateEngine;
+    }
 
     private static void runDbInitScript( final DataSource dataSource )
     {
@@ -82,7 +106,7 @@ public class QuickSplit
     {
         try( Connection connection = dataSource.getConnection() )
         {
-            System.out.println( "Loading data from GitHub." );
+            System.out.println( "Loading default data." );
 
             // load data from github
             final String url = "https://raw.githubusercontent.com/andywarren86/quicksplit/h2/db/";

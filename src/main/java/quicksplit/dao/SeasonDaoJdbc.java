@@ -69,10 +69,26 @@ public class SeasonDaoJdbc
     }
 
     @Override
-    public SeasonModel findCurrentSeason()
+    public SeasonModel findLatestSeason()
     {
-        return findByDate( DateUtils.truncate( new Date(), Calendar.DATE ) );
-    }
+        try( Connection connection = myDataSource.getConnection() )
+        {
+            final PreparedStatement stmt =
+                connection.prepareStatement( 
+                    "select * from season order by dt_start desc" );
+            final ResultSet rs = stmt.executeQuery();
+            if( rs.next() )
+            {
+                return new SeasonModel( rs.getLong( "id_season" ),
+                    rs.getDate( "dt_start" ),
+                    rs.getDate( "dt_end" ) );
+            }
+            return null;
+        }
+        catch( final SQLException e )
+        {
+            throw new RuntimeException( e );
+        }    }
 
     @Override
     public long insert( final Date startDate, final Date endDate )
