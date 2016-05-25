@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>Player List</title>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="../../js/bootstrap.js" th:src="@{js/bootstrap.js}"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
+    <script src="../../js/quicksplit.js" th:src="@{js/quicksplit.js}"></script>
+    
+    <link type="text/css" rel="stylesheet"
+      href="../../css/bootstrap.css" th:href="@{/css/bootstrap.css}">
+    <link type="text/css" rel="stylesheet"
+      href="../../css/bootstrap-theme.css" th:href="@{/css/bootstrap-theme.css}">
+    <link type="text/css" rel="stylesheet"
+      href="../../css/quicksplit.css" th:href="@{/css/quicksplit.css}"/>
+      
+    <script>
+	    $(document).ready( function(){
+	    	
+	    	$( "#edit-player-modal" ).on( "show.bs.modal", function (event) {
+	    		var button = $(event.relatedTarget)
+	    		$(this).find( ":input[name='Id']" ).val( button.data( "id" ) );
+	    		$(this).find( ":input[name='Name']" ).val( button.data( "name" ) );
+	    	});
+
+        $( "#add-player-modal, #edit-player-modal" ).on( "shown.bs.modal", function (event) {
+          $(this).find( "input:text:visible:first" ).focus();
+        });
+
+        var bootstrapOptions = {
+          errorElement: "span",
+          errorClass: "help-block",
+          highlight: function(element, errorClass) {
+            $(element).closest( ".form-group" ).addClass( "has-error" );
+          },
+          unhighlight: function(element, errorClass) {
+            $(element).closest( ".form-group" ).removeClass( "has-error" );
+          }
+        };
+
+        $( "#add-player-modal form, #edit-player-modal form" ).each( function(){
+          $(this).validate( bootstrapOptions );
+        });
+	    	
+	    });
+    </script>
+    
+  </head>
+  
+  <body>
+	  <nav th:replace="fragments :: nav" class="navbar navbar-default navbar-static-top">
+	    <div class="container">
+	    
+	      <div class="navbar-header">
+	        <a class="navbar-brand">Static Navbar</a>
+	      </div>
+	      
+	    </div>
+	  </nav>
+	  
+	  <div class="container">
+	  
+		  <h1>Players</h1>
+		  
+		  <table class="table table-condensed table-striped">
+			  <thead>
+			    <tr>
+			      <th>#</th>
+			      <th>Name</th>
+			      <th></th>
+			    </tr>
+			  </thead>
+			  <tbody th:remove="all-but-first">
+			    <tr th:each="player : ${Players}">
+			      <td th:text="${player.id}">1</td>
+			      <td th:text="${player.name}">Andrew</td>
+			      <td><a href="#" data-toggle="modal" 
+			        th:attr="data-id=${player.id},data-name=${player.name}" 
+			        data-target="#edit-player-modal" data-id="1" data-name="Andrew">Edit</a></td>
+			    </tr>
+			    <tr>
+			       <td>2</td>
+			       <td>Bob</td>
+			       <td>
+			         <a href="#" data-toggle="modal" data-target="#edit-player-modal" 
+			           data-id="2" data-name="Bob">Edit</a>
+			       </td>
+			    </tr>
+	      </tbody>
+		  </table>
+		  
+      <div class="button-row">
+  		  <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#add-player-modal">
+          <span class="glyphicon glyphicon-plus"></span>
+            Add Player
+        </button>
+		  </div>
+		</div>
+		
+		<div class="modal fade" id="edit-player-modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+	        <form th:action="@{/edit-player}" method="post">
+	          <input type="hidden" name="Id"/>
+		        <div class="modal-header">
+			        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			        <h4 class="modal-title">Edit Player</h4>
+			      </div>
+			      <div class="modal-body">
+			        <div class="form-group">
+	              <label for="EditName">Name</label>
+	              <input type="text" required class="form-control" name="Name" id="EditName"/>
+	            </div>
+			      </div>
+			      <div class="modal-footer">
+			        <button type="submit" class="btn btn-primary btn-sm">Save</button>
+			      </div>
+	        </form>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal fade" id="add-player-modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <form th:action="@{/add-player}" method="post">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title">Add Player</h4>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <label for="AddName">Name</label>
+                <input type="text" required class="form-control" name="Name" id="AddName"/>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary btn-sm">Save</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+	  
+	  
+ </body>
+  
+</html>

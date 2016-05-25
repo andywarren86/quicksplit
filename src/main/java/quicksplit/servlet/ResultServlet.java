@@ -27,7 +27,7 @@ public class ResultServlet
         final String seasonIdStr = req.getParameter( "Season" );
         final SeasonModel season = seasonIdStr != null ?
             daoFactory.getSeasonDao().findById( Long.parseLong( seasonIdStr ) ) :
-                daoFactory.getSeasonDao().findCurrentSeason();
+                daoFactory.getSeasonDao().findLatestSeason();
 
         final List<PlayerModel> players =
             daoFactory.getPlayerDao().listBySeason( season.getId() );

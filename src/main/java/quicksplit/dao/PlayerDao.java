@@ -11,5 +11,6 @@ public interface PlayerDao
     public PlayerModel findById( long id );
     public PlayerModel findByName( String name );
     public long insert( String name );
+    public void update( PlayerModel model );
     public void delete( long id );
 }

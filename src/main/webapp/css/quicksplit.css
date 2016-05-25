@@ -60,3 +60,10 @@ ul.pagination {
 .has-error .help-block::before {
   content: "* ";
 }
+
+/*
+ * Buttons
+ */
+.button-row {
+  margin-bottom: 20px;
+}
