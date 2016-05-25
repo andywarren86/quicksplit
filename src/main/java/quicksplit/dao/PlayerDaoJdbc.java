@@ -151,4 +151,22 @@ public class PlayerDaoJdbc
         }
     }
 
+    @Override
+    public void update( final PlayerModel model )
+    {
+        try( Connection connection = myDataSource.getConnection() )
+        {
+            final String sql = 
+                "update player set nm_player = ? where id_player = ?";
+            final PreparedStatement stmt = connection.prepareStatement( sql );
+            stmt.setString( 1, model.getName() );
+            stmt.setLong( 2, model.getId() );
+            stmt.executeUpdate();
+        }
+        catch( final Exception e )
+        {
+            throw new RuntimeException( e );
+        }
+    }
+
 }

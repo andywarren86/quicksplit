@@ -55,7 +55,7 @@
     
     <div class="container">
     
-      <h2>Season list</h2>
+      <h2>Seasons</h2>
       <p class="lead">Here's the list of seasons.</p>
       
       <table class="table table-condensed table-striped">
@@ -71,8 +71,8 @@
             <td>
               <a th:text="${season.id}" th:href="@{/Summary(Season=${season.id})}" href="#">1</a>
             </td>
-            <td th:text="${season.startDate}">Mon, 1 Jan 2016</td>
-            <td th:text="${season.endDate}">Fri, 30 Jun 2016</td>
+            <td th:text="${#dates.format(season.startDate,application.dateFormat)}">Mon, 1 Jan 2016</td>
+            <td th:text="${#dates.format(season.endDate,application.dateFormat)}">Fri, 30 Jun 2016</td>
           </tr>
         </tbody>
       </table>
@@ -91,7 +91,7 @@
           <form th:action="@{/add-season}" method="post">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <h4 class="modal-title" id="myModalLabel">Season Dates</h4>
+              <h4 class="modal-title" id="myModalLabel">Add Season</h4>
             </div>
             <div class="modal-body">
               <div class="form-group">
@@ -104,7 +104,7 @@
               </div>            
             </div>
             <div class="modal-footer">
-              <button type="submit" class="btn btn-primary btn-sm">Create</button>
+              <button type="submit" class="btn btn-primary btn-sm">Save</button>
             </div>
           </form>
         </div>
