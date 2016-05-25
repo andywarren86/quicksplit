@@ -1,10 +1,12 @@
 package quicksplit.core;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Properties;
 
 import javax.sql.DataSource;
 
@@ -18,20 +20,30 @@ public class QuickSplit
     public static final String AMOUNT_PATTERN = "0.00";
     public static final String DATE_PATTERN = "EEE, dd/MM/yyyy";
 
+    private static final Properties properties = new Properties();
+
     public static void Startup()
         throws Exception
     {
         System.out.println( "Quicksplit Startup Initiated" );
+        loadProperties();
         initialiseDatabase();
         System.out.println( "Startup complete!" );
     }
 
+    private static void loadProperties() throws IOException
+    {
+        final String propertiesResource = "/quicksplit.properties";
+        System.out.println( "Loading properties from: " + propertiesResource );
+        properties.load( QuickSplit.class.getResourceAsStream( propertiesResource ) );
+        properties.list( System.out );
+    }
+
     private static void initialiseDatabase() throws Exception
     {
-        final String dbUrl =
-            "jdbc:h2:~/quicksplit;AUTO_SERVER=TRUE;TRACE_LEVEL_SYSTEM_OUT=2";
-        final String username = "sa";
-        final String password = "";
+        final String dbUrl = properties.getProperty( "db.url" );
+        final String username = properties.getProperty( "db.username" );
+        final String password = properties.getProperty( "db.password" );
         final JdbcConnectionPool cp =
             JdbcConnectionPool.create( dbUrl, username, password );
         DaoFactory.init( cp );
@@ -85,7 +97,7 @@ public class QuickSplit
             System.out.println( "Loading data from GitHub." );
 
             // load data from github
-            final String url = "https://raw.githubusercontent.com/andywarren86/quicksplit/h2/db/";
+            final String url = "https://raw.githubusercontent.com/andywarren86/quicksplit/master/db/";
             final String[] tables = new String[] { "player", "season", "game", "result" };
             for( final String table : tables )
             {
