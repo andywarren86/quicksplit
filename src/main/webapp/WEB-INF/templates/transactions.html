@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>Transaction List</title>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="../../js/bootstrap.js" th:src="@{js/bootstrap.js}"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
+    <script src="../../js/quicksplit.js" th:src="@{js/quicksplit.js}"></script>
+    
+    <link type="text/css" rel="stylesheet"
+      href="../../css/bootstrap.css" th:href="@{/css/bootstrap.css}">
+    <link type="text/css" rel="stylesheet"
+      href="../../css/bootstrap-theme.css" th:href="@{/css/bootstrap-theme.css}">
+    <link type="text/css" rel="stylesheet"
+      href="../../css/quicksplit.css" th:href="@{/css/quicksplit.css}"/>
+      
+    <script>
+	    $(document).ready( function(){
+	      
+	    });
+    </script>
+    
+  </head>
+  
+  <body>
+	  <nav th:replace="fragments :: nav" class="navbar navbar-default navbar-static-top">
+	    <div class="container">
+	    
+	      <div class="navbar-header">
+	        <a class="navbar-brand">Static Navbar</a>
+	      </div>
+	      
+	    </div>
+	  </nav>
+	  
+	  <div class="container">
+	  
+		  <h1>Transaction List</h1>
+		  
+		  <table class="table table-condensed table-striped">
+			  <thead>
+			    <tr>
+			      <th>Player #</th>
+			      <th>Season #</th>
+			      <th>Date</th>
+			      <th>Amount</th>
+			      <th>Description</th>
+			    </tr>
+			  </thead>
+			  <tbody>
+			    <tr th:each="transaction : ${Transactions}">
+			      <td th:text="${transaction.playerId}">1</td>
+			      <td th:text="${transaction.seasonId}">2</td>
+			      <td th:text="${transaction.date}">Mon, 21 Mar 1986</td>
+			      <td th:text="${transaction.amount}">-25.60</td>
+			      <td th:text="${transaction.description}">Season #1 loss</td>
+			    </tr>
+          <tr th:remove="all">
+            <td>2</td>
+            <td>2</td>
+            <td>Mon, 21 Mar 1986</td>
+            <td>+12.20</td>
+            <td>Season #1 profit</td>
+          </tr>
+	      </tbody>
+		  </table>
+		  
+      <div class="button-row">
+  		  <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#add-transaction-modal">
+          <span class="glyphicon glyphicon-plus"></span>
+            Record Transaction
+        </button>
+		  </div>
+		</div>
+	  
+	  
+ </body>
+  
+</html>
