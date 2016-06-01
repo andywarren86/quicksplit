@@ -23,12 +23,13 @@
     <script>
 	    $(document).ready( function(){
 
+	      // create modal and pre-populate form
         $( "#add-payment-modal" ).on( "show.bs.modal", function (event) {
           var button = $(event.relatedTarget);
           var row = button.closest( "tr" );
           $(this).find( "#PlayerId" ).val( row.data( "id" ) );
           $(this).find( "#PlayerName" ).val( row.data( "name" ) );
-          var defaultAmount = parseInt( row.data( "amount" ) ) / -100;
+          var defaultAmount = parseInt( row.data( "balance" ) ) / -100;
           $(this).find( "#Amount" ).val( defaultAmount.toFixed(2) );
           $(this).find( "#Date" ).val( new Date().toISOString().slice(0, 10) );
           $(this).find( "#Description" ).val( 
@@ -52,67 +53,56 @@
 	  </nav>
 	  
 	  <div class="container">
-
-      <h1>Outstanding Accounts</h1>
-      <p>Outstanding account balances, click 'Record Payment' to record a payment or withdrawal against that player.</p>
+	  
+      <h3>Outstanding Accounts</h3>
+      <p>Outstanding account balances, click <code>Record Payment</code> to record a payment or withdrawal against that player.</p>
 
       <table class="table table-condensed table-striped">
         <thead>
           <tr>
             <th>Player</th>
-            <th>Outstanding Amount</th>
+            <th>Balance ($)</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
-          <tr data-id="1" data-name="Andrew" data-amount="10000" 
-            th:each="player : ${OutstandingPlayer}">
-            <td>Andrew</td>
-            <td>$100.00</td>
+          <tr data-id="1" data-name="Andrew" data-balance="10000" th:attr="data-id=${e.key.id},data-name=${e.key.name},data-balance=${e.value}"
+            th:each="e : ${Balanaces}">
+            <td th:text="${e.key.name}">Andrew</td>
+            <td th:text="${#numbers.formatDecimal(e.value/100.0,1,2)}">$100.00</td>
             <td>
               <a href="#" data-toggle="modal" data-target="#add-payment-modal">
                 Record Payment
               </a>
             </td>
           </tr>
-          <tr data-id="2" data-player="Zack" data-amount="-20000"
-            th:remove="all">
-            <td>Zack</td>
-            <td>-$200.00</td>
-            <td>
-              <a href="#">Record Payment</a>
-            </td>
-          </tr>
           <tr>
             <td><b>Total</b></td>
-            <td><b>$999.99</b></td>
+            <td><b th:text="${BalanceTotal}">150.00</b></td>
             <td></td>
           </tr>
         </tbody>
       </table>
 	  
-		  <h1>Recent Transactions</h1>
+		  <h3>Recent Transactions</h3>
 		  
 		  <table class="table table-condensed table-striped">
 			  <thead>
 			    <tr>
 			      <th>Player #</th>
-			      <th>Season #</th>
 			      <th>Date</th>
-			      <th>Amount</th>
+			      <th>Amount ($)</th>
 			      <th>Description</th>
 			    </tr>
 			  </thead>
 			  <tbody>
 			    <tr th:each="transaction : ${Transactions}" th:attr="data-id=${transaction.id}">
 			      <td th:text="${transaction.playerId}">1</td>
-			      <td th:text="${transaction.seasonId}">2</td>
-			      <td th:text="${#dates.format(transaction.date)}">Mon, 21 Mar 1986</td>
-			      <td th:text="${transaction.amount}">-25.60</td>
+			      <td th:text="${#dates.format(transaction.date,application.dateFormat)}">Mon, 21 Mar 1986</td>
+			      <td th:text="${#numbers.formatDecimal(transaction.amount/100,1,2)}">-25.60</td>
 			      <td th:text="${transaction.description}">Season #1 loss</td>
 			    </tr>
           <tr th:remove="all">
-            <td>2</td>
             <td>2</td>
             <td>Mon, 21 Mar 1986</td>
             <td>+12.20</td>
@@ -132,6 +122,7 @@
               <h4 class="modal-title">Record Payment</h4>
             </div>
             <div class="modal-body">
+            
               <div class="form-group">
                 <input type="hidden" name="PlayerId" id="PlayerId"/>
                 <label>Player</label>
@@ -152,6 +143,7 @@
                 <label>Description</label>
                 <textarea name="Description" id="Description" class="form-control" rows="2"></textarea>
               </div>
+              
             </div>
             <div class="modal-footer">
               <button type="submit" class="btn btn-primary btn-sm">Save</button>
