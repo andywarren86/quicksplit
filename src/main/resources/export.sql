@@ -1,4 +1,4 @@
-call csvwrite( 'C:\data\player.csv', 'select * from player' );
-call csvwrite( 'C:\data\season.csv', 'select * from season' );
-call csvwrite( 'C:\data\game.csv', 'select * from game' );
-call csvwrite( 'C:\data\result.csv', 'select * from result' );
+call csvwrite( 'C:\data\export\player.csv', 'select * from player' );
+call csvwrite( 'C:\data\export\season.csv', 'select * from season' );
+call csvwrite( 'C:\data\export\game.csv', 'select * from game' );
+call csvwrite( 'C:\data\export\result.csv', 'select * from result' );
