@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>Oustanding Accounts</title>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="../../js/bootstrap.js" th:src="@{js/bootstrap.js}"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
+    <script src="../../js/quicksplit.js" th:src="@{js/quicksplit.js}"></script>
+    
+    <link type="text/css" rel="stylesheet"
+      href="../../css/bootstrap.css" th:href="@{/css/bootstrap.css}"/>
+    <link type="text/css" rel="stylesheet"
+      href="../../css/bootstrap-theme.css" th:href="@{/css/bootstrap-theme.css}"/>
+    <link type="text/css" rel="stylesheet"
+      href="../../css/quicksplit.css" th:href="@{/css/quicksplit.css}"/>
+      
+    <script>
+      $(document).ready( function(){
+
+        // pre-populate modal form
+        $( "#add-payment-modal" ).on( "show.bs.modal", function (event) {
+          var button = $(event.relatedTarget);
+          var row = button.closest( "tr" );
+          $(this).find( "#PlayerId" ).val( row.data( "id" ) );
+          $(this).find( "#PlayerName" ).val( row.data( "name" ) );
+          var defaultAmount = parseInt( row.data( "balance" ) ) / -100;
+          $(this).find( "#Amount" ).val( defaultAmount.toFixed(2) );
+          $(this).find( "#Date" ).val( new Date().toISOString().slice(0, 10) );
+          $(this).find( "#Description" ).val( 
+            defaultAmount > 0 ? "Cash payment" : "Cash withdrawal" );
+        });
+        
+      });
+    </script>
+    
+  </head>
+  
+  <body>
+    <nav th:replace="fragments :: nav" class="navbar navbar-default navbar-static-top">
+      <div class="container">
+      
+        <div class="navbar-header">
+          <a class="navbar-brand">Static Navbar</a>
+        </div>
+        
+      </div>
+    </nav>
+    
+    <div class="container">
+    
+      <h3>Outstanding Accounts</h3>
+      <p>Players with outstanding balances are listed below, click <code>Record Payment</code> to record a payment or withdrawal against that player.</p>
+
+      <table class="table table-condensed table-striped">
+        <thead>
+          <tr>
+            <th>Player</th>
+            <th>Balance ($)</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-id="1" data-name="Andrew" data-balance="10000" th:attr="data-id=${e.key.id},data-name=${e.key.name},data-balance=${e.value}"
+            th:each="e : ${Balances}">
+            <td th:text="${e.key.name}">Andrew</td>
+            <td th:text="${#numbers.formatDecimal(e.value/100.0,1,2)}">100.00</td>
+            <td>
+              <a href="#" data-toggle="modal" data-target="#add-payment-modal">
+                Record Payment
+              </a>
+            </td>
+          </tr>
+          <tr th:remove="all" data-id="2" data-name="Bob" data-balance="-10000">
+            <td>Bob</td>
+            <td>-100.00</td>
+            <td>
+              <a href="#" data-toggle="modal" data-target="#add-payment-modal">
+                Record Payment
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td><b>Total</b></td>
+            <td><b th:text="${BalanceTotal}">150.00</b></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+      
+    </div>
+
+    <div class="modal fade" id="add-payment-modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <form th:action="@{/add-transaction}" method="post">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title">Record Payment</h4>
+            </div>
+            <div class="modal-body">
+            
+              <div class="form-group">
+                <input type="hidden" name="PlayerId" id="PlayerId"/>
+                <label>Player</label>
+                <input type="text" name="PlayerName" id="PlayerName" class="form-control" readonly>
+              </div>
+              <div class="form-group">
+                <label for="Date">Date</label>
+                <input type="date" name="Date" class="form-control" id="Date" required>
+              </div>
+              <div class="form-group">
+                <label for="Amount">Amount</label>
+                <div class="input-group">
+                  <div class="input-group-addon">$</div>
+                  <input type="number" name="Amount" class="form-control" id="Amount" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="Description">Description</label>
+                <textarea name="Description" id="Description" class="form-control" rows="2"></textarea>
+              </div>
+              
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary btn-sm">Save</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    
+    
+  </body>
+  
+</html>

@@ -1,6 +1,7 @@
 package quicksplit.dao;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -72,6 +73,29 @@ public class TransactionDaoJdbc
                 balances.put( player, rs.getLong( "am_balance" ) );
             }
             return balances;
+        }
+        catch( final SQLException e )
+        {
+            throw new RuntimeException( e );
+        }
+    }
+
+    @Override
+    public long insert( final Transaction model )
+    {
+        try( Connection connection = myDataSource.getConnection() )
+        {
+            final String sql = "insert into transaction values ( default, ?, null, ?, ?, ? )";
+            final PreparedStatement stmt = connection.prepareStatement( sql );
+            stmt.setLong( 1, model.getPlayerId() );
+            stmt.setDate( 2, new java.sql.Date( model.getDate().getTime() ) );
+            stmt.setLong( 3, model.getAmount() );
+            stmt.setString( 4, model.getDescription() );
+            stmt.executeUpdate();
+            
+            final ResultSet rs = stmt.getGeneratedKeys();
+            rs.next();
+            return rs.getLong( 1 );
         }
         catch( final SQLException e )
         {

@@ -18,7 +18,7 @@ having am_sum != 0;
  * Only to be used for initial data insert, then can be deleted.
  */
 insert into transaction ( id_player, id_season, dt_transaction, am_transaction, tx_description )
-select id_player, null, dt_transaction+1, am_transaction * -1, 'Cash deposit - Thanks for playing, better luck next time!' from transaction
+select id_player, null, dt_transaction+1, am_transaction * -1, 'Cash payment' from transaction
 where id_season is not null and am_transaction < 0;
 
 insert into transaction ( id_player, id_season, dt_transaction, am_transaction, tx_description )

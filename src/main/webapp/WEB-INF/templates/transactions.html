@@ -24,16 +24,20 @@
 	    $(document).ready( function(){
 
 	      // create modal and pre-populate form
-        $( "#add-payment-modal" ).on( "show.bs.modal", function (event) {
+        $( "#add-modal" ).on( "show.bs.modal", function (event) {
+          /*
           var button = $(event.relatedTarget);
           var row = button.closest( "tr" );
-          $(this).find( "#PlayerId" ).val( row.data( "id" ) );
-          $(this).find( "#PlayerName" ).val( row.data( "name" ) );
           var defaultAmount = parseInt( row.data( "balance" ) ) / -100;
-          $(this).find( "#Amount" ).val( defaultAmount.toFixed(2) );
           $(this).find( "#Date" ).val( new Date().toISOString().slice(0, 10) );
           $(this).find( "#Description" ).val( 
             defaultAmount > 0 ? "Cash payment" : "Cash withdrawal" );
+            */
+        });
+
+        $( "#delete-modal" ).on( "show.bs.modal", function( event ) {
+          var button = $(event).relatedTarget;
+          $(this).find( "#TransactionId" ).value( button.data( "id" ) );
         });
 	      
 	    });
@@ -54,37 +58,32 @@
 	  
 	  <div class="container">
 	  
-      <h3>Outstanding Accounts</h3>
-      <p>Outstanding account balances, click <code>Record Payment</code> to record a payment or withdrawal against that player.</p>
-
-      <table class="table table-condensed table-striped">
-        <thead>
-          <tr>
-            <th>Player</th>
-            <th>Balance ($)</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr data-id="1" data-name="Andrew" data-balance="10000" th:attr="data-id=${e.key.id},data-name=${e.key.name},data-balance=${e.value}"
-            th:each="e : ${Balanaces}">
-            <td th:text="${e.key.name}">Andrew</td>
-            <td th:text="${#numbers.formatDecimal(e.value/100.0,1,2)}">$100.00</td>
-            <td>
-              <a href="#" data-toggle="modal" data-target="#add-payment-modal">
-                Record Payment
-              </a>
-            </td>
-          </tr>
-          <tr>
-            <td><b>Total</b></td>
-            <td><b th:text="${BalanceTotal}">150.00</b></td>
-            <td></td>
-          </tr>
-        </tbody>
-      </table>
-	  
+    <div class="row">
+      <div class="col-sm-6">
 		  <h3>Recent Transactions</h3>
+      </div>
+
+      <div class="col-sm-6">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <form class="form-inline">
+            <div class="form-group">
+              <label>Filter by Player:</label>
+              <select name="PlayerId" id="PlayerId" class="form-control input-sm" th:remove="all-but-first">
+                <option></option>
+                <option>Tom</option>
+                <option>Dick</option>
+                <option>Harry</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-default btn-sm">Apply</button>
+            <button class="btn btn-link">Clear</button>
+          </form>
+        </div>
+      </div>
+      </div>
+
+    </div>
 		  
 		  <table class="table table-condensed table-striped">
 			  <thead>
@@ -93,54 +92,69 @@
 			      <th>Date</th>
 			      <th>Amount ($)</th>
 			      <th>Description</th>
+            <th></th>
 			    </tr>
 			  </thead>
-			  <tbody>
-			    <tr th:each="transaction : ${Transactions}" th:attr="data-id=${transaction.id}">
+			  <tbody th:remove="all-but-first">
+			    <tr th:each="transaction : ${Transactions}">
 			      <td th:text="${transaction.playerId}">1</td>
 			      <td th:text="${#dates.format(transaction.date,application.dateFormat)}">Mon, 21 Mar 1986</td>
 			      <td th:text="${#numbers.formatDecimal(transaction.amount/100,1,2)}">-25.60</td>
 			      <td th:text="${transaction.description}">Season #1 loss</td>
+            <td><a href="#" data-toggle="modal" data-target="#remove-modal" th:attr="data-id=${transaction.id}">Remove</a></td>
 			    </tr>
-          <tr th:remove="all">
+          <tr>
             <td>2</td>
             <td>Mon, 21 Mar 1986</td>
             <td>+12.20</td>
             <td>Season #1 profit</td>
+            <td><a href="#" data-toggle="modal" data-target="#remove-modal">Remove</a></td>
           </tr>
 	      </tbody>
 		  </table>
+
+      <div class="button-row">
+        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#add-modal">
+          <span class="glyphicon glyphicon-plus"></span>
+            Add Transaction
+        </button>
+      </div>
 		  
 		</div>
 
-    <div class="modal fade" id="add-payment-modal" tabindex="-1" role="dialog">
+    <div class="modal fade" id="add-modal" tabindex="-1" role="dialog">
       <div class="modal-dialog modal-sm">
         <div class="modal-content">
-          <form th:action="@{/add-payment}" method="post">
+          <form th:action="@{/add-transaction}" method="post">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <h4 class="modal-title">Record Payment</h4>
+              <h4 class="modal-title">Add Transaction</h4>
             </div>
             <div class="modal-body">
             
               <div class="form-group">
-                <input type="hidden" name="PlayerId" id="PlayerId"/>
-                <label>Player</label>
-                <input type="text" name="PlayerName" id="PlayerName" class="form-control" readonly>
+                <label for="PlayerId">Player</label>
+                <select name="PlayerId" id="PlayerId" class="form-control" th:remove="all-but-first">
+                  <option>Tom</option>
+                  <option>Dick</option>
+                  <option>Harry</option>
+                </select>
               </div>
               <div class="form-group">
                 <label for="Date">Date</label>
-                <input type="date" name="Date" class="form-control" id="Date" required>
+                <input type="date" name="Date" id="Date" class="form-control" 
+                  value="2016-03-21"
+                  th:value="${#dates.format(#dates.createToday(),'yyyy-MM-dd')}"required>
               </div>
               <div class="form-group">
                 <label for="Amount">Amount</label>
                 <div class="input-group">
                   <div class="input-group-addon">$</div>
-                  <input type="number" name="Amount" class="form-control" id="Amount" required>
+                  <input type="number" step="0.05" name="Amount" class="form-control" id="Amount" required>
                 </div>
               </div>
               <div class="form-group">
-                <label>Description</label>
+                <label for="Description">Description</label>
                 <textarea name="Description" id="Description" class="form-control" rows="2"></textarea>
               </div>
               
@@ -153,7 +167,27 @@
       </div>
     </div>
 	  
-	  
+    <div class="modal fade" id="remove-modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <form th:action="@{/remove-transaction}" method="post">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title">Delete Transaction</h4>
+            </div>
+            <div class="modal-body">
+              <input type="hidden" name="TransactionId">
+              <p>Are you sure you wish to remove this transaction?</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Nah</button>
+              <button type="submit" class="btn btn-danger btn-sm">Yeah!</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
   </body>
   
 </html>
