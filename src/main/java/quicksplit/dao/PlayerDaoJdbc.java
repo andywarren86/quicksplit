@@ -81,8 +81,10 @@ public class PlayerDaoJdbc
     {
         try( Connection connection = myDataSource.getConnection() )
         {
-            final String sql = "select * from player where nm_player = " + name;
-            final ResultSet rs = connection.createStatement().executeQuery( sql );
+            final PreparedStatement stmt =
+                connection.prepareStatement( "select * from player where nm_player = ?" );
+            stmt.setString( 1, name );
+            final ResultSet rs = stmt.executeQuery();
             if( rs.next() )
             {
                 final PlayerModel model = new PlayerModel();
@@ -156,7 +158,7 @@ public class PlayerDaoJdbc
     {
         try( Connection connection = myDataSource.getConnection() )
         {
-            final String sql = 
+            final String sql =
                 "update player set nm_player = ? where id_player = ?";
             final PreparedStatement stmt = connection.prepareStatement( sql );
             stmt.setString( 1, model.getName() );
