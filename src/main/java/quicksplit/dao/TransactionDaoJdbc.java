@@ -31,18 +31,11 @@ public class TransactionDaoJdbc
         {
             final List<Transaction> transactions = new ArrayList<>();
             final ResultSet rs = connection.createStatement().executeQuery(
-                "select * from transaction order by dt_transaction desc" );
-            while( rs.next() )
-            {
-                final Transaction transaction = new Transaction();
-                transaction.setId( rs.getLong( "id_transaction" ) );
-                transaction.setPlayerId( rs.getLong( "id_player" ) );
-                final Long seasonId = rs.getLong( "id_season" );
-                transaction.setSeasonId( rs.wasNull() ? null : seasonId );
-                transaction.setDate( rs.getDate( "dt_transaction" ) );
-                transaction.setAmount( rs.getLong( "am_transaction" ) );
-                transaction.setDescription( rs.getString( "tx_description" ) );
-                transactions.add( transaction );
+                "select * from transaction t " +
+                "inner join player p on p.id_player = t.id_player " +
+                "order by dt_transaction desc" );
+            while( rs.next() ) {
+                transactions.add( populateTransaction( rs ) );
             }
             return transactions;
         }
@@ -50,6 +43,47 @@ public class TransactionDaoJdbc
         {
             throw new RuntimeException( e );
         }
+    }
+
+    @Override
+    public List<Transaction> listByPlayer( final long playerId )
+    {
+        try( Connection connection = myDataSource.getConnection() )
+        {
+            final PreparedStatement stmt = connection.prepareStatement(
+                "select * from transaction t " +
+                "inner join player p on p.id_player = t.id_player " +
+                "where p.id_player = ? " +
+                "order by dt_transaction desc" );
+            stmt.setLong( 1, playerId );
+            final ResultSet rs = stmt.executeQuery();
+            final List<Transaction> transactions = new ArrayList<>();
+            while( rs.next() ) {
+                transactions.add( populateTransaction( rs ) );
+            }
+            return transactions;
+        }
+        catch( final SQLException e )
+        {
+            throw new RuntimeException( e );
+        }
+    }
+
+    private Transaction populateTransaction( final ResultSet rs ) throws SQLException
+    {
+        final Transaction transaction = new Transaction();
+        transaction.setId( rs.getLong( "id_transaction" ) );
+        final Long seasonId = rs.getLong( "id_season" );
+        transaction.setSeasonId( rs.wasNull() ? null : seasonId );
+        transaction.setDate( rs.getDate( "dt_transaction" ) );
+        transaction.setAmount( rs.getLong( "am_transaction" ) );
+        transaction.setDescription( rs.getString( "tx_description" ) );
+
+        final PlayerModel player = new PlayerModel();
+        player.setId( rs.getLong( "id_player" ) );
+        player.setName( rs.getString( "nm_player" ) );
+        transaction.setPlayer( player );
+        return transaction;
     }
 
     @Override
@@ -92,10 +126,26 @@ public class TransactionDaoJdbc
             stmt.setLong( 3, model.getAmount() );
             stmt.setString( 4, model.getDescription() );
             stmt.executeUpdate();
-            
+
             final ResultSet rs = stmt.getGeneratedKeys();
             rs.next();
             return rs.getLong( 1 );
+        }
+        catch( final SQLException e )
+        {
+            throw new RuntimeException( e );
+        }
+    }
+
+    @Override
+    public void delete( final long id )
+    {
+        try( Connection connection = myDataSource.getConnection() )
+        {
+            final PreparedStatement stmt = connection.prepareStatement(
+                "delete from transaction where id_transaction = ?" );
+            stmt.setLong( 1, id );
+            stmt.executeUpdate();
         }
         catch( final SQLException e )
         {

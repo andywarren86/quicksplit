@@ -31,9 +31,12 @@
           $(this).find( "#PlayerName" ).val( row.data( "name" ) );
           var defaultAmount = parseInt( row.data( "balance" ) ) / -100;
           $(this).find( "#Amount" ).val( defaultAmount.toFixed(2) );
-          $(this).find( "#Date" ).val( new Date().toISOString().slice(0, 10) );
           $(this).find( "#Description" ).val( 
             defaultAmount > 0 ? "Cash payment" : "Cash withdrawal" );
+        });
+        
+        $( "form" ).each( function(){
+          $(this).validate( bootstrapOptions );
         });
         
       });
@@ -55,9 +58,9 @@
     <div class="container">
     
       <h3>Outstanding Accounts</h3>
-      <p>Players with outstanding balances are listed below, click <code>Record Payment</code> to record a payment or withdrawal against that player.</p>
+      <p>Players with outstanding balances are listed below, click <code>Record Transaction</code> to record a payment or withdrawal against that player.</p>
 
-      <table class="table table-condensed table-striped">
+      <table class="table table-condensed table-striped colour-negative">
         <thead>
           <tr>
             <th>Player</th>
@@ -68,11 +71,11 @@
         <tbody>
           <tr data-id="1" data-name="Andrew" data-balance="10000" th:attr="data-id=${e.key.id},data-name=${e.key.name},data-balance=${e.value}"
             th:each="e : ${Balances}">
-            <td th:text="${e.key.name}">Andrew</td>
+            <td><a href="transactions.html" th:href="@{/transactions(PlayerId=${e.key.id})}" th:text="${e.key.name}">Test</a></td>
             <td th:text="${#numbers.formatDecimal(e.value/100.0,1,2)}">100.00</td>
             <td>
               <a href="#" data-toggle="modal" data-target="#add-payment-modal">
-                Record Payment
+                Record Transaction
               </a>
             </td>
           </tr>
@@ -81,13 +84,13 @@
             <td>-100.00</td>
             <td>
               <a href="#" data-toggle="modal" data-target="#add-payment-modal">
-                Record Payment
+                Record Transaction
               </a>
             </td>
           </tr>
           <tr>
             <td><b>Total</b></td>
-            <td><b th:text="${BalanceTotal}">150.00</b></td>
+            <td><b th:text="${#numbers.formatDecimal(BalanceTotal/100.0,1,2)}">150.00</b></td>
             <td></td>
           </tr>
         </tbody>
@@ -96,12 +99,12 @@
     </div>
 
     <div class="modal fade" id="add-payment-modal" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-sm">
+      <div class="modal-dialog">
         <div class="modal-content">
           <form th:action="@{/add-transaction}" method="post">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <h4 class="modal-title">Record Payment</h4>
+              <h4 class="modal-title">Record Transaction</h4>
             </div>
             <div class="modal-body">
             
@@ -112,7 +115,7 @@
               </div>
               <div class="form-group">
                 <label for="Date">Date</label>
-                <input type="date" name="Date" class="form-control" id="Date" required>
+                <input type="date" name="Date" class="form-control" id="Date" th:value="${#dates.format(#dates.createToday(),'yyyy-MM-dd')}" required>
               </div>
               <div class="form-group">
                 <label for="Amount">Amount</label>
@@ -123,7 +126,7 @@
               </div>
               <div class="form-group">
                 <label for="Description">Description</label>
-                <textarea name="Description" id="Description" class="form-control" rows="2"></textarea>
+                <textarea name="Description" id="Description" class="form-control" rows="2" required></textarea>
               </div>
               
             </div>

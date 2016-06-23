@@ -9,6 +9,8 @@ import quicksplit.model.Transaction;
 public interface TransactionDao
 {
     public List<Transaction> list();
+    public List<Transaction> listByPlayer( long playerId );
     public Map<PlayerModel,Long> listOutstandingBalances();
     public long insert( Transaction model );
+    public void delete( long id );
 }

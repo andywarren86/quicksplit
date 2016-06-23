@@ -6,6 +6,7 @@ public class Transaction
 {
     private long id;
     private long playerId;
+    private PlayerModel player;
     private Long seasonId;
     private Date date;
     private long amount;
@@ -26,6 +27,15 @@ public class Transaction
     public void setPlayerId( final long playerId )
     {
         this.playerId = playerId;
+    }
+    public PlayerModel getPlayer()
+    {
+        return player;
+    }
+    public void setPlayer( final PlayerModel player )
+    {
+        this.player = player;
+        this.playerId = player.getId();
     }
     public Long getSeasonId()
     {

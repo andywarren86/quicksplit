@@ -33,17 +33,6 @@
           $(this).find( "input:text:visible:first" ).focus();
         });
 
-        var bootstrapOptions = {
-          errorElement: "span",
-          errorClass: "help-block",
-          highlight: function(element, errorClass) {
-            $(element).closest( ".form-group" ).addClass( "has-error" );
-          },
-          unhighlight: function(element, errorClass) {
-            $(element).closest( ".form-group" ).removeClass( "has-error" );
-          }
-        };
-
         $( "#add-player-modal form, #edit-player-modal form" ).each( function(){
           $(this).validate( bootstrapOptions );
         });

@@ -22,7 +22,7 @@ import quicksplit.dao.DaoFactory;
 public class QuickSplit
 {
     public static final String AMOUNT_PATTERN = "0.00";
-    public static final String DATE_PATTERN = "EEE, dd/MM/yyyy";
+    public static final String DATE_PATTERN = "EEE, dd MMM yyyy";
 
     private static DataSource dataSource;
     private static TemplateEngine templateEngine;
