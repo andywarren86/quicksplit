@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
-    <title>Oustanding Accounts</title>
+    <title>Account Balances</title>
     
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="../../js/bootstrap.js" th:src="@{js/bootstrap.js}"></script>
@@ -22,22 +22,6 @@
       
     <script>
       $(document).ready( function(){
-
-        // pre-populate modal form
-        $( "#add-payment-modal" ).on( "show.bs.modal", function (event) {
-          var button = $(event.relatedTarget);
-          var row = button.closest( "tr" );
-          $(this).find( "#PlayerId" ).val( row.data( "id" ) );
-          $(this).find( "#PlayerName" ).val( row.data( "name" ) );
-          var defaultAmount = parseInt( row.data( "balance" ) ) / -100;
-          $(this).find( "#Amount" ).val( defaultAmount.toFixed(2) );
-          $(this).find( "#Description" ).val( 
-            defaultAmount > 0 ? "Cash payment" : "Cash withdrawal" );
-        });
-        
-        $( "form" ).each( function(){
-          $(this).validate( bootstrapOptions );
-        });
         
       });
     </script>
@@ -57,15 +41,14 @@
     
     <div class="container">
     
-      <h3>Outstanding Accounts</h3>
-      <p>Players with outstanding balances are listed below, click <code>Record Transaction</code> to record a payment or withdrawal against that player.</p>
+      <h3>Account Balances</h3>
+      <p>All players with an outstanding account balance are listed below. Click a name to view and record transactions against that player.</p>
 
       <table class="table table-condensed table-striped colour-negative">
         <thead>
           <tr>
             <th>Player</th>
             <th>Balance ($)</th>
-            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -73,71 +56,20 @@
             th:each="e : ${Balances}">
             <td><a href="transactions.html" th:href="@{/transactions(PlayerId=${e.key.id})}" th:text="${e.key.name}">Test</a></td>
             <td th:text="${#numbers.formatDecimal(e.value/100.0,1,2)}">100.00</td>
-            <td>
-              <a href="#" data-toggle="modal" data-target="#add-payment-modal">
-                Record Transaction
-              </a>
-            </td>
           </tr>
           <tr th:remove="all" data-id="2" data-name="Bob" data-balance="-10000">
             <td>Bob</td>
             <td>-100.00</td>
-            <td>
-              <a href="#" data-toggle="modal" data-target="#add-payment-modal">
-                Record Transaction
-              </a>
-            </td>
           </tr>
           <tr>
             <td><b>Total</b></td>
             <td><b th:text="${#numbers.formatDecimal(BalanceTotal/100.0,1,2)}">150.00</b></td>
-            <td></td>
           </tr>
         </tbody>
       </table>
       
     </div>
 
-    <div class="modal fade" id="add-payment-modal" tabindex="-1" role="dialog">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <form th:action="@{/add-transaction}" method="post">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <h4 class="modal-title">Record Transaction</h4>
-            </div>
-            <div class="modal-body">
-            
-              <div class="form-group">
-                <input type="hidden" name="PlayerId" id="PlayerId"/>
-                <label>Player</label>
-                <input type="text" name="PlayerName" id="PlayerName" class="form-control" readonly>
-              </div>
-              <div class="form-group">
-                <label for="Date">Date</label>
-                <input type="date" name="Date" class="form-control" id="Date" th:value="${#dates.format(#dates.createToday(),'yyyy-MM-dd')}" required>
-              </div>
-              <div class="form-group">
-                <label for="Amount">Amount</label>
-                <div class="input-group">
-                  <div class="input-group-addon">$</div>
-                  <input type="number" name="Amount" class="form-control" id="Amount" required>
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="Description">Description</label>
-                <textarea name="Description" id="Description" class="form-control" rows="2" required></textarea>
-              </div>
-              
-            </div>
-            <div class="modal-footer">
-              <button type="submit" class="btn btn-primary btn-sm">Save</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-    
     
   </body>
   

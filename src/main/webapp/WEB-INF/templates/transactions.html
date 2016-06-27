@@ -23,11 +23,6 @@
     <script>
 	    $(document).ready( function(){
 
-	      // create modal and pre-populate form
-        $( "#add-modal" ).on( "show.bs.modal", function (event) {
-
-        });
-
         $( "#remove-modal" ).on( "show.bs.modal", function( event ) {
           var button = $(event.relatedTarget);
           $(this).find( "#TransactionId" ).val( button.data( "id" ) );
@@ -57,7 +52,10 @@
 	  
     <div class="row">
       <div class="col-sm-6">
-		    <h3>Transactions</h3>
+		    <h3>
+		      Transaction History
+		      <span th:if="${Player!=null}" th:text="|for ${Player}|">for Player</span>
+		    </h3>
       </div>
 
       <div class="col-sm-6" style="text-align:right">
@@ -85,8 +83,8 @@
 			  </thead>
 			  <tbody>
 			    <tr th:each="transaction : ${Transactions}">
-			      <td th:text="${transaction.player.name}">Gary</td>
-			      <td th:text="${#dates.format(transaction.date,application.dateFormat)}">Mon, 21 Mar 1986</td>
+			      <td th:text="${transaction.player.name}">Player</td>
+			      <td th:text="${#dates.format(transaction.date,'dd MMM yyyy')}">21 Mar 1986</td>
 			      <td th:text="${#numbers.formatDecimal(transaction.amount/100.0,1,2)}">-25.60</td>
 			      <td th:text="${transaction.description}">Season #1 loss</td>
             <td><a href="#" data-toggle="modal" data-target="#remove-modal" th:attr="data-id=${transaction.id}">Remove</a></td>
@@ -106,7 +104,7 @@
       <div class="button-row">
         <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#add-modal">
           <span class="glyphicon glyphicon-plus"></span>
-            Add Transaction
+            Record Transaction
         </button>
       </div>
 		  
@@ -126,7 +124,7 @@
                 <label for="PlayerId">Player</label>
                 <select name="PlayerId" id="PlayerId" class="form-control" required>
                   <option></option>
-                  <option th:each="player : ${Players}" th:value="${player.id}" th:text="${player.name}">Test</option>
+                  <option th:each="player : ${Players}" th:value="${player.id}" th:text="${player.name}" th:selected="${player.name == Player}">Test</option>
                 </select>
               </div>
               <div class="form-group">
@@ -139,12 +137,12 @@
                 <label for="Amount">Amount</label>
                 <div class="input-group">
                   <div class="input-group-addon">$</div>
-                  <input type="number" name="Amount" id="Amount" class="form-control" value="0.00" required>
+                  <input type="number" name="Amount" id="Amount" class="form-control" value="0.00" th:value="${Total!=0}? ${#numbers.formatDecimal(Total/-100.0,1,2)} : '0.00'" required>
                 </div>
               </div>
               <div class="form-group">
                 <label for="Description">Description</label>
-                <textarea name="Description" id="Description" class="form-control" rows="2" required></textarea>
+                <textarea name="Description" id="Description" class="form-control" rows="2" th:text="${Total!=0}? (${Total &lt; 0}? 'Thanks for paying. Better luck next time.' : 'Withdrawal')" required></textarea>
               </div>
               
             </div>

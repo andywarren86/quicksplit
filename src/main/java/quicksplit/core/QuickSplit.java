@@ -65,12 +65,13 @@ public class QuickSplit
                 "select * from information_schema.tables where table_name = 'PLAYER'" );
             if( !rs.next() )
             {
-                System.out.println( "Running init script." );
+                final String backupLocation = "classpath:/backup.sql";
+                System.out.println( "Schema not present. Restoring from backup: " + backupLocation );
                 final String initSql =
                     IOUtils.toString(
-                        QuickSplit.class.getClassLoader().getResourceAsStream( "/init.sql" ) );
+                        QuickSplit.class.getClassLoader().getResourceAsStream( "/backup.sql" ) );
                 connection.createStatement().executeUpdate( initSql );
-                System.out.println( "Finished running init script." );
+                System.out.println( "Finished restoring backup." );
             }
         }
         System.out.println( "Finished initialising database." );
@@ -87,6 +88,7 @@ public class QuickSplit
 
         templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(templateResolver);
+        System.out.println( "Finished initialising template engine." );
     }
 
     public static TemplateEngine getTemplateEngine()
