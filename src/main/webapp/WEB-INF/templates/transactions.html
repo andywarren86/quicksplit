@@ -38,7 +38,7 @@
   </head>
   
   <body>
-	  <nav th:replace="fragments :: nav" class="navbar navbar-default navbar-static-top">
+	  <nav th:replace="fragments :: nav (accounts)" class="navbar navbar-default navbar-static-top">
 	    <div class="container">
 	    
 	      <div class="navbar-header">
@@ -53,52 +53,42 @@
     <div class="row">
       <div class="col-sm-6">
 		    <h3>
-		      Transaction History
-		      <span th:if="${Player!=null}" th:text="|for ${Player}|">for Player</span>
+		      Transaction History for <span th:text="${Player.name}">Player</span>
 		    </h3>
       </div>
 
+      <!-- 
       <div class="col-sm-6" style="text-align:right">
 
           <form class="form-inline" action="transactions" method="get">
             <div class="form-group has-feedback">
-              <input type="text" name="Player" class="form-control input-sm" placeholder="Filter by Player" th:value="${Player}"/>
+              <input type="text" name="Player" class="form-control input-sm" placeholder="Filter by Player" th:value="${Player.name}"/>
               <span class="glyphicon glyphicon-user form-control-feedback" aria-hidden="true"></span>
             </div>
           </form>
 
       </div>
+      -->
 
     </div>
 		  
 		  <table class="table table-condensed table-striped colour-negative">
 			  <thead>
 			    <tr>
-			      <th>Player</th>
-			      <th>Date</th>
-			      <th>Amount ($)</th>
-			      <th>Description</th>
-            <th></th>
+			      <th style="width:20%">Date</th>
+			      <th style="width:40%">Description</th>
+			      <th style="width:20%" class="amount">Amount ($)</th>
+			      <th style="width:20%" class="amount">Total ($)</th>
 			    </tr>
 			  </thead>
 			  <tbody>
 			    <tr th:each="transaction : ${Transactions}">
-			      <td th:text="${transaction.player.name}">Player</td>
 			      <td th:text="${#dates.format(transaction.date,'dd MMM yyyy')}">21 Mar 1986</td>
-			      <td th:text="${#numbers.formatDecimal(transaction.amount/100.0,1,2)}">-25.60</td>
 			      <td th:text="${transaction.description}">Season #1 loss</td>
-            <td><a href="#" data-toggle="modal" data-target="#remove-modal" th:attr="data-id=${transaction.id}">Remove</a></td>
+			      <td class="amount" th:text="${#numbers.formatDecimal(transaction.amount/100.0,1,2)}">-25.60</td>
+			      <td class="amount" th:text="${#numbers.formatDecimal(transaction.total/100.0,1,2)}">0.00</td>
 			    </tr>
 	      </tbody>
-	      <tfoot>
-	        <tr>
-	          <td>Total</td>
-	          <td></td>
-	          <td th:text="${#numbers.formatDecimal(Total/100.0,1,2)}">100.00</td>
-	          <td></td>
-	          <td></td>
-	        </tr>
-	      </tfoot>
 		  </table>
 
       <div class="button-row">
@@ -114,19 +104,14 @@
       <div class="modal-dialog ">
         <div class="modal-content">
           <form th:action="@{/add-transaction}" method="post">
+            <input type="hidden" name="PlayerId" th:value="${Player.id}"/>
+          
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <h4 class="modal-title">Add Transaction</h4>
+              <h4 class="modal-title">Record Transaction</h4>
             </div>
             <div class="modal-body">
             
-              <div class="form-group">
-                <label for="PlayerId">Player</label>
-                <select name="PlayerId" id="PlayerId" class="form-control" required>
-                  <option></option>
-                  <option th:each="player : ${Players}" th:value="${player.id}" th:text="${player.name}" th:selected="${player.name == Player}">Test</option>
-                </select>
-              </div>
               <div class="form-group">
                 <label for="Date">Date</label>
                 <input type="date" name="Date" id="Date" class="form-control" 

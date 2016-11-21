@@ -37,6 +37,10 @@ table td.negative {
   color: #CC1122; 
 }
 
+table th.amount, table td.amount {
+	text-align: right;
+}
+
 table tfoot {
 	font-weight: bold;
 }

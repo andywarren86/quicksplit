@@ -2,7 +2,7 @@
 
   <body>
     
-		<nav th:fragment="nav" class="navbar navbar-default navbar-static-top">
+		<nav th:fragment="nav (tab)" class="navbar navbar-default navbar-static-top">
 		  <div class="container">
 		  
 		    <div class="navbar-header">
@@ -17,12 +17,13 @@
 		    
 		    <div id="navbar" class="navbar-collapse collapse">
 		      <ul class="nav navbar-nav navbar-right">
-		        <li class=""><a th:href="@{/Summary}">Summary</a></li>
-		        <li class=""><a th:href="@{/Results}">Results</a></li>
-		        <li class="dropdown">
+		        <li th:classappend="${tab=='summary'} ? 'active'"><a th:href="@{/Summary}">Season Summary</a></li>
+		        <li th:classappend="${tab=='results'} ? 'active'"><a th:href="@{/Results}">Result Table</a></li>
+		        <li th:classappend="${tab=='accounts'} ? 'active'"><a th:href="@{/outstanding}">Accounts</a></li>
+		        <li class="dropdown" th:classappend="${tab=='admin'} ? 'active'">
 		          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Admin <span class="caret"></span></a>
 		          <ul class="dropdown-menu" role="menu">
-		            <li><a th:href="@{/AddResult}">Add Result</a></li>
+		            <li><a th:href="@{/AddResult}">Record Game</a></li>
 		            <li><a th:href="@{/players}">Players</a></li>
 		            <li><a th:href="@{/seasons}">Seasons</a></li>
 		          </ul>

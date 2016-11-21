@@ -2,7 +2,7 @@
  <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
  <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
  
-   <%@ attribute name="active" required="false" %>
+ <%@ attribute name="active" required="false" %>
    
    <nav class="navbar navbar-default navbar-static-top">
      <div class="container">
@@ -19,13 +19,16 @@
        
        <div id="navbar" class="navbar-collapse collapse">
          <ul class="nav navbar-nav navbar-right">
-           <li class="${active=='Summary'?'active':''}"><a href="Summary">Summary</a></li>
-           <li class="${active=='Results'?'active':''}"><a href="Results">Results</a></li>
+           <li class="${active=='Summary'?'active':''}"><a href="Summary">Season Summary</a></li>
+           <li class="${active=='Results'?'active':''}"><a href="Results">Result Table</a></li>
+           <li><a href="outstanding">Accounts</a></li>
            
            <li class="dropdown ${active=='Admin'?'active':''}">
              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Admin <span class="caret"></span></a>
              <ul class="dropdown-menu" role="menu">
-               <li><a href="AddResult" class="active">Add Result</a></li>
+               <li><a href="AddResult" class="active">Record Game</a></li>
+               <li><a href="players">Players</a></li>
+               <li><a href="seasons">Seasons</a></li>
              </ul>
            </li>
            

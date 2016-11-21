@@ -29,7 +29,7 @@
   </head>
   
   <body>
-    <nav th:replace="fragments :: nav" class="navbar navbar-default navbar-static-top">
+    <nav th:replace="fragments :: nav (accounts)" class="navbar navbar-default navbar-static-top">
       <div class="container">
       
         <div class="navbar-header">
@@ -41,29 +41,29 @@
     
     <div class="container">
     
-      <h3>Account Balances</h3>
-      <p>All players with an outstanding account balance are listed below. Click a name to view and record transactions against that player.</p>
+      <h3>Accounts</h3>
+      <p>Any players with an outstanding account balance are listed below.</p>
+      <p>Click player for transaction history.</p>
 
       <table class="table table-condensed table-striped colour-negative">
         <thead>
           <tr>
-            <th>Player</th>
-            <th>Balance ($)</th>
+            <th style="width:20%">Player</th>
+            <th style="width:20%" class="amount">Balance ($)</th>
+            <th style="width:60%"></th>
           </tr>
         </thead>
         <tbody>
           <tr data-id="1" data-name="Andrew" data-balance="10000" th:attr="data-id=${e.key.id},data-name=${e.key.name},data-balance=${e.value}"
             th:each="e : ${Balances}">
             <td><a href="transactions.html" th:href="@{/transactions(PlayerId=${e.key.id})}" th:text="${e.key.name}">Test</a></td>
-            <td th:text="${#numbers.formatDecimal(e.value/100.0,1,2)}">100.00</td>
-          </tr>
-          <tr th:remove="all" data-id="2" data-name="Bob" data-balance="-10000">
-            <td>Bob</td>
-            <td>-100.00</td>
+            <td class="amount" th:text="${#numbers.formatDecimal(e.value/100.0,1,2)}">100.00</td>
+            <td></td>
           </tr>
           <tr>
             <td><b>Total</b></td>
-            <td><b th:text="${#numbers.formatDecimal(BalanceTotal/100.0,1,2)}">150.00</b></td>
+            <td class="amount"><b th:text="${#numbers.formatDecimal(BalanceTotal/100.0,1,2)}">100.00</b></td>
+            <td></td>
           </tr>
         </tbody>
       </table>

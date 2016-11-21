@@ -54,12 +54,17 @@ public class TransactionDaoJdbc
                 "select * from transaction t " +
                 "inner join player p on p.id_player = t.id_player " +
                 "where p.id_player = ? " +
-                "order by dt_transaction desc" );
+                "order by dt_transaction" );
             stmt.setLong( 1, playerId );
             final ResultSet rs = stmt.executeQuery();
+
             final List<Transaction> transactions = new ArrayList<>();
+            long runningTotal = 0;
             while( rs.next() ) {
-                transactions.add( populateTransaction( rs ) );
+                final Transaction transaction = populateTransaction( rs );
+                runningTotal += transaction.getAmount();
+                transaction.setTotal( runningTotal );
+                transactions.add( transaction );
             }
             return transactions;
         }
@@ -78,11 +83,6 @@ public class TransactionDaoJdbc
         transaction.setDate( rs.getDate( "dt_transaction" ) );
         transaction.setAmount( rs.getLong( "am_transaction" ) );
         transaction.setDescription( rs.getString( "tx_description" ) );
-
-        final PlayerModel player = new PlayerModel();
-        player.setId( rs.getLong( "id_player" ) );
-        player.setName( rs.getString( "nm_player" ) );
-        transaction.setPlayer( player );
         return transaction;
     }
 

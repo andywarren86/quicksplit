@@ -1,5 +1,7 @@
 package quicksplit.servlet;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.annotation.WebServlet;
@@ -38,21 +40,20 @@ public class TransactionServlet
             player = playerDao.findById( Long.parseLong( playerIdStr ) );
         }
 
-        List<Transaction> transactions;
-        if( player != null )
+        if( player == null )
         {
-            transactions = transactionService.listByPlayer( player.getId() );
-            request.setAttribute( "Player", player.getName() );
-        }
-        else
-        {
-            transactions = transactionService.list();
+            throw new IllegalStateException( "Invalid player selected" );
         }
 
-        request.setAttribute( "Transactions", transactions );
-        request.setAttribute( "Total",
-            transactions.stream().mapToLong( t -> t.getAmount() ).sum() );
-        request.setAttribute( "Players", playerDao.list() );
+        final List<Transaction> transactions =
+            transactionService.listByPlayer( player.getId() );
+
+        // reverse transactions to display in descending order
+        final List<Transaction> descTransactions = new ArrayList<>( transactions );
+        Collections.reverse( descTransactions );
+
+        request.setAttribute( "Transactions", descTransactions );
+        request.setAttribute( "Player", player );
 
         // process thymeleaf template
         processTemplate( request, response, "transactions" );
