@@ -25,13 +25,18 @@ public class TransactionAddServlet
         final DateFormat df = new SimpleDateFormat( "yyyy-MM-dd" );
         final Long playerId = Long.parseLong( request.getParameter( "PlayerId" ) );
         final Date date = df.parse( request.getParameter( "Date" ) );
-        final BigDecimal amount = new BigDecimal( request.getParameter( "Amount" ) );
+        final String type = request.getParameter( "Type" );
         final String desc = request.getParameter( "Description" );
+        final BigDecimal amount = new BigDecimal( request.getParameter( "Amount" ) );
+        long centAmount = amount.multiply( BigDecimal.valueOf( 100 ) ).longValue();
+        if( "WITHDRAWAL".equals( type ) ) {
+            centAmount *= -1;
+        }
 
         final Transaction model = new Transaction();
         model.setPlayerId( playerId );
         model.setDate( date );
-        model.setAmount( amount.multiply( BigDecimal.valueOf( 100 ) ).longValue() );
+        model.setAmount( centAmount );
         model.setDescription( desc );
         DaoFactory.getInstance().getTransactionDao().insert( model );
 

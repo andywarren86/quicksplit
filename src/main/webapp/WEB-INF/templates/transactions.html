@@ -31,6 +31,16 @@
         $( "form" ).each( function(){
           $(this).validate( bootstrapOptions );
         });
+        
+        $( "#Type" ).on( "change", function(e){
+          var value = $(this).val();
+          if( value == "DEPOSIT" ) {
+            $( "#Description" ).val( "Thanks for paying. Better luck next time." );
+          }
+          else if( value == "WITHDRAWAL" ) {
+            $( "#Description" ).val( "Withdrawal" );
+          }
+        });
 	      
 	    });
     </script>
@@ -119,15 +129,23 @@
                   th:value="${#dates.format(#dates.createToday(),'yyyy-MM-dd')}" required>
               </div>
               <div class="form-group">
+                <label for="Type">Type</label>
+                <select class="form-control" name="Type" id="Type" required>
+                  <option value=""></option>
+                  <option value="DEPOSIT">Deposit</option>
+                  <option value="WITHDRAWAL">Withdrawal</option>
+                </select>
+              </div>
+              <div class="form-group">
                 <label for="Amount">Amount</label>
                 <div class="input-group">
                   <div class="input-group-addon">$</div>
-                  <input type="number" name="Amount" id="Amount" class="form-control" value="0.00" th:value="${Total!=0}? ${#numbers.formatDecimal(Total/-100.0,1,2)} : '0.00'" required>
+                  <input type="number" name="Amount" id="Amount" class="form-control" value="0.00" required min="0">
                 </div>
               </div>
               <div class="form-group">
                 <label for="Description">Description</label>
-                <textarea name="Description" id="Description" class="form-control" rows="2" th:text="${Total!=0}? (${Total &lt; 0}? 'Thanks for paying. Better luck next time.' : 'Withdrawal')" required></textarea>
+                <textarea name="Description" id="Description" class="form-control" rows="2" required></textarea>
               </div>
               
             </div>
