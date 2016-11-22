@@ -12,31 +12,30 @@ apply plugin: 'java'
 apply plugin: 'war'
 apply plugin: 'eclipse'
 apply plugin: 'com.bmuschko.tomcat'
-apply plugin: 'com.bmuschko.cargo'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    compile 'org.apache.commons:commons-lang3:3.4',
-            'org.apache.commons:commons-io:1.3.2',
-            'com.h2database:h2:1.4.191',
-            'org.thymeleaf:thymeleaf:3.0.0.RELEASE'
+    compile         'org.apache.commons:commons-lang3:3.4',
+                    'org.apache.commons:commons-io:1.3.2',
+                    'com.h2database:h2:1.4.191',
+                    'org.thymeleaf:thymeleaf:3.0.0.RELEASE'
             
-    testCompile 'junit:junit:4.12',
-                'com.codeborne:selenide:4.0'
+    testCompile     'junit:junit:4.12',
+                    'com.codeborne:selenide:4.0'
     
     providedCompile 'javax.servlet:javax.servlet-api:3.1.0',
                     'javax.servlet.jsp:javax.servlet.jsp-api:2.3.2-b02',
                     'javax.el:javax.el-api:3.0.1-b04'
                     
-    runtime 'javax.servlet:jstl:1.2'
+    runtime         'javax.servlet:jstl:1.2'
     
     def tomcatVersion = '8.0.32'
-    tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
-           "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}",
-           "org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}"
+    tomcat          "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
+                    "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}",
+                    "org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}"
 }
 
 tomcat {
@@ -50,16 +49,4 @@ tomcat {
             roles = [ 'tier1' ]
         }
     }
-}
-
-cargo {
-    containerId = 'tomcat8x'
-    port = 80
-    
-    remote {
-        protocol = 'http'
-        hostname = 'localhost'
-        username = 'admin'
-        password = 'admin'
-    }   
 }

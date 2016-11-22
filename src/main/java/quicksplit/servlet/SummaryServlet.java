@@ -15,7 +15,7 @@ import quicksplit.dao.DaoFactory;
 import quicksplit.model.PlayerModel;
 import quicksplit.model.SeasonModel;
 
-@WebServlet({ "/Summary", "/index.html" })
+@WebServlet({ "/summary", "/Summary", "/index.html" })
 public class SummaryServlet extends BaseServlet
 {
     @Override
@@ -58,9 +58,12 @@ public class SummaryServlet extends BaseServlet
         }
 
         req.setAttribute( "playerList", players );
-        req.setAttribute( "stats", statsMap );
+        req.setAttribute( "statMap", statsMap );
         req.setAttribute( "season", season );
-        req.setAttribute( "seasons", daoFactory.getSeasonDao().list() );
-        req.getRequestDispatcher( "/jsp/Summary.jsp"  ).forward( req, resp );
+        req.setAttribute( "seasonList", daoFactory.getSeasonDao().list() );
+
+        // process thymeleaf template
+        final String template = season == null ? "summary-overall" : "summary";
+        processTemplate( req, resp, template );
     }
 }

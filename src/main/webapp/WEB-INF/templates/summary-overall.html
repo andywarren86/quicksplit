@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>QuickSplit: Summary</title>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="../../js/bootstrap.js" th:src="@{js/bootstrap.js}"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
+    <script src="../../js/quicksplit.js" th:src="@{js/quicksplit.js}"></script>
+    <script src="../../js/jquery.tablesorter.min.js" th:src="@{js/jquery.tablesorter.min.js}"></script>
+    
+    <link type="text/css" rel="stylesheet"
+      href="../../css/bootstrap.css" th:href="@{/css/bootstrap.css}">
+    <link type="text/css" rel="stylesheet"
+      href="../../css/bootstrap-theme.css" th:href="@{/css/bootstrap-theme.css}">
+    <link type="text/css" rel="stylesheet"
+      href="../../css/quicksplit.css" th:href="@{/css/quicksplit.css}"/>
+      
+    <script>
+      $(document).ready( function(){
+        
+        // make table sortable
+        var defaultSort = [3,1];
+        $( ".statTable" ).tablesorter({
+          cssAsc: "descending",
+          cssDesc: "ascending",
+          sortList: [defaultSort]
+        });
+        
+      });
+    </script>
+    
+    <style type="text/css">
+      table.statTable td:first-child {
+        text-align: left;
+      }
+    </style>
+    
+  </head>
+  
+  <body>
+    <nav th:replace="fragments :: nav (summary)" class="navbar navbar-default navbar-static-top">
+      <div class="container">
+      
+        <div class="navbar-header">
+          <a class="navbar-brand">Static Navbar</a>
+        </div>
+        
+      </div>
+    </nav>
+    
+    <div class="container">
+    
+      <h1>Summary - Overall</h1>
+
+      <nav>
+        <ul class="pagination pagination-sm">
+          <li th:each="s : ${seasonList}">
+            <a href="#" th:href="@{/summary(Season=${s.id})}" th:text="${s.id}">1</a>
+          </li>
+        </ul>
+        <ul class="pagination pagination-sm">
+          <li class="active"><a href="#" th:href="@{/summary(Season='ALL')}">Overall</a></li>
+        </ul>
+      </nav>
+        
+      <div class="table-responsive" style="margin-bottom: 1em;">
+        <table class="statTable colourNegative">
+          <thead>
+            <tr style="cursor:pointer;">
+              <th>Player</th>
+              <th></th>
+              <th>Count</th>
+              <th>Total</th>
+              <th>Average</th>
+              <th></th>
+              <th>Up<br/>Games</th>
+              <th>Up %</th>
+              <th>Avg. Won</th>
+              <th>Most Won</th>
+              <th></th>
+              <th>Down<br/>Games</th>
+              <th>Down %</th>
+              <th>Avg. Lost</th>
+              <th>Most Lost</th>
+              <th></th>
+              <th>Even<br/>Games</th>
+              <th>Even %</th>
+              <th></th>
+              <th>Up<br/>Streak</th>
+              <th>Up<br/>Streak $</th>
+              <th>Down<br/>Streak</th>
+              <th>Down<br/>Streak $</th>
+            </tr>
+          </thead>
+          
+          <tbody>
+            <tr th:each="player : ${playerList}">
+              <td th:text="${player.name}">Bob</td>
+              <td></td>
+              <td th:text="${statMap[player].count}">0</td>
+              <td th:text="${#numbers.formatDecimal(statMap[player].total/100.0,1,2)}">0.00</td>
+              <td th:text="${#numbers.formatDecimal(statMap[player].average/100.0,1,2)}">0.00</td>
+              <td></td>
+              <td th:text="${statMap[player].winCount}">0</td>
+              <td th:text="${#numbers.formatDecimal(statMap[player].winPercent*100.0,1,0)}+'%'">0%</td>
+              <td th:text="${#numbers.formatDecimal(statMap[player].averageWon/100.0,1,2)}">0.00</td>
+              <td th:text="${#numbers.formatDecimal(statMap[player].mostWon/100.0,1,2)}">0.00</td>
+              <td></td>
+              <td th:text="${statMap[player].lostCount}">0</td>
+              <td th:text="${#numbers.formatDecimal(statMap[player].lostPercent*100.0,1,0)}+'%'">0%</td>
+              <td th:text="${#numbers.formatDecimal(statMap[player].averageLost/100.0,1,2)}">0.00</td>
+              <td th:text="${#numbers.formatDecimal(statMap[player].mostLost/100.0,1,2)}">0.00</td>
+              <td></td>
+              <td th:text="${statMap[player].evenCount}">0</td>
+              <td th:text="${#numbers.formatDecimal(statMap[player].evenPercent*100.0,1,0)}+'%'">0%</td>
+              <td></td>
+              <td th:text="${statMap[player].winStreak}">0</td>
+              <td th:text="${#numbers.formatDecimal(statMap[player].winStreakTotal/100.0,1,2)}">0.00</td>
+              <td th:text="${statMap[player].downStreak}">0</td>
+              <td th:text="${#numbers.formatDecimal(statMap[player].downStreakTotal/100.0,1,2)}">0.00</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    
+    </div>
+    
+ </body>
+  
+</html>
