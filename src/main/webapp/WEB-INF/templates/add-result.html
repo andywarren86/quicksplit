@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>Add Game</title>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="../../js/bootstrap.js" th:src="@{/js/bootstrap.js}"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
+    <script src="../../js/quicksplit.js" th:src="@{/js/quicksplit.js}"></script>
+    
+    <link type="text/css" rel="stylesheet"
+      href="../../css/bootstrap.css" th:href="@{/css/bootstrap.css}">
+    <link type="text/css" rel="stylesheet"
+      href="../../css/bootstrap-theme.css" th:href="@{/css/bootstrap-theme.css}">
+    <link type="text/css" rel="stylesheet"
+      href="../../css/quicksplit.css" th:href="@{/css/quicksplit.css}"/>
+      
+    <script type="text/javascript">
+      
+      function appendNewRow() {
+        var newRow = $( ".result-row:first" ).clone();
+        
+        // clear values
+        newRow.find( ":input" ).val(null);
+        
+        // update index
+        var newIndex = $( ".result-row" ).length;
+        newRow.find( ":input" ).each( function(i,e){
+          $(e).attr( "name", $(e).attr( "name" ).replace( /\[\d+\]/, "["+newIndex+"]" ) );
+        });
+        
+        // remove validation artefacts
+        $( ".form-group", newRow ).removeClass( "has-error" );
+        $( ":input", newRow ).removeAttr( "aria-required aria-describedby aria-invalid" );
+        $( "span.help-block", newRow ).remove();
+        
+        newRow.insertAfter( $( ".result-row:last" ) );
+      }
+      
+      /* Check at least one of the supplied elements has a non-empty value */
+      function hasValue(elem) {
+        return $(elem).filter(function() { return $(this).val(); }).length > 0;
+      }
+      
+      $(document).ready(function(){
+        
+        // ensures there is always an empty row at the bottom
+        $( "form" ).on( "change", ".result-row :input", function(){
+          if( hasValue( $( ".result-row:last :input" ) ) ) {
+            appendNewRow();
+          }
+        });
+        
+        // validate form on submit
+        $( "form" ).validate( bootstrapOptions );
+        
+      });
+      
+    </script>
+    
+    <style>
+      .result-row > div:first-child {
+        padding-left: 0;
+      }
+      .result-row > div:last-child {
+        padding-right: 0;
+      }
+    </style>
+    
+  </head>
+  
+  <body>
+    <nav th:replace="fragments :: nav (admin)" class="navbar navbar-default navbar-static-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand">Static Navbar</a>
+        </div>
+      </div>
+    </nav>
+    
+    <div class="container">
+    
+      <div th:if="${NewGame != null}" class="alert alert-success" role="alert">
+        <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>
+        New game created for <strong th:text="${#dates.format(NewGame.date,'EEE, dd MMM yyyy')}">Mon, 21 Nov 2016</strong>
+      </div>
+    
+      <h1>Create Game</h1>
+      <p class="lead">Enter details below</p>
+      
+      <form name="AddResultForm" method="post" th:action="@{add-result}" autocomplete="off">
+
+        <div class="form-group">
+          <label class="control-label">Game Date</label>
+          <input type="date" class="form-control" name="gameDate" th:value="${#dates.format(addResultForm.gameDate,'yyyy-MM-dd')}" value="2016-01-01" required />
+        </div>
+        
+        <label>Results</label>
+        
+        <div th:each="result,stat : ${addResultForm.results}" class="result-row clearfix">
+
+          <div class="col-xs-7">
+            <div class="form-group">
+              <label class="sr-only">Player</label>
+              <select class="form-control" th:name="|results[${stat.index}].playerId|">
+                <option value="">Select Player</option>
+                <option th:each="player : ${Players}" th:value="${player.id}" th:text="${player.name}" th:selected="${result.playerId==player.id}">Bob</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="col-xs-5">
+            <div class="form-group">
+              <label class="sr-only">Amount</label>
+              <div class="input-group">
+                <div class="input-group-addon">$</div>
+                <input type="number" class="form-control" th:name="|results[${stat.index}].amount|" placeholder="Amount" th:value="${result.amount}"/>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+        
+        <div style="padding-bottom:1em;">
+          <button type="submit" class="btn btn-primary">Create Game</button>
+        </div>
+        
+      </form>
+    </div>
+    
+  </body>
+
+</html>

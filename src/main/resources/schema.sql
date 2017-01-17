@@ -4,33 +4,33 @@ drop table if exists game;
 drop table if exists result;
 drop table if exists transaction;
 
-CREATE TABLE player
+create table player
 (
-  id_player NUMBER NOT NULL PRIMARY KEY auto_increment,
-  nm_player VARCHAR( 255 ) NOT NULL
+  id_player number not null primary key auto_increment,
+  nm_player varchar( 255 ) not null
 );
 
-CREATE TABLE season
+create table season
 (
-  id_season NUMBER NOT NULL PRIMARY KEY auto_increment,
-  dt_start DATE NOT NULL,
-  dt_end DATE NOT NULL
+  id_season number not null primary key auto_increment,
+  dt_start date not null,
+  dt_end date not null
 );
 
-CREATE TABLE game
+create table game
 (
-  id_game NUMBER NOT NULL PRIMARY KEY auto_increment,
-  id_season NUMBER NOT NULL,
-  dt_game DATE NOT NULL,
+  id_game number not null primary key auto_increment,
+  id_season number not null,
+  dt_game date not null,
   
   constraint fk_season foreign key ( id_season ) references season ( id_season )
 );
 
-CREATE TABLE result
+create table result
 (
-  id_game NUMBER NOT NULL,
-  id_player NUMBER NOT NULL,
-  no_result NUMBER NOT NULL,
+  id_game number not null,
+  id_player number not null,
+  no_result number not null,
   
   primary key ( id_game, id_player ),
   constraint fk_result_player foreign key ( id_player ) references player ( id_player ),

@@ -12,23 +12,21 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang3.time.DateUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import quicksplit.model.SeasonModel;
 
+@Component
 public class SeasonDaoJdbc
     implements SeasonDao
 {
-    private final DataSource myDataSource;
-
-    public SeasonDaoJdbc( final DataSource dataSource)
-    {
-        myDataSource = dataSource;
-    }
+    @Autowired DataSource dataSource;
 
     @Override
     public SeasonModel findById( final long id )
     {
-        try( Connection connection = myDataSource.getConnection() )
+        try( Connection connection = dataSource.getConnection() )
         {
             final ResultSet rs = connection.createStatement()
                 .executeQuery( "select * from season where id_season = " + id );
@@ -47,7 +45,7 @@ public class SeasonDaoJdbc
     @Override
     public SeasonModel findByDate( final Date date )
     {
-        try( Connection connection = myDataSource.getConnection() )
+        try( Connection connection = dataSource.getConnection() )
         {
             final PreparedStatement stmt = connection.prepareStatement(
                 "select * from season where dt_start <= ? and dt_end >= ?" );
@@ -71,10 +69,10 @@ public class SeasonDaoJdbc
     @Override
     public SeasonModel findLatestSeason()
     {
-        try( Connection connection = myDataSource.getConnection() )
+        try( Connection connection = dataSource.getConnection() )
         {
             final PreparedStatement stmt =
-                connection.prepareStatement( 
+                connection.prepareStatement(
                     "select * from season order by dt_start desc" );
             final ResultSet rs = stmt.executeQuery();
             if( rs.next() )
@@ -93,7 +91,7 @@ public class SeasonDaoJdbc
     @Override
     public long insert( final Date startDate, final Date endDate )
     {
-        try( Connection connection = myDataSource.getConnection() )
+        try( Connection connection = dataSource.getConnection() )
         {
             final PreparedStatement stmt =
                 connection.prepareStatement( "insert into season values ( default, ?, ? )" );
@@ -114,7 +112,7 @@ public class SeasonDaoJdbc
     @Override
     public List<SeasonModel> list()
     {
-        try( Connection connection = myDataSource.getConnection() )
+        try( Connection connection = dataSource.getConnection() )
         {
             final PreparedStatement stmt =
                 connection.prepareStatement( "select * from season" );

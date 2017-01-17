@@ -8,22 +8,21 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import quicksplit.model.PlayerModel;
 
+@Component
 public class PlayerDaoJdbc
     implements PlayerDao
 {
-    private final DataSource myDataSource;
-
-    public PlayerDaoJdbc( final DataSource dataSource )
-    {
-        myDataSource = dataSource;
-    }
+    @Autowired DataSource dataSource;
 
     @Override
     public long insert( final String name )
     {
-        try( Connection connection = myDataSource.getConnection() )
+        try( Connection connection = dataSource.getConnection() )
         {
             final PreparedStatement stmt =
                 connection.prepareStatement( "insert into player values ( default, ? )" );
@@ -43,7 +42,7 @@ public class PlayerDaoJdbc
     @Override
     public void delete( final long id )
     {
-        try( Connection connection = myDataSource.getConnection() )
+        try( Connection connection = dataSource.getConnection() )
         {
             final String sql = "delete from player where id_player = " + id;
             connection.createStatement().executeUpdate( sql );
@@ -57,7 +56,7 @@ public class PlayerDaoJdbc
     @Override
     public PlayerModel findById( final long id )
     {
-        try( Connection connection = myDataSource.getConnection() )
+        try( Connection connection = dataSource.getConnection() )
         {
             final String sql = "select * from player where id_player = " + id;
             final ResultSet rs = connection.createStatement().executeQuery( sql );
@@ -79,7 +78,7 @@ public class PlayerDaoJdbc
     @Override
     public PlayerModel findByName( final String name )
     {
-        try( Connection connection = myDataSource.getConnection() )
+        try( Connection connection = dataSource.getConnection() )
         {
             final PreparedStatement stmt =
                 connection.prepareStatement( "select * from player where nm_player = ?" );
@@ -103,7 +102,7 @@ public class PlayerDaoJdbc
     @Override
     public List<PlayerModel> list()
     {
-        try( Connection connection = myDataSource.getConnection() )
+        try( Connection connection = dataSource.getConnection() )
         {
             final String sql = "select * from player order by nm_player";
             final ResultSet rs = connection.createStatement().executeQuery( sql );
@@ -126,7 +125,7 @@ public class PlayerDaoJdbc
     @Override
     public List<PlayerModel> listBySeason( final Long seasonId )
     {
-        try( Connection connection = myDataSource.getConnection() )
+        try( Connection connection = dataSource.getConnection() )
         {
             final String sql = "select distinct p.* from player p " +
                 "inner join result r on r.id_player = p.id_player " +
@@ -156,7 +155,7 @@ public class PlayerDaoJdbc
     @Override
     public void update( final PlayerModel model )
     {
-        try( Connection connection = myDataSource.getConnection() )
+        try( Connection connection = dataSource.getConnection() )
         {
             final String sql =
                 "update player set nm_player = ? where id_player = ?";

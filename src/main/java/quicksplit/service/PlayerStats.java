@@ -1,36 +1,56 @@
-package quicksplit.core;
+package quicksplit.service;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * Represents statistics for a player over a series of games.
  */
-public class Stats
+public class PlayerStats
 {
-    long count = 0;
-    long total = 0;
-    double average = 0;
+    private long playerId;
+    private String playerName;
 
-    long winCount = 0;
-    long winTotal = 0;
-    double winPercent = 0;
-    double averageWon = 0;
-    long mostWon = 0;
+    private long count = 0;
+    private long total = 0;
+    private double average = 0;
 
-    long lostCount = 0;
-    long lostTotal = 0;
-    double lostPercent = 0;
-    double averageLost = 0;
-    long mostLost = 0;
+    private long winCount = 0;
+    private long winTotal = 0;
+    private double winPercent = 0;
+    private double averageWon = 0;
+    private long mostWon = 0;
 
-    long evenCount = 0;
-    double evenPercent = 0;
+    private long lostCount = 0;
+    private long lostTotal = 0;
+    private double lostPercent = 0;
+    private double averageLost = 0;
+    private long mostLost = 0;
 
-    long winStreak = 0;
-    long winStreakTotal = 0;
-    long downStreak = 0;
-    long downStreakTotal = 0;
+    private long evenCount = 0;
+    private double evenPercent = 0;
 
+    private long winStreak = 0;
+    private long winStreakTotal = 0;
+    private long downStreak = 0;
+    private long downStreakTotal = 0;
+
+
+    public long getPlayerId()
+    {
+        return playerId;
+    }
+    public void setPlayerId( final long playerId )
+    {
+        this.playerId = playerId;
+    }
+    public String getPlayerName()
+    {
+        return playerName;
+    }
+    public void setPlayerName( final String playerName )
+    {
+        this.playerName = playerName;
+    }
     public long getCount()
     {
         return count;

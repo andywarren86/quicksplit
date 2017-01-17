@@ -17,13 +17,13 @@
 		    
 		    <div id="navbar" class="navbar-collapse collapse">
 		      <ul class="nav navbar-nav navbar-right">
-		        <li th:classappend="${tab=='summary'} ? 'active'"><a th:href="@{/Summary}">Season Summary</a></li>
-		        <li th:classappend="${tab=='results'} ? 'active'"><a th:href="@{/Results}">Result Table</a></li>
-		        <li th:classappend="${tab=='accounts'} ? 'active'"><a th:href="@{/outstanding}">Accounts</a></li>
+		        <li th:classappend="${tab=='summary'} ? 'active'"><a th:href="@{/summary}">Season Summary</a></li>
+		        <li th:classappend="${tab=='results'} ? 'active'"><a th:href="@{/results}">Result Table</a></li>
+		        <li th:classappend="${tab=='accounts'} ? 'active'"><a th:href="@{/accounts}">Accounts</a></li>
 		        <li class="dropdown" th:classappend="${tab=='admin'} ? 'active'">
 		          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Admin <span class="caret"></span></a>
 		          <ul class="dropdown-menu" role="menu">
-		            <li><a th:href="@{/AddResult}">Record Game</a></li>
+		            <li><a th:href="@{/add-result}">Record Game</a></li>
 		            <li><a th:href="@{/players}">Players</a></li>
 		            <li><a th:href="@{/seasons}">Seasons</a></li>
 		          </ul>

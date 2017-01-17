@@ -23,12 +23,19 @@ $( document ).ready( function(){
 
 // default jquery validation options for bootstrap forms
 var bootstrapOptions = {
-  errorElement: "span",
-  errorClass: "help-block",
   highlight: function(element, errorClass) {
     $(element).closest( ".form-group" ).addClass( "has-error" );
   },
   unhighlight: function(element, errorClass) {
     $(element).closest( ".form-group" ).removeClass( "has-error" );
+  },
+  errorElement: "span",
+  errorClass: "help-block",
+  errorPlacement: function(error, element) {
+    if(element.parent('.input-group').length) {
+        error.insertAfter(element.parent());
+    } else {
+        error.insertAfter(element);
+    }
   }
 };

@@ -60,12 +60,12 @@
 
       <nav>
         <ul class="pagination pagination-sm">
-          <li th:each="s : ${seasonList}">
-            <a href="#" th:href="@{/summary(Season=${s.id})}" th:text="${s.id}">1</a>
+          <li th:each="s : ${seasons}">
+            <a href="#" th:href="@{/summary(season=${s.id})}" th:text="${s.id}">1</a>
           </li>
         </ul>
         <ul class="pagination pagination-sm">
-          <li class="active"><a href="#" th:href="@{/summary(Season='ALL')}">Overall</a></li>
+          <li class="active"><a href="#" th:href="@{/summary-overall}">Overall</a></li>
         </ul>
       </nav>
         
@@ -100,30 +100,30 @@
           </thead>
           
           <tbody>
-            <tr th:each="player : ${playerList}">
-              <td th:text="${player.name}">Bob</td>
+            <tr th:each="s : ${stats}">
+              <td th:text="${s.playerName}">Bob</td>
               <td></td>
-              <td th:text="${statMap[player].count}">0</td>
-              <td th:text="${#numbers.formatDecimal(statMap[player].total/100.0,1,2)}">0.00</td>
-              <td th:text="${#numbers.formatDecimal(statMap[player].average/100.0,1,2)}">0.00</td>
+              <td th:text="${s.count}">0</td>
+              <td th:text="${#numbers.formatDecimal(s.total/100.0,1,2)}">0.00</td>
+              <td th:text="${#numbers.formatDecimal(s.average/100.0,1,2)}">0.00</td>
               <td></td>
-              <td th:text="${statMap[player].winCount}">0</td>
-              <td th:text="${#numbers.formatDecimal(statMap[player].winPercent*100.0,1,0)}+'%'">0%</td>
-              <td th:text="${#numbers.formatDecimal(statMap[player].averageWon/100.0,1,2)}">0.00</td>
-              <td th:text="${#numbers.formatDecimal(statMap[player].mostWon/100.0,1,2)}">0.00</td>
+              <td th:text="${s.winCount}">0</td>
+              <td th:text="${#numbers.formatDecimal(s.winPercent*100.0,1,0)}+'%'">0%</td>
+              <td th:text="${#numbers.formatDecimal(s.averageWon/100.0,1,2)}">0.00</td>
+              <td th:text="${#numbers.formatDecimal(s.mostWon/100.0,1,2)}">0.00</td>
               <td></td>
-              <td th:text="${statMap[player].lostCount}">0</td>
-              <td th:text="${#numbers.formatDecimal(statMap[player].lostPercent*100.0,1,0)}+'%'">0%</td>
-              <td th:text="${#numbers.formatDecimal(statMap[player].averageLost/100.0,1,2)}">0.00</td>
-              <td th:text="${#numbers.formatDecimal(statMap[player].mostLost/100.0,1,2)}">0.00</td>
+              <td th:text="${s.lostCount}">0</td>
+              <td th:text="${#numbers.formatDecimal(s.lostPercent*100.0,1,0)}+'%'">0%</td>
+              <td th:text="${#numbers.formatDecimal(s.averageLost/100.0,1,2)}">0.00</td>
+              <td th:text="${#numbers.formatDecimal(s.mostLost/100.0,1,2)}">0.00</td>
               <td></td>
-              <td th:text="${statMap[player].evenCount}">0</td>
-              <td th:text="${#numbers.formatDecimal(statMap[player].evenPercent*100.0,1,0)}+'%'">0%</td>
+              <td th:text="${s.evenCount}">0</td>
+              <td th:text="${#numbers.formatDecimal(s.evenPercent*100.0,1,0)}+'%'">0%</td>
               <td></td>
-              <td th:text="${statMap[player].winStreak}">0</td>
-              <td th:text="${#numbers.formatDecimal(statMap[player].winStreakTotal/100.0,1,2)}">0.00</td>
-              <td th:text="${statMap[player].downStreak}">0</td>
-              <td th:text="${#numbers.formatDecimal(statMap[player].downStreakTotal/100.0,1,2)}">0.00</td>
+              <td th:text="${s.winStreak}">0</td>
+              <td th:text="${#numbers.formatDecimal(s.winStreakTotal/100.0,1,2)}">0.00</td>
+              <td th:text="${s.downStreak}">0</td>
+              <td th:text="${#numbers.formatDecimal(s.downStreakTotal/100.0,1,2)}">0.00</td>
             </tr>
           </tbody>
         </table>

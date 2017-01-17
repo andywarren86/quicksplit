@@ -86,9 +86,9 @@ public class ChromeTest
             .shouldHave( text( "87.90" ) );
 
         $( "button.btn-primary" ).click();
-        $( "#Type" ).selectOption( "Deposit" );
-        $( "#Amount" ).setValue( "1.00" );
-        $( "#Description" ).setValue( "Automated test" );
+        $( "#type" ).selectOption( "Deposit" );
+        $( "#amount" ).setValue( "1.00" );
+        $( "#description" ).setValue( "Automated test" );
         $( ".modal-footer button.btn-primary" ).click();
     }
 

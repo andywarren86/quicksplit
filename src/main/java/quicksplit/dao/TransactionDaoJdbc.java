@@ -11,23 +11,22 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import quicksplit.model.PlayerModel;
 import quicksplit.model.Transaction;
 
+@Component
 public class TransactionDaoJdbc
     implements TransactionDao
 {
-    private final DataSource myDataSource;
-
-    public TransactionDaoJdbc( final DataSource dataSource )
-    {
-        myDataSource = dataSource;
-    }
+    @Autowired DataSource dataSource;
 
     @Override
     public List<Transaction> list()
     {
-        try( Connection connection = myDataSource.getConnection() )
+        try( Connection connection = dataSource.getConnection() )
         {
             final List<Transaction> transactions = new ArrayList<>();
             final ResultSet rs = connection.createStatement().executeQuery(
@@ -48,7 +47,7 @@ public class TransactionDaoJdbc
     @Override
     public List<Transaction> listByPlayer( final long playerId )
     {
-        try( Connection connection = myDataSource.getConnection() )
+        try( Connection connection = dataSource.getConnection() )
         {
             final PreparedStatement stmt = connection.prepareStatement(
                 "select * from transaction t " +
@@ -89,7 +88,7 @@ public class TransactionDaoJdbc
     @Override
     public Map<PlayerModel, Long> listOutstandingBalances()
     {
-        try( Connection connection = myDataSource.getConnection() )
+        try( Connection connection = dataSource.getConnection() )
         {
             final Map<PlayerModel,Long> balances = new LinkedHashMap<>();
             final ResultSet rs = connection.createStatement().executeQuery(
@@ -117,7 +116,7 @@ public class TransactionDaoJdbc
     @Override
     public long insert( final Transaction model )
     {
-        try( Connection connection = myDataSource.getConnection() )
+        try( Connection connection = dataSource.getConnection() )
         {
             final String sql = "insert into transaction values ( default, ?, null, ?, ?, ? )";
             final PreparedStatement stmt = connection.prepareStatement( sql );
@@ -140,7 +139,7 @@ public class TransactionDaoJdbc
     @Override
     public void delete( final long id )
     {
-        try( Connection connection = myDataSource.getConnection() )
+        try( Connection connection = dataSource.getConnection() )
         {
             final PreparedStatement stmt = connection.prepareStatement(
                 "delete from transaction where id_transaction = ?" );

@@ -10,21 +10,20 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import quicksplit.model.GameModel;
 
+@Component
 public class GameDaoJdbc implements GameDao
 {
-    private final DataSource myDataSource;
-
-    public GameDaoJdbc( final DataSource dataSource )
-    {
-        myDataSource = dataSource;
-    }
+    @Autowired DataSource dataSource;
 
     @Override
     public List<GameModel> list()
     {
-        try( Connection connection = myDataSource.getConnection() )
+        try( Connection connection = dataSource.getConnection() )
         {
             final ResultSet rs =
                 connection.createStatement().executeQuery( "select * from game" );
@@ -47,7 +46,7 @@ public class GameDaoJdbc implements GameDao
     @Override
     public List<GameModel> listBySeason( final long seasonId )
     {
-        try( Connection connection = myDataSource.getConnection() )
+        try( Connection connection = dataSource.getConnection() )
         {
             final PreparedStatement stmt =
                 connection.prepareStatement(
@@ -75,7 +74,7 @@ public class GameDaoJdbc implements GameDao
     @Override
     public GameModel findById( final long id )
     {
-        try( Connection connection = myDataSource.getConnection() )
+        try( Connection connection = dataSource.getConnection() )
         {
             final ResultSet rs = connection.createStatement().executeQuery(
                 "select * from game where id_game = " + id );
@@ -98,7 +97,7 @@ public class GameDaoJdbc implements GameDao
     @Override
     public long insert( final long seasonId, final Date date )
     {
-        try( Connection connection = myDataSource.getConnection() )
+        try( Connection connection = dataSource.getConnection() )
         {
             final PreparedStatement stmt =
                 connection.prepareStatement( "insert into game values ( default, ?, ? )" );

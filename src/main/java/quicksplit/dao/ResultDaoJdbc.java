@@ -12,25 +12,24 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import quicksplit.model.GameModel;
 import quicksplit.model.PlayerModel;
 import quicksplit.model.ResultModel;
 
+@Component
 public class ResultDaoJdbc
     implements ResultDao
 {
-    private final DataSource myDataSource;
-
-    public ResultDaoJdbc( final DataSource dataSource  )
-    {
-        myDataSource = dataSource;
-    }
+    @Autowired DataSource dataSource;
+    @Autowired PlayerDao playerDao;
 
     @Override
     public ResultModel getById( final long playerId, final long gameId )
     {
-        try( Connection connection = myDataSource.getConnection() )
+        try( Connection connection = dataSource.getConnection() )
         {
             final ResultSet rs = connection.createStatement().executeQuery(
                 "select * from result "
@@ -54,7 +53,7 @@ public class ResultDaoJdbc
     @Override
     public void insert( final long playerId, final long gameId, final long amount )
     {
-        try( Connection connection = myDataSource.getConnection() )
+        try( Connection connection = dataSource.getConnection() )
         {
             final PreparedStatement stmt =
                 connection.prepareStatement( "insert into result values (?, ?, ?)" );
@@ -72,7 +71,7 @@ public class ResultDaoJdbc
     @Override
     public List<ResultModel> listByPlayer( final long playerId )
     {
-        try( Connection connection = myDataSource.getConnection() )
+        try( Connection connection = dataSource.getConnection() )
         {
             final PreparedStatement stmt = connection.prepareStatement(
                 "select r.* from result r " +
@@ -100,7 +99,7 @@ public class ResultDaoJdbc
     @Override
     public List<ResultModel> listByPlayerSeason( final long playerId, final long seasonId )
     {
-        try( Connection connection = myDataSource.getConnection() )
+        try( Connection connection = dataSource.getConnection() )
         {
             final PreparedStatement stmt = connection.prepareStatement(
                 "select r.* from result r " +
@@ -133,10 +132,9 @@ public class ResultDaoJdbc
     @Override
     public Map<GameModel,List<Long>> generateResultTable( final long seasonId )
     {
-        try( final Connection connection = myDataSource.getConnection() )
+        try( final Connection connection = dataSource.getConnection() )
         {
-            final List<PlayerModel> players =
-                DaoFactory.getInstance().getPlayerDao().listBySeason( seasonId );
+            final List<PlayerModel> players = playerDao.listBySeason( seasonId );
 
             String select = "select g.id_game, g.id_season, g.dt_game";
             String resultJoins = "";

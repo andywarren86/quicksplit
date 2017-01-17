@@ -10,7 +10,7 @@
 /build/
 /bin/
 
-.project
-.classpath
+*.project
+*.classpath
 
-quicksplit.local.properties
+*.db

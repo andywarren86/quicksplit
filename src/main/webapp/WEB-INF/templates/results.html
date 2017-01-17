@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>Results</title>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="../../js/bootstrap.js" th:src="@{/js/bootstrap.js}"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
+    <script src="../../js/quicksplit.js" th:src="@{/js/quicksplit.js}"></script>
+    
+    <link type="text/css" rel="stylesheet"
+      href="../../css/bootstrap.css" th:href="@{/css/bootstrap.css}">
+    <link type="text/css" rel="stylesheet"
+      href="../../css/bootstrap-theme.css" th:href="@{/css/bootstrap-theme.css}">
+    <link type="text/css" rel="stylesheet"
+      href="../../css/quicksplit.css" th:href="@{/css/quicksplit.css}"/>
+      
+    <script>
+      $(document).ready( function(){
+        
+        var bootstrapOptions = {
+          errorElement: "span",
+          errorClass: "help-block",
+          highlight: function(element, errorClass) {
+            $(element).closest( ".form-group" ).addClass( "has-error" );
+          },
+          unhighlight: function(element, errorClass) {
+            $(element).closest( ".form-group" ).removeClass( "has-error" );
+          }
+        };
+
+        $( ".modal form" ).each( function(){
+          $(this).validate( bootstrapOptions );
+        });      
+      });
+    </script>
+    
+  </head>
+  
+  <body>
+    <nav th:replace="fragments :: nav (results)" class="navbar navbar-default navbar-static-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand">Static Navbar</a>
+        </div>
+      </div>
+    </nav>
+    
+    <div class="container">
+    
+      <h1>Results - Season <span th:text="${season.id}">X</span></h1>
+      
+      <h4>
+	      <span th:text="${#dates.format(season.startDate,'EEE, dd MMM yyyy')}">Mon, 1 Jan 2016</span>
+	      to
+	      <span th:text="${#dates.format(season.endDate,'EEE, dd MMM yyyy')}">Fri, 31 Dec 2016</span>
+      </h4>
+      
+      <nav>
+        <ul class="pagination pagination-sm">
+          <li th:each="s : ${seasons}" th:classappend="${s.id}==${season.id}? 'active'">
+            <a href="#" th:href="@{/results(season=${s.id})}" th:text="${s.id}">1</a>
+          </li>
+        </ul>
+      </nav>
+      
+      <div class="table-responsive" style="margin-bottom:1em;">
+        <table class="statTable colourNegative">
+          <thead>
+            <tr>
+              <th></th>
+              <th th:each="p : ${playerList}" th:text="${p.name}">Blah</th>
+            </tr> 
+          </thead>
+          <tbody>
+            <tr th:each="e: ${resultMap}">
+              <td th:text="${#dates.format(e.key.date,'EEE, dd MMM yyyy')}">Mon, 1 Jan 2016</td>
+              <td th:each="amount : ${e.value}">
+                <span th:if="${amount!=null}" th:text="${#numbers.formatDecimal(amount/100.0,1,2)}">999.99</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+    
+  </body>
+
+</html>

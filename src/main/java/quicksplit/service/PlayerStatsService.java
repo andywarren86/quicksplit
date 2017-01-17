@@ -1,44 +1,49 @@
-package quicksplit.servlet;
+package quicksplit.service;
 
 import java.util.List;
 import java.util.LongSummaryStatistics;
 
-import quicksplit.core.Stats;
-import quicksplit.dao.DaoFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import quicksplit.dao.PlayerDao;
+import quicksplit.dao.ResultDao;
+import quicksplit.model.PlayerModel;
 import quicksplit.model.ResultModel;
 
-public class PlayerStatGenerator
+@Service
+public class PlayerStatsService
 {
-    private final Long myPlayerId;
-
-    public PlayerStatGenerator( final Long playerId )
-    {
-        myPlayerId = playerId;
-    }
+    @Autowired ResultDao resultDao;
+    @Autowired PlayerDao playerDao;
 
     /**
      * Generate overall stats
      */
-    public Stats generateStats()
+    public PlayerStats generateStats( final long playerId )
     {
-        final List<ResultModel> results =
-            DaoFactory.getInstance().getResultDao().listByPlayer( myPlayerId );
-        return generate( results );
+        final List<ResultModel> results = resultDao.listByPlayer( playerId );
+        return generateStats( playerId, results );
     }
 
     /**
      * Generate stats for a particular season
      */
-    public Stats generateStats( final Long seasonId )
+    public PlayerStats generateStats( final long playerId, final long seasonId )
     {
         final List<ResultModel> results =
-            DaoFactory.getInstance().getResultDao().listByPlayerSeason( myPlayerId, seasonId );
-        return generate( results );
+            resultDao.listByPlayerSeason( playerId, seasonId );
+        return generateStats( playerId, results );
     }
 
-    private Stats generate( final List<ResultModel> results )
+    private PlayerStats generateStats( final long playerId,
+                                       final List<ResultModel> results )
     {
-        final Stats stats = new Stats();
+        final PlayerStats stats = new PlayerStats();
+
+        final PlayerModel player = playerDao.findById( playerId );
+        stats.setPlayerId( playerId );
+        stats.setPlayerName( player.getName() );
 
         final LongSummaryStatistics summary =
             results.stream().mapToLong( r -> r.getAmount() ).summaryStatistics();
