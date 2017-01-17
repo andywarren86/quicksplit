@@ -1,10 +1,5 @@
 package quicksplit.core;
 
-import java.nio.file.Paths;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -12,8 +7,10 @@ import org.flywaydb.core.Flyway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -22,14 +19,12 @@ import org.springframework.context.annotation.PropertySource;
 import quicksplit.dao.PlayerDao;
 import quicksplit.service.PlayerStatsService;
 
+@SpringBootApplication
 @Configuration
 @PropertySource( "classpath:/quicksplit.properties" )
 @ComponentScan( basePackageClasses={ PlayerStatsService.class, PlayerDao.class })
 public class AppConfig
 {
-    public static final String AMOUNT_PATTERN = "0.00";
-    public static final String DATE_PATTERN = "EEE, dd MMM yyyy";
-
     @Value("${db.driverClassName}")
     private String driverClassName;
 
@@ -44,20 +39,11 @@ public class AppConfig
 
     private static final Logger logger = LoggerFactory.getLogger(AppConfig.class);
 
-    /** app startup tester **/
-    public static void main( final String[] agrs ) throws Exception
+    public static void main( final String[] args )
     {
-        logger.info( "Quicksplit Startup Initiated" );
-        logger.info( "Current dir: " + Paths.get( "." ).toAbsolutePath().toString() );
-
-        // load spring config
-        final AnnotationConfigApplicationContext appConfig =
-            new AnnotationConfigApplicationContext( AppConfig.class );
-
-        printAppContext( appConfig );
-
-        logger.info( "Startup complete!" );
-        appConfig.close();
+        final ConfigurableApplicationContext appContext =
+            SpringApplication.run( AppConfig.class, args );
+        //printAppContext( appContext );
     }
 
     public static void printAppContext( final ApplicationContext applicationContext ) {
@@ -77,6 +63,9 @@ public class AppConfig
     @Bean
     public DataSource dataSource()
     {
+        System.out.println( "Datasource!" );
+        System.out.println( "url: " + url );
+
         final BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDriverClassName( driverClassName );
         dataSource.setUrl( url );
@@ -91,15 +80,6 @@ public class AppConfig
         flyway.setDataSource( dataSource() );
         flyway.migrate();
         return flyway;
-    }
-
-    public static String formatAmount( final int amount )
-    {
-        return new DecimalFormat( AMOUNT_PATTERN ).format( amount/100.0 );
-    }
-    public static String formatDate( final Date d )
-    {
-        return new SimpleDateFormat( DATE_PATTERN ).format( d );
     }
 
 }

@@ -9,7 +9,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.spring4.view.ThymeleafViewResolver;
-import org.thymeleaf.templatemode.TemplateMode;
 
 import quicksplit.controller.SummaryController;
 
@@ -33,8 +32,7 @@ public class WebConfig extends WebMvcConfigurerAdapter{
         //templateResolver.setApplicationContext(this.applicationContext);
         templateResolver.setPrefix("/WEB-INF/templates/");
         templateResolver.setSuffix(".html");
-        // HTML is the default value, added here for the sake of clarity.
-        templateResolver.setTemplateMode(TemplateMode.HTML);
+
         // Template cache is true by default. Set to false if you want
         // templates to be automatically updated when modified.
         templateResolver.setCacheable(true);
@@ -47,7 +45,7 @@ public class WebConfig extends WebMvcConfigurerAdapter{
         // enables Spring's own MessageSource message resolution mechanisms.
         final SpringTemplateEngine templateEngine = new SpringTemplateEngine();
         templateEngine.setTemplateResolver(templateResolver());
-        templateEngine.setEnableSpringELCompiler(false);
+        //templateEngine.setEnableSpringELCompiler(false);
         return templateEngine;
     }
 

@@ -1,60 +1,37 @@
 buildscript {
+    ext {
+      springBootVersion = '1.4.3.RELEASE'
+    }
     repositories {
-        jcenter()
+      mavenCentral()
     }
     dependencies {
-        classpath 'com.bmuschko:gradle-tomcat-plugin:2.2.4',
-                  'com.bmuschko:gradle-cargo-plugin:2.2.2'
+      classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
     }
 }
  
 apply plugin: 'java'
 apply plugin: 'war'
 apply plugin: 'eclipse'
-apply plugin: 'com.bmuschko.tomcat'
 apply plugin: 'project-report'
+apply plugin: 'org.springframework.boot'
+
+sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    compile         'org.springframework:spring-context:4.3.4.RELEASE',
-                    'org.springframework:spring-webmvc:4.3.4.RELEASE',
+    compile         'org.springframework.boot:spring-boot-starter-thymeleaf',
+                    'org.springframework.boot:spring-boot-starter-web',
                     'org.apache.commons:commons-lang3:3.4',
                     'org.apache.commons:commons-io:1.3.2',
                     'org.apache.commons:commons-dbcp2:2.1.1',
-                    'com.h2database:h2:1.4.191',
-                    'org.thymeleaf:thymeleaf:3.0.2.RELEASE',
-                    'org.thymeleaf:thymeleaf-spring4:3.0.2.RELEASE',
-                    'org.flywaydb:flyway-core:4.0.3',
-                    'org.slf4j:slf4j-api:1.7.21',
-                    'org.slf4j:slf4j-log4j12:1.7.21'
+                    'org.flywaydb:flyway-core:4.0.3'
             
-    testCompile     'junit:junit:4.12',
+    testCompile     'junit:junit',
                     'com.codeborne:selenide:4.0'
-    
-    providedCompile 'javax.servlet:javax.servlet-api:3.1.0',
-                    'javax.servlet.jsp:javax.servlet.jsp-api:2.3.2-b02',
-                    'javax.el:javax.el-api:3.0.1-b04'
                     
-    runtime         'javax.servlet:jstl:1.2'
-    
-    def tomcatVersion = '8.0.32'
-    tomcat          "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
-                    "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}",
-                    "org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}"
-}
-
-tomcat {
-    httpPort = 8080
-    stopPort = 8090
-    ajpPort  = 8091
-    users {
-        user {
-            username = 'admin'
-            password = 'admin'
-            roles = [ 'tier1' ]
-        }
-    }
+    runtime         'com.h2database:h2'
 }
